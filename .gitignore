@@ -36,7 +36,7 @@ yarn.lock
 !.vscode/extensions.json
 
 # env
-.env
+.env.local
 
 # public
 /public
