@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Quote } from 'lucide-react';
-import { CommentSection } from '@/components/blog/CommentSection';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
 
 const testimonials = [
@@ -115,11 +114,7 @@ export default function BlogPage() {
                 </ScrollReveal>
               ))}
             </div>
-            
-            {/* Comment Section */}
-            <div className="mt-16">
-              <CommentSection />
-            </div>
+          
           </div>
 
           {/* Fanpage Card */}
