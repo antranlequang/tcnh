@@ -3,6 +3,7 @@
 /node_modules
 /.next
 service-account-key.json
+.DS_Store
 
 # Logs
 logs
@@ -38,6 +39,3 @@ yarn.lock
 
 # env
 .env.local
-
-# public
-/public
