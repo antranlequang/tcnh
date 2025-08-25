@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSheetData } from '@/lib/google-sheets';
+import { google } from "googleapis";
+
+const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON);
+
+const auth = new google.auth.GoogleAuth({
+  credentials: serviceAccount,
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+});
+
+const sheets = google.sheets({ version: "v4", auth });
 
 export async function GET(request: NextRequest) {
   try {
