@@ -131,7 +131,7 @@ export default function AchievementsPage() {
   return (
     <div>
       <PageBanner
-        title="Thành tích chúng tớ đạt được"
+        title="THÀNH TÍCH CHÚNG TỚ ĐẠT ĐƯỢC"
         subtitle='"Góc flexing chỉ là vô tình..."'
         imageUrl="/images/back-ocean.jpg"
         imageHint="trophies awards"

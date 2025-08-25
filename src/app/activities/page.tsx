@@ -253,7 +253,7 @@ export default function ActivitiesPage() {
     return (
         <div>
             <PageBanner
-                title="Hoạt động của chúng tớ"
+                title="HOẠT ĐỘNG CỦA CHÚNG TỚ"
                 subtitle="Các chương trình và sự kiện hấp dẫn mà Đoàn Khoa đã tổ chức."
                 imageUrl="/images/back-ocean.jpg"
                 imageHint="students event"

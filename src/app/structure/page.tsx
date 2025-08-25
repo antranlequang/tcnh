@@ -48,7 +48,8 @@ const departments = [
     shortDescription: "Phong trào vững bước, Tình nguyện vươn xa",
     content: "Ban Phong trào – Tình nguyện được ví như “trái tim” của Đoàn Khoa, nơi nhiệt huyết tuổi trẻ vang vọng qua từng hoạt động, từng sự kiện. \n- Ở mảng Phong trào, ban tổ chức các hoạt động sôi nổi, khơi dậy sức trẻ và sự sáng tạo, đồng thời đồng hành trong chương trình định hướng nghề nghiệp và nghiên cứu khoa học, tạo môi trường phát triển toàn diện cho sinh viên.\n- Với mảng Tình nguyện, ban đảm nhận các hoạt động thiện nguyện như bảo vệ môi trường, giữ gìn an ninh trật tự, tổ chức sân chơi cho thiếu nhi, lan tỏa tinh thần sẻ chia và trách nhiệm cộng đồng.\nÂm thầm nhưng không kém phần quan trọng, ban còn phụ trách hậu cần, quản lý tài chính và chăm lo đời sống tinh thần cho thành viên, giữ cho tập thể luôn gắn kết và tràn đầy năng lượng. Nếu trong bạn vẫn cháy ngọn lửa nhiệt thành, hãy để trái tim mình hòa nhịp cùng Ban Phong trào – Tình nguyện và cùng nhau viết tiếp những câu chuyện đẹp của tuổi trẻ.",
     images: [
-      { src: "/images/ban/pttn/1.JPG"},
+      { src: "/images/ban/pttn/0.jpg"},
+      { src: "/images/ban/pttn/1.jpeg"},
       { src: "/images/ban/pttn/2.jpeg"},
       { src: "/images/ban/pttn/3.jpeg"},
       { src: "/images/ban/pttn/4.JPG"},

@@ -181,8 +181,8 @@ export function ApplicationForm() {
           {/* II. Đoàn khoa */}
           <div className="flex justify-center my-4">
             <Image
-                src="/images/doankhoa.jpg"
-                alt="Teamwork illustration"
+                src="/images/doankhoa1.jpg"
+                alt="DoanKhoa"
                 width={800}
                 height={400}
                 className="rounded-3xl shadow-md"
@@ -316,7 +316,7 @@ export function ApplicationForm() {
             <>
               <div className="flex justify-center my-4">
                 <Image
-                    src="/images/ban/pttn/1.jpeg"
+                    src="/images/ban/pttn/0.jpg"
                     alt="Phong trào - Tình nguyện"
                     width={800}
                     height={400}
