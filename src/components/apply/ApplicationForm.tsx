@@ -287,8 +287,8 @@ export function ApplicationForm() {
             <>
               <div className="flex justify-center my-4">
                 <Image
-                    src="/images/ban/tcxd/0.JPG"
-                    alt="Teamwork illustration"
+                    src="/images/ban/tcxd/0.jpeg"
+                    alt="Tổ chức - Xây dựng Đoàn"
                     width={800}
                     height={400}
                     className="rounded-3xl shadow-md"
