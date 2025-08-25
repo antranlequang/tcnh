@@ -1,31 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
-// Kiểm tra biến môi trường
-if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON) {
-  throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY_JSON is not set');
+// Lazy initialization to avoid build-time errors
+let auth: any;
+let sheets: any;
+
+function initializeGoogleSheets() {
+  if (!auth) {
+    // Kiểm tra biến môi trường
+    if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON) {
+      throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY_JSON is not set');
+    }
+    if (!process.env.GOOGLE_SHEET_ID) {
+      throw new Error('GOOGLE_SHEET_ID is not set');
+    }
+
+    // Parse service account JSON từ biến môi trường
+    const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON);
+
+    // Cấu hình Google Sheets API client
+    auth = new google.auth.GoogleAuth({
+      credentials: {
+        ...serviceAccount,
+        private_key: serviceAccount.private_key.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    sheets = google.sheets({ version: 'v4', auth });
+  }
+  return { auth, sheets };
 }
-if (!process.env.GOOGLE_SHEET_ID) {
-  throw new Error('GOOGLE_SHEET_ID is not set');
-}
-
-// Parse service account JSON từ biến môi trường
-const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON);
-
-// Cấu hình Google Sheets API client
-const auth = new google.auth.GoogleAuth({
-  credentials: {
-    ...serviceAccount,
-    private_key: serviceAccount.private_key.replace(/\\n/g, '\n'),
-  },
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
-
-const sheets = google.sheets({ version: 'v4', auth });
 
 // GET: Lấy dữ liệu từ Google Sheets
 export async function GET(req: NextRequest) {
   try {
+    const { sheets } = initializeGoogleSheets();
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
       range: 'Sheet1!A:C', // chỉnh lại nếu cần
@@ -52,6 +62,7 @@ export async function GET(req: NextRequest) {
 // POST: Ghi dữ liệu vào Google Sheets
 export async function POST(req: NextRequest) {
   try {
+    const { sheets } = initializeGoogleSheets();
     const body = await req.json();
     const { name, email, message } = body;
 
