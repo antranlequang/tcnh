@@ -11,7 +11,7 @@ const departments = [
     shortDescription: 'Vững vàng "Thông tin", sẵn sàng "Gắn kết"',
     content: 'Ban Tổ chức - Xây dựng Đoàn là “Huyết mạch” của Đoàn Khoa, Ban Tổ chức - Xây dựng Đoàn không chỉ truyền cảm hứng “làm Đoàn” cho đoàn viên mà còn là sợi dây liên kết bền chặt giữa các cấp Đoàn với nhau, góp phần tạo nên một khối thống nhất trong mọi hoạt động.\nBan còn đóng vai trò then chốt trong việc truyền đạt các thông tin quan trọng từ Đoàn cấp trên đến Chi đoàn, đảm bảo các hoạt động Đoàn - Hội được diễn ra một cách đồng bộ và hiệu quả. Ban là một nơi tuyệt vời để trau dồi các kỹ năng như xử lý giấy tờ, giao tiếp, viết mail, tổ chức các buổi sinh hoạt và những kỹ năng khác giúp ta tỉ mỉ, cẩn thận hơn trong công việc.\n Đây là nơi hội tụ những con người "trầm tính" nhưng lại mang trong tim “ngọn lửa” vô cùng nhiệt huyết với Đoàn Khoa, với công tác Đoàn - Hội, với phương châm “Tuổi trẻ dấn thân - Cống hiến không ngừng”, Ban Tổ chức - Xây dựng Đoàn sẽ luôn là ngọn cờ đi đầu, nỗ lực vì các hoạt động Đoàn - Hội ngày một vững mạnh.',
     images: [
-      { src: "/images/ban/tcxd/0.jpg"},
+      { src: "/images/ban/tcxd/0.jpeg"},
       { src: "/images/ban/tcxd/1.jpg"},
       { src: "/images/ban/tcxd/2.jpeg"},
       { src: "/images/ban/tcxd/3.jpg"},
