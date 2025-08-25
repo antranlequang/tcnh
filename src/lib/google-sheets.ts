@@ -15,9 +15,9 @@ function normalizePrivateKey(maybeKey?: string) {
 
 // Khởi tạo Google Sheets API client
 // Các nguồn credentials được ưu tiên theo thứ tự:
-// 1) GOOGLE_SERVICE_ACCOUNT_JSON_BASE64 (toàn bộ file JSON ở dạng base64)
-// 2) GOOGLE_CLIENT_EMAIL + GOOGLE_PRIVATE_KEY
-// 3) GOOGLE_SERVICE_ACCOUNT_KEY_FILE (đường dẫn tới file JSON)
+// 1) GOOGLE_SERVICE_ACCOUNT_KEY_JSON (toàn bộ file JSON)
+// 2) GOOGLE_SERVICE_ACCOUNT_JSON_BASE64 (toàn bộ file JSON ở dạng base64)
+// 3) GOOGLE_CLIENT_EMAIL + GOOGLE_PRIVATE_KEY
 
 type ServiceAccountCreds = {
   client_email: string;
@@ -26,25 +26,44 @@ type ServiceAccountCreds = {
 
 let resolvedCreds: ServiceAccountCreds | undefined;
 
-// 1) Base64 JSON
-const base64Json = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64 || process.env.GOOGLE_SERVICE_ACCOUNT_BASE64;
-if (base64Json) {
+// 1) Direct JSON
+const directJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON;
+if (directJson) {
   try {
-    const jsonString = Buffer.from(base64Json, 'base64').toString('utf8');
-    const parsed = JSON.parse(jsonString);
+    const parsed = JSON.parse(directJson);
     if (parsed.client_email && parsed.private_key) {
       resolvedCreds = {
         client_email: String(parsed.client_email),
         private_key: normalizePrivateKey(String(parsed.private_key)) as string,
       };
-      console.log('Using Google Sheets credentials from GOOGLE_SERVICE_ACCOUNT_JSON_BASE64.');
+      console.log('Using Google Sheets credentials from GOOGLE_SERVICE_ACCOUNT_KEY_JSON.');
     }
   } catch (e) {
-    console.warn('Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON_BASE64. Will try other credential sources.');
+    console.warn('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY_JSON. Will try other credential sources.');
   }
 }
 
-// 2) Raw env pair
+// 2) Base64 JSON
+if (!resolvedCreds) {
+  const base64Json = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64 || process.env.GOOGLE_SERVICE_ACCOUNT_BASE64;
+  if (base64Json) {
+    try {
+      const jsonString = Buffer.from(base64Json, 'base64').toString('utf8');
+      const parsed = JSON.parse(jsonString);
+      if (parsed.client_email && parsed.private_key) {
+        resolvedCreds = {
+          client_email: String(parsed.client_email),
+          private_key: normalizePrivateKey(String(parsed.private_key)) as string,
+        };
+        console.log('Using Google Sheets credentials from GOOGLE_SERVICE_ACCOUNT_JSON_BASE64.');
+      }
+    } catch (e) {
+      console.warn('Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON_BASE64. Will try other credential sources.');
+    }
+  }
+}
+
+// 3) Raw env pair
 if (!resolvedCreds) {
   const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
   const normalizedPrivateKey = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
@@ -58,7 +77,7 @@ if (!resolvedCreds) {
   );
   if (clientEmail || process.env.GOOGLE_PRIVATE_KEY) {
     if (!isEnvCredsValid) {
-      console.warn('Env credentials detected but invalid. Falling back to keyFile.');
+      console.warn('Env credentials detected but invalid. No credentials available.');
     } else {
       resolvedCreds = {
         client_email: clientEmail as string,
@@ -69,17 +88,14 @@ if (!resolvedCreds) {
   }
 }
 
-const auth = new google.auth.GoogleAuth(
-  resolvedCreds
-    ? {
-        credentials: resolvedCreds,
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-      }
-    : {
-        keyFile: process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE || './service-account-key.json',
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-      }
-);
+if (!resolvedCreds) {
+  throw new Error('No valid Google Sheets credentials found. Please set GOOGLE_SERVICE_ACCOUNT_KEY_JSON or other credential environment variables.');
+}
+
+const auth = new google.auth.GoogleAuth({
+  credentials: resolvedCreds,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
 
 const sheets = google.sheets({ version: 'v4', auth });
 

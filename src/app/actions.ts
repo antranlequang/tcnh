@@ -1,8 +1,8 @@
 "use server";
 
 import { z } from 'zod';
-import { moderateBlogComments } from '@/ai/flows/moderate-blog-comments';
-import { analyzeApplication } from '@/ai/flows/analyze-application';
+// import { moderateBlogComments } from '@/ai/flows/moderate-blog-comments';
+// import { analyzeApplication } from '@/ai/flows/analyze-application';
 import { ContactFormSchema, CommentFormSchema, ApplicationFormSchema, type ContactFormState, type CommentFormState, type ApplicationFormState } from '@/lib/definitions';
 import { appendApplicationToSheet, appendContactToSheet, appendCommentToSheet } from '@/lib/google-sheets';
 import { google } from "googleapis";
@@ -67,16 +67,16 @@ export async function submitComment(
   const { name, comment, parentId, isAnonymous } = validatedFields.data;
 
   try {
-    // AI content moderation
-    const moderationResult = await moderateBlogComments({ comment });
+    // AI content moderation disabled
+    // const moderationResult = await moderateBlogComments({ comment });
 
-    if (!moderationResult.isSafe) {
-      return {
-        message: "Bình luận không thể đăng do vi phạm quy định cộng đồng.",
-        isSafe: false,
-        reason: moderationResult.reason || "Nội dung không phù hợp với tiêu chuẩn cộng đồng.",
-      };
-    }
+    // if (!moderationResult.isSafe) {
+    //   return {
+    //     message: "Bình luận không thể đăng do vi phạm quy định cộng đồng.",
+    //     isSafe: false,
+    //     reason: moderationResult.reason || "Nội dung không phù hợp với tiêu chuẩn cộng đồng.",
+    //   };
+    // }
 
     // Insert comment into Supabase
     const { error } = await supabase.from("comments").insert({
@@ -194,19 +194,20 @@ export async function submitApplication(
       sheetWriteOk = false;
     }
 
-    // Thử phân tích đơn ứng tuyển (có thể fail)
-    let analysis = '';
-    try {
-      const analysisResult = await analyzeApplication({
-          reason: applicationData.impression,
-          expectation: applicationData.experience,
-          situation: applicationData.teamwork
-      });
-      analysis = analysisResult.analysis || '';
-    } catch (analysisError) {
-      console.error("Error analyzing application:", analysisError);
-      analysis = 'Phân tích tạm thời không khả dụng.';
-    }
+    // AI analysis disabled
+    // let analysis = '';
+    // try {
+    //   const analysisResult = await analyzeApplication({
+    //       reason: applicationData.impression,
+    //       expectation: applicationData.experience,
+    //       situation: applicationData.teamwork
+    //   });
+    //   analysis = analysisResult.analysis || '';
+    // } catch (analysisError) {
+    //   console.error("Error analyzing application:", analysisError);
+    //   analysis = 'Phân tích tạm thời không khả dụng.';
+    // }
+    const analysis = '';
 
     return { 
       message: sheetWriteOk
