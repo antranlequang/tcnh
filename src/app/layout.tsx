@@ -9,6 +9,9 @@ import { Footer } from '@/components/layout/Footer';
 export const metadata: Metadata = {
   title: 'ĐK-TCNH',
   description: 'Trang web của Đoàn khoa Tài chính - Ngân hàng',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({

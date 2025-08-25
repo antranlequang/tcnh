@@ -85,20 +85,40 @@ const sheets = google.sheets({ version: 'v4', auth });
 
 export interface ApplicationData {
   fullName: string;
-  email: string;
+  birthDate: string;
+  gender: string;
+  studentId: string;
+  className: string;
+  schoolEmail: string;
   phone: string;
   facebookLink: string;
-  reason: string;
-  expectation: string;
-  situation: string;
+  currentAddress: string;
+  transport: string;
+  healthIssues: string;
+  strengthsWeaknesses: string;
+  specialSkills: string;
+  
+  impression: string;
+  experience: string;
+  extrovert: string;
+  teamwork: string;
   department: string;
-  portraitPhoto?: File;
+  deptQuestion1: string;
+  deptQuestion2: string;
 }
 
 export interface ContactData {
   name: string;
   email: string;
   message: string;
+}
+
+export interface CommentData {
+  name: string;
+  comment: string;
+  parentId?: number;
+  isAnonymous: boolean;
+  timestamp: string;
 }
 
 export async function appendApplicationToSheet(applicationData: ApplicationData) {
@@ -114,16 +134,28 @@ export async function appendApplicationToSheet(applicationData: ApplicationData)
     // Chuẩn bị dữ liệu để ghi vào sheet
     const values = [
       [
-        new Date().toISOString(), // Timestamp
+        new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
         applicationData.fullName,
-        applicationData.email,
+        applicationData.birthDate,
+        applicationData.gender,
+        applicationData.studentId,
+        applicationData.className,
+        applicationData.schoolEmail,
         applicationData.phone,
         applicationData.facebookLink,
-        applicationData.reason,
-        applicationData.expectation,
-        applicationData.situation,
+        applicationData.currentAddress,
+        applicationData.transport,
+        applicationData.healthIssues,
+        applicationData.strengthsWeaknesses,
+        applicationData.specialSkills,
+        
+        applicationData.impression,
+        applicationData.experience,
+        applicationData.extrovert,
+        applicationData.teamwork,
         applicationData.department,
-        // applicationData.portraitPhoto ? 'Có ảnh' : 'Không có ảnh', // Thông tin về ảnh
+        applicationData.deptQuestion1,
+        applicationData.deptQuestion2,
       ]
     ];
 
@@ -207,5 +239,77 @@ export async function getSheetData() {
   } catch (error) {
     console.error('Error reading from Google Sheet:', error);
     throw new Error(`Failed to read from Google Sheet: ${error}`);
+  }
+}
+
+export async function appendCommentToSheet(commentData: CommentData) {
+  try {
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const range = process.env.GOOGLE_SHEET_RANGE_COMMENTS || 'Comments!A:F';
+
+    if (!spreadsheetId || spreadsheetId === 'demo_sheet_id_replace_with_real_one' || spreadsheetId === 'your_google_sheet_id_here') {
+      console.warn('Google Sheets not configured properly. Data would be saved to:', commentData);
+      return { success: false, message: 'Google Sheets chưa được cấu hình: thiếu GOOGLE_SHEET_ID' };
+    }
+
+    const values = [
+      [
+        commentData.timestamp,
+        commentData.isAnonymous ? 'Ẩn danh' : commentData.name,
+        commentData.comment,
+        commentData.parentId || '',
+        commentData.isAnonymous.toString(),
+        commentData.name,
+      ]
+    ];
+
+    const response = await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values,
+      },
+    });
+
+    console.log('Comment data appended successfully:', response.data);
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
+    return { success: true, message: 'Comment data written to Google Sheet successfully', sheetUrl };
+
+  } catch (error) {
+    console.error('Error writing comment data to Google Sheet:', error);
+    throw new Error(`Failed to write comment data to Google Sheet: ${error}`);
+  }
+}
+
+export async function getCommentsFromSheet(): Promise<CommentData[]> {
+  try {
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const range = process.env.GOOGLE_SHEET_RANGE_COMMENTS || 'Comments!A:F';
+
+    if (!spreadsheetId || spreadsheetId === 'demo_sheet_id_replace_with_real_one') {
+      console.warn('Google Sheets not configured properly. Returning demo data.');
+      return [];
+    }
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
+
+    const rows = response.data.values || [];
+    if (rows.length <= 1) return []; // Skip header row
+
+    return rows.slice(1).map((row, index) => ({
+      name: row[5] || 'Ẩn danh', // Actual name
+      comment: row[2] || '',
+      parentId: row[3] ? parseInt(row[3]) : undefined,
+      isAnonymous: row[4] === 'true',
+      timestamp: row[0] || new Date().toISOString(),
+    }));
+
+  } catch (error) {
+    console.error('Error reading comments from Google Sheet:', error);
+    return [];
   }
 }

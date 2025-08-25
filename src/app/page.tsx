@@ -1,3 +1,5 @@
+"use client";  
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -5,8 +7,37 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ArrowRight } from 'lucide-react';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => setIsVisible(entry.isIntersecting));
+      },
+      { threshold: 0.5 } // 50% video hiển thị mới tính
+    );
+
+    if (videoRef.current) observer.observe(videoRef.current);
+
+    return () => {
+      if (videoRef.current) observer.unobserve(videoRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isVisible) {
+        videoRef.current.play().catch(() => {});
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isVisible]);
+
   const carouselItems = [
     {
       image: "/images/achievement.png",
@@ -69,54 +100,107 @@ export default function Home() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <ScrollReveal>
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="order-1 md:order-2">
-                <Image
-                  src="/images/doankhoa.jpg"
-                  alt="Group of students"
-                  width={700}
-                  height={500}
-                  className="rounded-xl shadow-2xl"
-                  data-ai-hint="students collaborating"
-                />
+            <div className="space-y-16">
+
+              <div className="flex flex-col md:flex-row items-center gap-12 ">
+                <div className="md:w-1/2 space-y-4 text-center">
+                  <h2 className="text-5xl md:text-4xl font-anton font-medium text-primary">
+                    <span className="block md:inline">ĐOÀN KHOA</span>{' '}
+                    <span className="block md:inline mt-3">TÀI CHÍNH - NGÂN HÀNG</span>
+                  </h2>
+                  <p className="font-nunito text-muted-foreground text-lg text-justify">
+                    Đoàn Khoa Tài chính - Ngân hàng tự hào là lực lượng tiên phong trong công tác Đoàn và phong trào thanh niên tại Trường Đại học Kinh tế - Luật. Dưới sự dẫn dắt của Đoàn Trường và Chi ủy - Ban Chủ nhiệm Khoa, Đoàn Khoa Tài chính - Ngân hàng luôn đem đến những hoạt động năng động, nhiệt huyết, với sự tham gia và cống hiến của đông đảo sinh viên.
+                  </p>
+                </div>
+                <div className="md:w-1/2">
+                  <Image
+                    src="/images/doankhoa1.jpg"
+                    alt="Group of students"
+                    width={700}
+                    height={500}
+                    className="rounded-xl shadow-2xl"
+                    data-ai-hint="students collaborating"
+                  />
+                </div>
               </div>
-              <div className="order-2 md:order-1 space-y-4 text-center">
-                <h2 className="text-3xl md:text-4xl font-headline font-semibold text-primary">
-                  <span className="block md:inline">Đoàn khoa</span>{' '}
-                  <span className="block md:inline">Tài chính - Ngân hàng</span>
-                </h2>
-                <p className="text-muted-foreground text-lg text-justify">
-                Đoàn khoa là tổ chức chính trị - xã hội, đóng vai trò là cầu nối, mang các hoạt động và phong trào thanh niên đến gần hơn với sinh viên. Mục tiêu hoạt động của tổ chức này là lấy lợi ích của sinh viên làm trọng tâm, từ đó tổ chức các chương trình thiết thực, giúp sinh viên phát huy những giá trị tốt đẹp và lan tỏa các phong trào tích cực.
-                </p>
+
+              <h2 className="text-5xl md:text-5xl font-passions font-medium text-primary mt-0 text-center italic">"Giữa muôn vàn lựa chọn, chúng ta đã chọn cùng nhau đi qua những tháng năm rực rỡ nhất."</h2>
+              
+              <div className="flex flex-col md:flex-row-reverse items-center gap-12">
+                <div className="md:w-1/2 space-y-4 text-center">
+                  <p className="font-nunito text-muted-foreground text-lg text-justify">
+                  Mái nhà chung mang tên Đoàn khoa Tài chính - Ngân hàng, nơi các bạn có thể tìm thấy những người bạn đồng hành, những tri kỷ cùng chia sẻ đam mê, ước mơ và luôn an toàn, đáng tin cậy cho bạn hạ cánh viết tiếp những câu chuyện thanh xuân tươi đẹp khó phai. Bởi bằng ngọn lửa nhiệt huyết của tuổi trẻ, luôn sẵn sàng cống hiến vì những giá trị cộng đồng cùng tinh thần trách nhiệm và đoàn kết, Đoàn khoa Tài chính - Ngân hàng luôn là “tấm gương soi”, là cầu nối vững chắc, góp phần đưa các hoạt động Đoàn, các phong trào thanh niên tiêu biểu đến với các bạn sinh viên của Trường nói chung và sinh viên Khoa Tài chính - Ngân hàng nói riêng. 
+                  </p>
+                </div>
+                <div className="md:w-1/2">
+                  <Image
+                    src="/images/doankhoa2.jpg"
+                    alt="Group of students"
+                    width={700}
+                    height={500}
+                    className="rounded-xl shadow-2xl"
+                    data-ai-hint="students collaborating"
+                  />
+                </div>
               </div>
+
+              <div className="flex flex-col md:flex-row items-center gap-12">
+                <div className="md:w-1/2 space-y-4 text-center">
+                  <p className="font-nunito text-muted-foreground text-lg text-justify">
+                  Với phương châm đặt lợi ích của sinh viên làm cốt lõi, từng hoạt động, chương trình của Đoàn Khoa không chỉ hứa hẹn sẽ tạo ra một môi trường năng động, sáng tạo và mang đậm dấu ấn riêng, mà còn góp phần nâng cao nhận thức chính trị, bồi dưỡng lý tưởng cách mạng cho đoàn viên, sinh viên. Các hoạt động được thiết kế nhằm hướng đến những nhu cầu thiết thực, kết hợp hài hòa giữa giáo dục chính trị – tư tưởng với phát triển kỹ năng và phong trào, qua đó đem lại cơ hội cho các bạn sinh viên thỏa sức khám phá bản thân, phát huy vai trò của tuổi trẻ, đồng thời lan tỏa những giá trị tích cực đến cộng đồng.
+                  </p>
+                </div>
+                <div className="md:w-1/2">
+                  <Image
+                    src="/images/doankhoa3.jpg"
+                    alt="Group of students"
+                    width={700}
+                    height={500}
+                    className="rounded-xl shadow-2xl"
+                    data-ai-hint="students collaborating"
+                  />
+                </div>
+              </div>
+
             </div>
           </ScrollReveal>
         </div>
       </section>
-
+      
+      <h2 className="text-center text-3xl md:text-5xl font-anton font-medium text-primary mt-14">LÀ MỘT TÂN SINH VIÊN, BẠN SẼ CHỌN GÌ?</h2>
       {/* Video Section */}
       <section className="py-8 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="relative w-full overflow-hidden rounded-xl shadow-2xl" style={{ paddingTop: "56.25%" }}>
-            <iframe
-              className="absolute top-0 left-0 w-full h-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-              src="https://www.youtube.com/embed/Hqmbo0ROBQw?si=0shOzqdwtHBptPjJ&t=32"
-              title="Intro Video"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+          {/* Giới hạn toàn bộ khung video */}
+          <div className="relative max-w-5xl mx-auto overflow-hidden rounded-xl shadow-2xl aspect-video">
+            <video
+              ref={videoRef}
+              className="w-full h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+              src="/videos/video.mp4"
+              controls
+              muted={false} // có tiếng
+              onEnded={() => {
+                const section = document.getElementById("explore-section");
+                if (section) {
+                  section.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+            >
+              Trình duyệt của bạn không hỗ trợ video.
+            </video>
           </div>
         </div>
       </section>
 
       {/* Carousel Section */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 text-center">
+      <section id="explore-section" className="py-16 md:py-24">
+        <div className="container mx-auto px-9 text-center">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-4xl font-headline font-semibold text-primary">TÌM HIỂU VỀ CHÚNG TỚ</h2>
-            <p className="text-muted-foreground font-semibold text-2xl md:text-1xl mx-auto mb-12">
-              Các hoạt động, sự kiện, thành tích nổi bật của Đoàn Khoa mình nè.
+            <h2 className="text-3xl md:text-5xl font-anton font-medium text-primary mt-0">
+              TÌM HIỂU VỀ CHÚNG TỚ
+            </h2>
+            <p className="text-muted-foreground font-nunito font-semibold text-1xl md:text-1xl mx-auto mb-12 mt-5">
+              Các hoạt động, chương trình, sự kiện, thành tích nổi bật của Đoàn Khoa mình nè
             </p>
           </ScrollReveal>
           <Carousel
@@ -158,7 +242,7 @@ export default function Home() {
             <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 transform translate-x-1/2" />
           </Carousel>
 
-          <h2 className="text-3xl md:text-4xl font-headline font-semibold text-primary mt-32">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
+          <h2 className="text-3xl md:text-5xl font-anton font-medium text-primary mt-32">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
           <Image
             src="/images/banner-tuyen.png"
             alt="Extra illustration"

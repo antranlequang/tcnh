@@ -10,7 +10,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"PT Sans"', 'sans-serif'],
+        nunito: ['Nunito','sans-serif'],
+        passions: ['"Passions Conflict"', 'cursive'],
+        anton: ['Anton','sans-serif'],
         headline: ['"Space Grotesk"', 'sans-serif'],
         code: ['monospace'],
       },

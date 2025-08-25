@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Passions+Conflict&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Passions+Conflict&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -103,6 +106,19 @@
   filter: blur(14px);
   pointer-events: none;
 }
+
+/* Font */
+.font-nunito {
+  font-family: 'Nunito', sans-serif;
+}
+.font-passions {
+  font-family: 'Passions Conflict', cursive;
+}
+.font-anton
+n {
+  font-family: 'Anton', sans-serif;
+}
+
 
 /* =============== Visual FX & Animations =============== */
 @layer utilities {
@@ -252,3 +268,4 @@
 .card-sheen:hover::after {
   left: 140%;
 }
+

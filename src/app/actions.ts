@@ -4,8 +4,10 @@ import { z } from 'zod';
 import { moderateBlogComments } from '@/ai/flows/moderate-blog-comments';
 import { analyzeApplication } from '@/ai/flows/analyze-application';
 import { ContactFormSchema, CommentFormSchema, ApplicationFormSchema, type ContactFormState, type CommentFormState, type ApplicationFormState } from '@/lib/definitions';
-import { appendApplicationToSheet, appendContactToSheet } from '@/lib/google-sheets';
-
+import { appendApplicationToSheet, appendContactToSheet, appendCommentToSheet } from '@/lib/google-sheets';
+import { google } from "googleapis";
+import { Readable } from "stream";
+import { supabase } from "@/lib/supabaseClient";
 
 export async function submitContactForm(
   prevState: ContactFormState,
@@ -46,10 +48,14 @@ export async function submitComment(
   prevState: CommentFormState,
   formData: FormData
 ): Promise<CommentFormState> {
-  const validatedFields = CommentFormSchema.safeParse({
-    name: formData.get('name'),
-    comment: formData.get('comment'),
-  });
+  const rawData = {
+    name: formData.get('name')?.toString() || null,
+    comment: formData.get('comment')?.toString() || '',
+    parentId: formData.get('parentId')?.toString() || null,
+    isAnonymous: formData.get('isAnonymous') === 'true',
+  };
+
+  const validatedFields = CommentFormSchema.safeParse(rawData);
 
   if (!validatedFields.success) {
     return {
@@ -58,33 +64,48 @@ export async function submitComment(
     };
   }
 
-  const { name, comment } = validatedFields.data;
+  const { name, comment, parentId, isAnonymous } = validatedFields.data;
 
   try {
+    // AI content moderation
     const moderationResult = await moderateBlogComments({ comment });
 
     if (!moderationResult.isSafe) {
       return {
-        message: "Comment cannot be posted.",
+        message: "Bình luận không thể đăng do vi phạm quy định cộng đồng.",
         isSafe: false,
-        reason: moderationResult.reason || "This comment violates our community guidelines.",
+        reason: moderationResult.reason || "Nội dung không phù hợp với tiêu chuẩn cộng đồng.",
       };
     }
-    
-    // In a real app, you would save the comment to a database here.
-    console.log("New safe comment submitted by:", name);
-    
+
+    // Insert comment into Supabase
+    const { error } = await supabase.from("comments").insert({
+      name: isAnonymous ? null : name,
+      comment,
+      parent_id: parentId,
+      is_anonymous: isAnonymous,
+      avatar: null,
+    });
+
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return {
+        message: "Không thể lưu bình luận. Vui lòng thử lại.",
+        isSafe: false,
+        reason: error.message,
+      };
+    }
+
     return {
-      message: "Your comment has been posted!",
+      message: "Bình luận của bạn đã được đăng thành công!",
       isSafe: true,
     };
-
   } catch (error) {
-    console.error("Error moderating comment:", error);
+    console.error("Error processing comment:", error);
     return {
-      message: "Your comment has been posted! (Moderation service unavailable)",
-      isSafe: true,
-    }
+      message: "Đã có lỗi xảy ra. Vui lòng thử lại.",
+      isSafe: false,
+    };
   }
 }
 
@@ -108,14 +129,26 @@ export async function submitApplication(
 
     const validatedFields = ApplicationFormSchema.safeParse({
       fullName: formData.get('fullName')?.toString() || '',
-      email: formData.get('email')?.toString() || '',
+      birthDate: formData.get('birthDate')?.toString() || '',
+      gender: formData.get('gender')?.toString() || '',
+      studentId: formData.get('studentId')?.toString() || '',
+      className: formData.get('className')?.toString() || '',
+      schoolEmail: formData.get('schoolEmail')?.toString() || '',
       phone: formData.get('phone')?.toString() || '',
       facebookLink: formData.get('facebookLink')?.toString() || '',
+      currentAddress: formData.get('currentAddress')?.toString() || '',
+      transport: formData.get('transport')?.toString() || '',
+      healthIssues: formData.get('healthIssues')?.toString() || '',
+      strengthsWeaknesses: formData.get('strengthsWeaknesses')?.toString() || '',
+      specialSkills: formData.get('specialSkills')?.toString() || '',
       portraitPhoto: formData.get('portraitPhoto') || null,
-      reason: formData.get('reason')?.toString() || '',
-      expectation: formData.get('expectation')?.toString() || '',
-      situation: formData.get('situation')?.toString() || '',
-      department: formData.get('department')?.toString(),
+      impression: formData.get('impression')?.toString() || '',
+      experience: formData.get('experience')?.toString() || '',
+      extrovert: formData.get('extrovert')?.toString() || '',
+      teamwork: formData.get('teamwork')?.toString() || '',
+      department: formData.get('department')?.toString() || '',
+      deptQuestion1: formData.get('deptQuestion1')?.toString() || '',
+      deptQuestion2: formData.get('deptQuestion2')?.toString() || '',
     });
 
     if (!validatedFields.success) {
@@ -137,7 +170,10 @@ export async function submitApplication(
       };
     }
 
-    const applicationData = validatedFields.data;
+    const applicationData = {
+      ...validatedFields.data,
+      healthIssues: validatedFields.data.healthIssues || '',
+    };
 
     // Ghi dữ liệu vào Google Sheet (có thể fail)
     let sheetUrl: string | undefined = undefined;
@@ -162,9 +198,9 @@ export async function submitApplication(
     let analysis = '';
     try {
       const analysisResult = await analyzeApplication({
-          reason: applicationData.reason,
-          expectation: applicationData.expectation,
-          situation: applicationData.situation
+          reason: applicationData.impression,
+          expectation: applicationData.experience,
+          situation: applicationData.teamwork
       });
       analysis = analysisResult.analysis || '';
     } catch (analysisError) {

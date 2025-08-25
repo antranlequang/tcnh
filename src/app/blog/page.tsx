@@ -12,66 +12,66 @@ const testimonials = [
   {
     name: 'PHAN NHẬT MINH TRUNG',
     positions: ['Cựu Bí thư Đoàn Khoa Khóa 18', 'Cựu Trưởng ban Truyền thông - Kỹ thuật Khóa 18', 'Cựu Trưởng ban Tổ chức - Xây dựng Đoàn Khóa 18'],
-    avatar: 'https://placehold.co/100x100.png',
+    avatar: '/images/blog/minhtrung.jpg',
     avatarHint: 'caovannhan',
-    comment: 'Đang cập nhật...'
+    comment: 'Khoảng 4 năm đồng hành cùng Đoàn Khoa Tài chính - Ngân hàng là một hành trình thanh xuân đáng nhớ đối với mình. Cảm ơn Đoàn đã cho mình cơ hội được cống hiến, được trưởng thành và được sống hết mình với đam mê. Những buổi họp thâu đêm, những chương trình thành công rực rỡ và cả những khó khăn, thử thách đều đã trở thành kỷ niệm đẹp nhất. Từng ngày sống trong ngôi nhà chung ấy, mình đã học được cách lắng nghe, thấu hiểu, và quan trọng hơn cả là cách yêu thương. Giờ đây, khi đã thôi nhiệm vụ, mình muốn gửi gắm đến các em khóa sau lời nhắn nhủ chân thành: Hãy luôn giữ trong mình ngọn lửa nhiệt huyết, đam mê, và hãy coi Đoàn Khoa là ngôi nhà thứ hai của mình. Tin mình đi, những trải nghiệm tại đây sẽ là hành trang quý giá nhất trên con đường sự nghiệp và cuộc sống của các em sau này.'
   },
   {
     name: 'CAO VĂN NHÂN',
     positions: ['Cựu Bí thư Đoàn Khoa Khóa 19', 'Cựu Trưởng ban Truyền thông - Kỹ thuật Khóa 19', 'Cựu Trưởng ban Tổ chức - Xây dựng Đoàn Khóa 19'],
-    avatar: 'https://placehold.co/100x100.png',
+    avatar: '/images/blog/vannhan.jpg',
     avatarHint: 'caovannhan',
     comment: 'Chào mấy bạn tân sinh viên ‘mầm non’ nha 🌱. Với anh thì Đoàn Khoa là một ngôi nhà nhỏ – chứa toàn bộ những kỷ niệm đắt giá nhất thời sinh viên. Ban đầu chỉ là tò mò, sôi nổi theo lửa Đoàn, gắn bó với trách nhiệm, cuối cùng là sự tự hào lớn gắn bó trong suốt 4 năm đại học. Ở đây mang theo những kỹ năng, trải nghiệm mới, những hành trình mới, gặp những ‘đồng chí’ cực dễ thương để cùng làm điều mình thích, và quan trọng nhất là bước đệm để trưởng thành hơn. Thế nên là bạn Đoàn không khô khan đâu nha – vui lắm, dễ thương lắm luôn đó! 😉'
   },
   {
     name: 'THÁI DƯƠNG THANH THẢO',
     positions: ['Cựu Phó Bí thư Đoàn Khoa Khóa 19', 'Cựu Trưởng ban Tuyên giáo - Sự kiện Khóa 19'],
-    avatar: 'https://placehold.co/100x100.png',
-    avatarHint: 'caovannhan',
-    comment: 'Đang cập nhật...'
+    avatar: '/images/blog/thanhthao.jpg',
+    avatarHint: 'thanhthao',
+    comment: 'Nhìn lại quãng đường đã qua cùng Đoàn Khoa Tài chính - Ngân hàng, mình nhận ra đó là một hành trình thanh xuân đáng nhớ. Cảm ơn Đoàn đã cho mình cơ hội được cống hiến, được trưởng thành và được sống hết mình với đam mê. Mình đã trải qua đủ mọi cung bậc cảm xúc, từ những đêm thức trắng để chạy chương trình đến những nụ cười rạng rỡ khi dự án thành công. Ở đây, mình đã học được cách lắng nghe, thấu hiểu, và quan trọng hơn cả là cách yêu thương. Đoàn Khoa không chỉ là một tổ chức, mà là một gia đình lớn, nơi mình tìm thấy những người bạn đồng hành và những kỷ niệm vô giá. Giờ đây, khi đã thôi nhiệm vụ, mình muốn gửi gắm đến các em: hãy luôn giữ trong mình ngọn lửa nhiệt huyết, đam mê, và hãy coi Đoàn Khoa là ngôi nhà thứ hai của mình. Tin mình đi, những trải nghiệm tại đây sẽ là hành trang quý giá nhất trên con đường sự nghiệp và cuộc sống của các em sau này.'
   },
   {
     name: 'NGUYỄN NGỌC HÂN',
     positions: ['Cựu Bí thư Đoàn Khoa Khóa 20', 'Cựu Phó ban Truyền thông - Kỹ thuật Khóa 20', 'Cựu Trưởng ban Tổ chức - Xây dựng Đoàn Khóa 20'],
-    avatar: 'https://placehold.co/100x100.png',
+    avatar: '/images/blog/ngochan.JPG',
     avatarHint: 'nguyenngochan',
-    comment: 'Đang cập nhật...'
+    comment: '4 năm Đại học gắn bó với Đoàn Khoa là khoảng thời gian mình nhận ra bản thân nhiều hơn. Ở đây, mình có cơ hội được bắt đầu những thứ mình chưa từng nghĩ là sẽ làm, được trau dồi các kỹ năng, tổ chức sự kiện cho hàng trăm bạn sinh viên, hay đơn giản là học cách lắng nghe và làm việc với nhiều tính cách khác nhau. Có lúc vui vì mọi thứ trơn tru, cũng có lúc mệt vì áp lực deadline chồng chất. Nhưng nhờ vậy mình biết mình chịu được đến đâu, mạnh ở điểm nào và yếu ở đâu. Đoàn Khoa với mình không chỉ là một “hoạt động ngoại khóa” để ghi CV, mà còn là nơi mang đến cho mình hành trang ra trường kỹ lưỡng và hoàn thiện nhất. Nếu không gặp ĐK, bản thân mình sẽ chỉ là một phiên bản an toàn hơn, ít trải nghiệm và ít câu chuyện để kể hơn rất nhiều. Cảm ơn Đoàn Khoa Tài chính - Ngân hàng rất nhiều!'
   },
   {
     name: 'ĐÀO THỊ THÙY DUNG',
     positions: ['Nguyên Bí thư Đoàn Khoa Khóa 21', 'Cựu Trưởng ban Tổ chức - Xây dựng Đoàn Khóa 21'],
-    avatar: 'https://placehold.co/100x100.png',
+    avatar: '/images/blog/thuydung.jpg',
     avatarHint: 'thuydung',
-    comment: 'Đang cập nhật...'
+    comment: 'Hellu mấy bạn tân sinh diên nhó 🙋‍♀️. Chắc hẳn hành trình đại học của các bạn vừa mới bắt đầu thôi nhỉ, và Đoàn Khoa chính là nơi để bạn gieo những hạt mầm đầu tiên đấy 🌱. Chị sẽ chia sẻ xíu xíu với mấy bạn nhoa ^^. Đại học không chỉ là học hành và thi cử, mà còn là quãng thời gian để trải nghiệm, để gặp gỡ và để trưởng thành. Với chị, Đoàn Khoa chính là ‘cánh cửa’ đầu tiên mở ra những trải nghiệm ấy. Ở đây, mỗi thành viên đều có thể học được những kỹ năng mà sách vở không dạy, được sống trọn vẹn trong những hành trình đầy màu sắc của tuổi trẻ, và tìm thấy cảm giác luôn có ‘Nhà’ đồng hành nè. Đoàn Khoa không chỉ là hoạt động, mà còn là nơi lưu giữ những kỷ niệm quý giá nhất đời sinh viên. Ai đã một lần bước vào, chắc chắn sẽ mang về cho mình điều gì đó thật đặc biệt nè 🌷. "Đoàn Khoa không hứa cho bạn tất cả những gì bạn muốn, nhưng sẽ trao cho bạn tất cả những gì Đoàn Khoa có". Hãy thử một lần ‘ghé’ Đoàn Khoa, biết đâu bạn sẽ tìm thấy cho mình một ngôi nhà nhỏ của tuổi trẻ 🙆‍♀️'
   },
-  {
+    {
     name: 'LÊ HOA ĐÀO',
     positions: ['Nguyên Phó Bí thư Đoàn Khoa Khóa 21', 'Nguyên Trưởng ban Tuyên giáo - Sự kiện Khóa 21'],
-    avatar: 'https://placehold.co/100x100.png',
+    avatar: '/images/blog/hoadao.jpg',
     avatarHint: 'lehoadao',
-    comment: 'Đang cập nhật...'
+    comment: 'Với mình, Đoàn Khoa Tài chính - Ngân hàng không chỉ là một tổ chức, mà là một gia đình lớn. Nơi đây, mình đã tìm thấy những người bạn, những người anh chị em luôn đồng hành và hỗ trợ mình trong mọi hoàn cảnh. Mình còn nhớ như in những đêm thức trắng cùng nhau để chuẩn bị cho các chương trình, những nụ cười rạng rỡ khi dự án thành công, và cả những giọt nước mắt khi gặp thất bại. Chính những khoảnh khắc ấy đã gắn kết chúng mình lại với nhau, tạo nên một sức mạnh phi thường. Khi mình rời đi, mình không cảm thấy buồn, mà thay vào đó là một niềm tin vững chắc. Mình tin rằng các em sẽ tiếp tục giữ gìn và phát huy những giá trị truyền thống tốt đẹp của Đoàn Khoa. Hãy luôn đoàn kết, luôn yêu thương và hãy cùng nhau tạo nên những dấu ấn riêng của thế hệ mình. Mình tin rằng các em sẽ làm tốt hơn cả những gì mà chúng mình đã từng làm.'
   },
   {
     name: 'HOÀNG NGUYỄN BẢO TRÂM',
     positions: ['Nguyên UV.BCH Đoàn Khoa Khóa 21', 'Nguyên Trưởng ban Truyền thông - Kỹ thuật Khóa 21'],
-    avatar: 'https://placehold.co/100x100.png',
+    avatar: '/images/blog/baotram.jpg',
     avatarHint: 'baotram',
-    comment: 'Đang cập nhật...'
+    comment: 'Không biết có nên viết mấy dòng này không nữa, chứ nghĩ tới quãng thời gian 3 năm gắn bó với Đoàn khoa, với ban Truyền thông – Kỹ thuật, tự dưng thấy trong lòng vừa bồi hồi lại vừa vui. Nhớ lúc mới vào thì cũng ngây ngô, lo sợ không biết mình có làm nổi không, rồi lại sợ mình không hòa nhập tốt. Vậy mà qua từng ngày, nhờ những người anh, người chị và các bạn hướng dẫn và giúp đỡ thì các kỹ năng của mình dần phát huy khá nhiều. Càng làm càng cuốn, mấy deadline dí thì dí thật, nhưng khi qua rồi thì lại nhớ cái cảm giác chạy cùng nhau tới sáng, cười giỡn ồn ào như cái chợ. Nhưng nhờ vậy mà cũng giảm được phần nào sự mệt mỏi. Ba năm gắn bó, điều mình nhớ nhất chắc không chỉ là những ấn phẩm, những chương trình mình đã từng làm, mà còn là cái không khí anh chị em trong ban luôn cười nhiều hơn than, lúc nào cũng chịu khó giúp đỡ nhau qua từng cái lỗi máy móc, từng cái banner gấp trong đêm. Nhiều lúc cũng stress lắm, nhưng nhờ vậy mới thấy mình mạnh mẽ hơn, tự tin hơn và trưởng thành lúc nào chẳng hay. Nếu có một lời để nhắn gửi cho các em sau này thì mình chỉ muốn nói: đừng sợ khó, đừng ngại thử. Cứ nhào vô, cứ làm hết mình vì ở Đoàn khoa đặc biệt là ban Truyền thông – Kỹ thuật, luôn có đồng đội kề bên. Đi cùng nhau mới thấy, những trải nghiệm này chính là thứ sẽ làm thanh xuân của tụi mình đáng nhớ hơn rất nhiều.'
   },
   {
     name: 'LÂM HỒNG MINH QUÂN',
     positions: ['Nguyên Phó Bí thư Đoàn Khoa Khóa 22', 'Nguyên Trưởng ban Truyền thông - Kỹ thuật Khóa 22'],
-    avatar: 'https://placehold.co/100x100.png',
+    avatar: '/images/blog/minhquan.jpg',
     avatarHint: 'minhquan',
-    comment: 'Đang cập nhật...'
+    comment: 'Chào các bạn tân sinh viên! Nếu hỏi anh quãng thời gian nào đẹp nhất trong 04 năm đại học, anh sẽ không ngần ngại trả lời: Đó chính là hành trình gắn bó với Đoàn Khoa. Từ những ngày đầu bước vào UEL, anh đã bị cuốn hút bởi ngọn lửa nhiệt huyết, sự năng động và sức trẻ của các anh chị Đoàn Khoa. Từ đó, anh biết rằng đây sẽ là nơi mình gửi gắm cả thanh xuân sinh viên. Ở Đoàn Khoa, anh không chỉ được học các kỹ năng, tích lũy kinh nghiệm, hay nhận được sự dìu dắt quý báu từ anh chị mà anh còn còn tìm thấy những người bạn tri kỷ, những người mà anh chưa từng nghĩ sẽ đồng hành cùng mình trong quãng đời sinh viên này. Và hơn tất cả, anh đã tìm thấy một đại gia đình mang tên Đoàn Khoa. Nơi đây không chỉ là một ngôi nhà ấm áp để trở về, mà còn là nơi thắp lên và giữ cho “ngọn lửa” nhiệt huyết của tuổi trẻ mãi mãi bùng cháy, để mỗi khi mỏi mệt, ta lại có một bến đỗ bình yên và biết rằng mình luôn có một đại gia đình để sẻ chia. Chào mừng các bạn đã về nhà! Hãy cùng nhau viết tiếp những trang sách thanh xuân thật rực rỡ nhé! 💙'
   },
-  {
-    name: 'TRẦN LÊ QUANG AN',
-    positions: ['Chủ nhiệm Chuyên san Tài chính và Công nghệ ứng dụng Khóa 22', 'Nguyên UV.BCH Đoàn Khoa Khóa 22', 'Thành viên Ban Tổ chức - Xây dựng Đoàn Khóa 22'],
-    avatar: 'https://placehold.co/100x100.png',
-    avatarHint: 'quangan',
-    comment: 'Đang cập nhật...'
-  },
+  // {
+  //   name: 'TRẦN LÊ QUANG AN',
+  //   positions: ['Chủ nhiệm Chuyên san Tài chính và Công nghệ ứng dụng Khóa 22', 'Nguyên UV.BCH Đoàn Khoa Khóa 22', 'Thành viên Ban Tổ chức - Xây dựng Đoàn Khóa 22'],
+  //   avatar: 'https://placehold.co/100x100.png',
+  //   avatarHint: 'quangan',
+  //   comment: 'Đang cập nhật...'
+  // },
 ];
 
 export default function BlogPage() {
@@ -79,7 +79,7 @@ export default function BlogPage() {
     <div>
       <PageBanner
         title="GÓC TÂM SỰ"
-        subtitle="Đang bí văn..."
+        subtitle='"Nơi những cảm xúc chân thật nhất được giải bày..."'
         imageUrl="/images/back-ocean.jpg"
         imageHint="community discussion"
       />
@@ -88,26 +88,28 @@ export default function BlogPage() {
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
             {/* Testimonials */}
-            <h2 className="text-2xl md:text-4xl font-headline font-semibold mb-8 text-primary text-center">Đôi lời gửi gắm từ cựu thành viên</h2>
+            <h2 className="text-2xl md:text-4xl font-anton font-medium mb-8 text-primary text-center">ĐÔI LỜI GỬI GẮM TỪ CỰU SINH VIÊN</h2>
             <div className="space-y-8">
               {testimonials.map((testimonial, index) => (
                 <ScrollReveal key={index} delayMs={60 * index}>
                   <Card className="overflow-hidden shadow-lg">
-                    <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-center">
-                      <Avatar className="h-24 w-24">
-                        <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint={testimonial.avatarHint} />
-                        <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className="relative text-center md:text-left">
-                        <Quote className="absolute -top-2 left-0 h-8 w-8 text-primary/20 transform -translate-x-4" />
-                        <p className="font-bold font-headline text-lg text-primary">{testimonial.name}</p>
-                        <div className="mb-4 space-y-1">
-                          {(testimonial.positions ?? [testimonial.positions]).map((pos, i) => (
-                            <p key={i} className="text-sm font-semibold text-muted-foreground">{pos}</p>
-                          ))}
+                    <CardContent className="p-6 flex flex-col gap-6">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-32 w-32 ml-5">
+                          <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint={testimonial.avatarHint} />
+                          <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="text-center md:text-left">
+                          <p className="font-bold font-headline text-lg text-primary">{testimonial.name}</p>
+                          <div className="mb-4 space-y-1">
+                            {(testimonial.positions ?? [testimonial.positions]).map((pos, i) => (
+                              <p key={i} className="text-sm font-semibold text-muted-foreground">{pos}</p>
+                            ))}
+                          </div>
                         </div>
-                        <blockquote className="text-muted-foreground italic text-justify">{testimonial.comment}</blockquote>
+                        
                       </div>
+                      <blockquote className="text-muted-foreground italic text-justify">{testimonial.comment}</blockquote>
                     </CardContent>
                   </Card>
                 </ScrollReveal>
@@ -115,10 +117,9 @@ export default function BlogPage() {
             </div>
             
             {/* Comment Section */}
-            {/* <div className="mt-16">
-              <h2 className="text-3xl font-headline font-semibold mb-8">Để lại bình luận</h2>
+            <div className="mt-16">
               <CommentSection />
-            </div> */}
+            </div>
           </div>
 
           {/* Fanpage Card */}
@@ -145,8 +146,28 @@ export default function BlogPage() {
               </CardContent>
             </Card>
           </div>
+
         </div>
       </main>
+
+      <div className="container mx-auto px-9 text-center">
+      <h2 className="text-3xl md:text-5xl font-anton font-medium text-primary mt-5">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
+          <Image
+            src="/images/banner-tuyen.png"
+            alt="Extra illustration"
+            width={1200}
+            height={600}
+            className="mt-10 w-full h-auto rounded-xl shadow-2xl object-cover"
+          />
+          <div className="mt-6">
+            <Link href="/apply">
+              <Button className="mb-20 px-6 py-6 text-lg font-semibold">
+                ỨNG TUYỂN NGAY
+              </Button>
+            </Link>
+          </div>
+      </div>
+      
     </div>
   );
 }

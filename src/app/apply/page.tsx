@@ -8,7 +8,7 @@ export default function ApplyPage() {
     <div>
       <PageBanner
         title="GÓC TÌM NGƯỜI NHÀ"
-        subtitle="Chừng chờ gì mà không tham gia vào Đoàn khoa Tài chính - Ngân hàng nhỉ"
+        subtitle='"Chừng chờ gì mà không tham gia vào Đoàn khoa Tài chính - Ngân hàng nhỉ"'
         imageUrl="/images/back-ocean.jpg"
         imageHint="recruitment hiring"
       />
