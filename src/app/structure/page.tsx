@@ -30,6 +30,8 @@ const departments = [
       { src: "/images/ban/tgsk/2.jpg"},
       { src: "/images/ban/tgsk/3.jpg"},
       { src: "/images/ban/tgsk/4.jpg"},
+      { src: "/images/ban/tgsk/5.jpg"},
+      { src: "/images/ban/tgsk/6.jpg"},
     ],
   },
   {
