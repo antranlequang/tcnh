@@ -67,12 +67,16 @@ const programs = [
         ],
     },
     {
-        name: 'Chương trình tìm hiểu về văn hóa dân tộc Việt Nam "54 sắc màu dân tộc"',
-        description: 'Tuyên truyền sâu rộng đến sinh viên các văn hóa dân tộc Việt Nam qua các giai đoạn lịch sử, từ đó tạo ra một không gian lưu giữ giá trị văn hóa dân tộc mới mẻ, sáng tạo nhưng không mất đi nét truyền thống đặc trưng, nâng cao văn hóa thưởng thức cho sinh viên.',
+        name: 'Hội thao cán bộ Đoàn - Hội',
+        description: 'Hội thao Cán bộ Đoàn - Hội là sự kiện thường niên được tổ chức nhằm tạo ra một sân chơi lành mạnh, bổ ích cho các cán bộ đang công tác trong Đoàn Thanh niên và Hội Sinh viên. Đây không chỉ là nơi để các cán bộ thể hiện tài năng, rèn luyện thể chất thông qua các bộ môn thể thao, mà còn là cơ hội để giao lưu, học hỏi và thắt chặt tình đoàn kết giữa các đơn vị.',
         images: [
-            { src: '/images/programn/7/0.jpg'},
             { src: '/images/programn/7/1.jpg'},
             { src: '/images/programn/7/2.jpg'},
+            { src: '/images/programn/7/3.jpg'},
+            { src: '/images/programn/7/4.JPG'},
+            { src: '/images/programn/7/5.JPG'},
+            { src: '/images/programn/7/6.JPG'},
+            { src: '/images/programn/7/7.JPG'},
         ],
     },
     {
@@ -85,16 +89,16 @@ const programs = [
             { src: '/images/programn/8/4.JPG'},
         ],
     },
-    {
-        name: 'Bút tích thời đại',
-        description: 'Đây là cơ hội để các bạn sinh viên hiểu rõ hơn về các Danh nhân kiệt xuất - những người đã cống hiến cả cuộc đời mình cho nền văn minh nhân loại và các giá trị to lớn về tinh thần mà Vườn tượng mang lại. Từ đó, hình thành tình cảm, tình yêu thương dành cho Trường Đại học Kinh tế - Luật. Bên cạnh đó, đây cũng là sân chơi lành mạnh cho đoàn viên, thanh niên. Thúc đẩy các hoạt động phong trào, bồi dưỡng năng lực và phẩm chất cho đoàn viên, thanh niên được học hỏi, giao lưu, tìm hiểu thêm về các “tượng đài” của tri thức, của lẽ sống cao đẹp với nghị lực sống lớn lao tạo nên thành công vang dội và các ngày lễ, kỷ niệm lớn để thế hệ trẻ cùng nhau nhìn lại và ghi nhớ những chặng đường, những dấu ấn mà ông cha ta đã để lại trong lịch sử vẻ vang của dân tộc Việt Nam.',
-        images: [
-            { src: '/images/programn/9/1.JPG'},
-            { src: '/images/programn/9/2.JPG'},
-            { src: '/images/programn/9/3.JPG'},
-            { src: '/images/programn/9/4.JPG'},
-        ],
-    },
+    // {
+    //     name: 'Bút tích thời đại',
+    //     description: 'Đây là cơ hội để các bạn sinh viên hiểu rõ hơn về các Danh nhân kiệt xuất - những người đã cống hiến cả cuộc đời mình cho nền văn minh nhân loại và các giá trị to lớn về tinh thần mà Vườn tượng mang lại. Từ đó, hình thành tình cảm, tình yêu thương dành cho Trường Đại học Kinh tế - Luật. Bên cạnh đó, đây cũng là sân chơi lành mạnh cho đoàn viên, thanh niên. Thúc đẩy các hoạt động phong trào, bồi dưỡng năng lực và phẩm chất cho đoàn viên, thanh niên được học hỏi, giao lưu, tìm hiểu thêm về các “tượng đài” của tri thức, của lẽ sống cao đẹp với nghị lực sống lớn lao tạo nên thành công vang dội và các ngày lễ, kỷ niệm lớn để thế hệ trẻ cùng nhau nhìn lại và ghi nhớ những chặng đường, những dấu ấn mà ông cha ta đã để lại trong lịch sử vẻ vang của dân tộc Việt Nam.',
+    //     images: [
+    //         { src: '/images/programn/9/1.JPG'},
+    //         { src: '/images/programn/9/2.JPG'},
+    //         { src: '/images/programn/9/3.JPG'},
+    //         { src: '/images/programn/9/4.JPG'},
+    //     ],
+    // },
     {
         name: 'Đại hội Đại biểu Đoàn TNCS Hồ Chí Minh Khoa Tài chính - Ngân hàng',
         description: 'Là sự kiện diễn ra 2 lần trong 5 năm nhằm tổng kết việc thực hiện và nhìn lại chặng đường trong nhiệm kỳ vừa qua; đổi mới nội dung và phương thức hoạt động; xác định mục tiêu, nhiệm vụ, giải pháp công tác đoàn và phong trào thanh niên trong nhiệm kỳ mới đồng thời ra mắt cơ cấu nhân sự mới. Đây là cột mốc quan trọng đánh dấu một chặng đường khác mở ra với tất cả sự tín nhiệm, sự nhiệt huyết tràn đầy của tuổi trẻ góp phần vào sự phát triển, hoàn thiện của Đoàn khoa Tài chính - Ngân hàng nói riêng và Đoàn Thanh niên Cộng sản Hồ Chí Minh nói chung.',
@@ -138,15 +142,15 @@ const programs = [
 ];
 
 const categories = [
-    {
-        name: 'Hiểu luật - Làm đúng',
-        description: 'Mục tiêu lan tỏa tinh thần Thượng tôn Hiến pháp, pháp luật nhằm giúp các bạn sinh viên hiểu rõ hơn vai trò ý nghĩa của pháp luật đối với cuộc sống hàng ngày. Từ đó, một cách sâu rộng các bạn có trách nhiệm hơn, tự giác hơn trong học tập và làm việc theo pháp luật, góp phần đảm bảo trật tự an toàn xã hội cũng như phát triển kinh tế xã hội của đất nước.',
-        images: [
-            { src: '/images/sections/1/1.jpg'},
-            { src: '/images/sections/1/2.jpg'},
-            { src: '/images/sections/1/3.jpg'},
-        ],
-    },
+    // {
+    //     name: 'Hiểu luật - Làm đúng',
+    //     description: 'Mục tiêu lan tỏa tinh thần Thượng tôn Hiến pháp, pháp luật nhằm giúp các bạn sinh viên hiểu rõ hơn vai trò ý nghĩa của pháp luật đối với cuộc sống hàng ngày. Từ đó, một cách sâu rộng các bạn có trách nhiệm hơn, tự giác hơn trong học tập và làm việc theo pháp luật, góp phần đảm bảo trật tự an toàn xã hội cũng như phát triển kinh tế xã hội của đất nước.',
+    //     images: [
+    //         { src: '/images/sections/1/1.jpg'},
+    //         { src: '/images/sections/1/2.jpg'},
+    //         { src: '/images/sections/1/3.jpg'},
+    //     ],
+    // },
 
     {
         name: 'Mỗi ngày một tin tốt - Mỗi tuần một câu chuyện đẹp',
@@ -226,18 +230,18 @@ const categories = [
         name: "Gương treo tường",
         description: 'Đây là một bài viết thường niên đặc biệt, nhằm tuyên dương những bạn sinh viên có thành tích xuất sắc trong suốt một năm học. Đây là một bài viết để vinh danh những nỗ lực, sự cống hiến và thành tựu đáng kể mà các bạn đã đạt được trong các lĩnh vực học tập, nghiên cứu, văn hóa và các hoạt động khác. Gương treo tường cũng tạo ra một không gian để chia sẻ và truyền cảm hứng cho những bạn sinh viên khác, khuyến khích họ nỗ lực và phấn đấu để đạt được những mục tiêu cao hơn.',
         images: [
-            { src: '/images/sections/9/1.jpg'},
+            { src: '/images/sections/10/1.jpg'},
         ],
     },
-    {
-        name: "Tuyển sinh cùng FBMC",
-        description: 'Là chuỗi bài viết nhằm hỗ trợ, tư vấn, giải đáp thắc mắc và cập nhật những thông tin về Trường Đại học Kinh tế - Luật mới nhất, sớm nhất cho các bạn Tân sinh viên, đặc biệt là những bạn sinh viên ngoại tỉnh lên Thành phố sinh sống, học tập; trực tiếp đồng hành, giúp đỡ các bạn trong việc hoàn thiện hồ sơ nhập học. Đồng thời các bạn được trải nghiệm các hoạt động sáng tạo để hiểu thêm về khoa, ngành học, cảm nhận môi trường học tập năng động, sáng tạo. ',
-        images: [
-            { src: 'https://placehold.co/600x400.png', hint: 'students workshop' },
-            { src: 'https://placehold.co/600x400.png', hint: 'data analysis' },
-            { src: 'https://placehold.co/600x400.png', hint: 'presentation screen' },
-        ],
-    },
+    // {
+    //     name: "Tuyển sinh cùng FBMC",
+    //     description: 'Là chuỗi bài viết nhằm hỗ trợ, tư vấn, giải đáp thắc mắc và cập nhật những thông tin về Trường Đại học Kinh tế - Luật mới nhất, sớm nhất cho các bạn Tân sinh viên, đặc biệt là những bạn sinh viên ngoại tỉnh lên Thành phố sinh sống, học tập; trực tiếp đồng hành, giúp đỡ các bạn trong việc hoàn thiện hồ sơ nhập học. Đồng thời các bạn được trải nghiệm các hoạt động sáng tạo để hiểu thêm về khoa, ngành học, cảm nhận môi trường học tập năng động, sáng tạo. ',
+    //     images: [
+    //         { src: 'https://placehold.co/600x400.png', hint: 'students workshop' },
+    //         { src: 'https://placehold.co/600x400.png', hint: 'data analysis' },
+    //         { src: 'https://placehold.co/600x400.png', hint: 'presentation screen' },
+    //     ],
+    // },
 ];
 
 const partners = [

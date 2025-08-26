@@ -94,6 +94,8 @@ export function ApplicationForm() {
       <Form {...form}>
         <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
+
+
           {/* I. Thông tin chung */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField name="fullName" control={form.control} render={({ field }) => (

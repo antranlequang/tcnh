@@ -196,7 +196,7 @@ n {
   will-change: opacity, transform;
 }
 .reveal-in {
-  animation: fade-slide-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fade-slide-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Aurora background */
