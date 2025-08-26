@@ -39,7 +39,7 @@ export function ApplicationForm() {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const startTime = new Date("2025-08-27T20:00:00+07:00").getTime();
+  const startTime = new Date("2025-08-27T05:00:00+07:00").getTime();
   const endTime = new Date("2025-09-19T23:59:59+07:00").getTime();
 
   const [now, setNow] = useState(Date.now());
