@@ -112,7 +112,7 @@ export default function StructurePage() {
       </main>
       
       <div className="container mx-auto px-9 text-center">
-        <h2 className="text-3xl md:text-5xl font-anton font-medium text-primary mt-0">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
+        <h2 className="text-2xl md:text-5xl font-anton font-medium text-primary mt-0">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
           <Image
             src="/images/banner-tuyen.png"
             alt="Extra illustration"

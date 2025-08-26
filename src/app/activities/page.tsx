@@ -332,7 +332,7 @@ export default function ActivitiesPage() {
                 
                 {/* Partners Section */}
                 <section className="mt-24">
-                    <h2 className="text-3xl md:text-5xl font-anton font-medium text-center mb-14 text-primary mt-14">CÁC ĐƠN VỊ ĐÃ HỢP TÁC</h2>
+                    <h2 className="text-4xl md:text-5xl font-anton font-medium text-center mb-14 text-primary mt-14">CÁC ĐƠN VỊ ĐÃ HỢP TÁC</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 items-center">
                         {partners.map((partner, index) => (
                             <div key={`${partner.name}-${index}`} className="flex justify-center " title={partner.name}>
@@ -351,7 +351,7 @@ export default function ActivitiesPage() {
             </main>
 
             <div className="container mx-auto px-9 text-center">
-                <h2 className="text-3xl md:text-5xl font-anton font-medium text-primary mt-5">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
+                <h2 className="text-2xl md:text-5xl font-anton font-medium text-primary mt-5">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
                 <Image
                     src="/images/banner-tuyen.png"
                     alt="Extra illustration"

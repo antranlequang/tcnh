@@ -17,7 +17,7 @@ export default function ApplyPage() {
           <ScrollReveal>
             <Card className="shadow-2xl">
               <CardHeader>
-                <CardTitle className="text-3xl font-headline text-primary text-center">Đơn đăng ký ứng tuyển</CardTitle>
+                <CardTitle className="text-3xl font-anton font-medium text-primary text-center">Đơn đăng ký ứng tuyển</CardTitle>
                 <CardDescription>
                 </CardDescription>
               </CardHeader>

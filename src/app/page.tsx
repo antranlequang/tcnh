@@ -104,7 +104,7 @@ export default function Home() {
 
               <div className="flex flex-col md:flex-row items-center gap-12 ">
                 <div className="md:w-1/2 space-y-4 text-center">
-                  <h2 className="text-5xl md:text-4xl font-anton font-medium text-primary">
+                  <h2 className="text-3xl md:text-4xl font-anton font-medium text-primary">
                     <span className="block md:inline">ĐOÀN KHOA</span>{' '}
                     <span className="block md:inline mt-3">TÀI CHÍNH - NGÂN HÀNG</span>
                   </h2>
@@ -167,7 +167,7 @@ export default function Home() {
         </div>
       </section>
       
-      <h2 className="text-center text-3xl md:text-5xl font-anton font-medium text-primary mt-14">LÀ MỘT TÂN SINH VIÊN, BẠN SẼ CHỌN GÌ?</h2>
+      <h2 className="text-center text-2xl md:text-5xl font-anton font-medium text-primary mt-14">LÀ MỘT TÂN SINH VIÊN, BẠN SẼ CHỌN GÌ?</h2>
       {/* Video Section */}
       <section className="py-8 md:py-16">
         <div className="container mx-auto px-4">
@@ -242,7 +242,7 @@ export default function Home() {
             <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 transform translate-x-1/2" />
           </Carousel>
 
-          <h2 className="text-3xl md:text-5xl font-anton font-medium text-primary mt-32">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
+          <h2 className="text-2xl md:text-5xl font-anton font-medium text-primary mt-32">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
           <Image
             src="/images/banner-tuyen.png"
             alt="Extra illustration"
