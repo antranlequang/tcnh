@@ -42,21 +42,21 @@ export default function Home() {
     {
       image: "/images/achievement.png",
       hint: "achievement",
-      title: "Nhấn điii",
+      title: "Nhấn vào",
       // description: "Nhấn để tìm hiểu thêm",
       link: "/achievements"
     },
     {
       image: "/images/activities.png",
       hint: "activities",
-      title: "Nhấn điii",
+      title: "Nhấn vào",
       // description: "Nhấn để tìm hiểu thêm",
       link: "/activities"
     },
     {
       image: "/images/structure.png",
       hint: "structure",
-      title: "Nhấn điii",
+      title: "Nhấn vào",
       // description: "Nhấn để tìm hiểu thêm",
       link: "/structure"
     },
@@ -75,11 +75,11 @@ export default function Home() {
       <section className="relative w-full text-center">
         <div className="relative">
           <Image
-            src="/images/backkipu.png"
+            src="/images/backkipu.jpg"
             alt="Finance - Banking Faculty Union"
             width={1920}
             height={600}
-            className="w-full h-auto object-cover"
+            className="w-full h-auto object-cover mt-0"
             data-ai-hint="university campus"
           />
           {/* <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
@@ -101,7 +101,6 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <ScrollReveal>
             <div className="space-y-16">
-
               <div className="flex flex-col md:flex-row items-center gap-12 ">
                 <div className="md:w-1/2 space-y-4 text-center">
                   <h2 className="text-3xl md:text-4xl font-anton font-medium text-primary">
@@ -167,7 +166,7 @@ export default function Home() {
         </div>
       </section>
       
-      <h2 className="text-center text-2xl md:text-5xl font-anton font-medium text-primary mt-14">LÀ MỘT TÂN SINH VIÊN, BẠN SẼ CHỌN GÌ?</h2>
+      <h2 className="text-center text-2xl md:text-5xl font-anton font-medium text-primary mt-0">LÀ MỘT TÂN SINH VIÊN, BẠN SẼ CHỌN GÌ?</h2>
       {/* Video Section */}
       <section className="py-8 md:py-16">
         <div className="container mx-auto px-4">
@@ -196,10 +195,10 @@ export default function Home() {
       <section id="explore-section" className="py-16 md:py-24">
         <div className="container mx-auto px-9 text-center">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-5xl font-anton font-medium text-primary mt-0">
+            <h2 className="text-3xl md:text-5xl font-anton font-medium text-primary mt-0 md:mt-0">
               TÌM HIỂU VỀ CHÚNG TỚ
             </h2>
-            <p className="text-muted-foreground font-nunito font-semibold text-1xl md:text-1xl mx-auto mb-12 mt-5">
+            <p className="text-muted-foreground font-nunito font-semibold text-1xl md:text-3xl mx-auto mb-6 mt-5 md:mb-12">
               Các hoạt động, chương trình, sự kiện, thành tích nổi bật của Đoàn Khoa mình nè
             </p>
           </ScrollReveal>
@@ -242,17 +241,20 @@ export default function Home() {
             <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 transform translate-x-1/2" />
           </Carousel>
 
-          <h2 className="text-2xl md:text-5xl font-anton font-medium text-primary mt-32">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
+          <h2 style={{ color: "#45973c" }} className="text-3xl md:text-5xl font-anton font-medium text-primary mt-10 md:mt-20">TUYỂN CỘNG TÁC VIÊN</h2>
+          {/* <p className="text-muted-foreground font-nunito font-semibold text-1xl md:text-3xl mx-auto mb-0 mt-5">
+              Các hoạt động, chương trình, sự kiện, thành tích nổi bật của Đoàn Khoa mình nè
+            </p> */}
           <Image
-            src="/images/banner-tuyen.png"
+            src="/images/back-bia.jpg"
             alt="Extra illustration"
-            width={1200}
-            height={600}
-            className="mt-10 w-full h-auto rounded-xl shadow-2xl object-cover"
+            width={800}
+            height={400}
+            className="mt-6 md:mt-10 w-auto h-auto rounded-xl shadow-2xl object-cover mx-auto"
           />
           <div className="mt-6">
             <Link href="/apply">
-              <Button className="px-6 py-6 text-lg font-semibold">
+              <Button className="bg-[#45973c] hover:bg-[#357a2e] text-white px-6 py-6 text-lg font-semibold">
                 ỨNG TUYỂN NGAY
               </Button>
             </Link>

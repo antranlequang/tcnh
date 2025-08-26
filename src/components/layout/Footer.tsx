@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from "next/image";
 import { University, Mail, Phone, MapPin, Facebook } from 'lucide-react';
 import { ContactForm } from '@/components/shared/ContactForm';
-
+import React from 'react';
 export function Footer() {
   return (
     <footer className="relative border-t  overflow-hidden">

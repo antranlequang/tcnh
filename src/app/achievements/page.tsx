@@ -31,14 +31,14 @@ export function FeaturedAchievement() {
 
   return (
     <div className="w-full max-w-5xl text-center mx-auto mt-0">
-      <div className="relative mx-auto w-full max-w-[480px] h-[300px] md:max-w-[1040px] md:h-[650px] overflow-hidden rounded-xl shadow-2xl">
+      <div className="relative mx-auto w-full max-w-[480px] h-[300px] md:max-w-[1040px] md:h-[650px] rounded-xl shadow-2xl">
         {images.map((img, i) => (
           <Image
             key={i}
             src={img}
             alt={`Achievement ${i + 1}`}
-            width={800}
-            height={500}
+            width={600}
+            height={400}
             className={`absolute top-0 left-0 object-cover w-full h-full transition-opacity duration-700 ease-in-out ${
               i === current ? "opacity-100" : "opacity-0"
             }`}
@@ -140,7 +140,8 @@ export default function AchievementsPage() {
 
       <main className="container mx-auto px-4 py-16 md:py-24">
         <FeaturedAchievement/>
-        <div className="mt-10 grid grid-cols-1 gap-8 place-items-center">
+        <h2 className="text-4xl md:text-5xl font-anton font-medium text-primary mt-14 md:mt-20 text-center">THÀNH TÍCH TIÊU BIỂU</h2>
+        <div className="mt-5 grid grid-cols-1 gap-8 place-items-center">
           {achievements.map((achievement, index) => (
             <ScrollReveal key={index} delayMs={80 * index}>
               <Card className="w-full max-w-4xl overflow-hidden shadow-lg hover:shadow-3xl transition-all duration-300 group mt-10">
@@ -168,18 +169,18 @@ export default function AchievementsPage() {
         </div>
       </main>
 
-      <div className="container mx-auto px-9 text-center">
-        <h2 className="text-2xl md:text-5xl font-anton font-medium text-primary mt-0">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
+      <div className="container mx-auto px-6 text-center">
+        <h2 style={{ color: "#45973c" }} className="text-3xl md:text-5xl font-anton font-medium text-primary mt-0 md:mt-0">TUYỂN CỘNG TÁC VIÊN</h2>
           <Image
-            src="/images/banner-tuyen.png"
+            src="/images/back-bia.jpg"
             alt="Extra illustration"
-            width={1200}
-            height={600}
-            className="mt-10 w-full h-auto rounded-xl shadow-2xl object-cover"
+            width={800}
+            height={400}
+            className="mt-6 md:mt-10 w-auto h-auto rounded-xl shadow-2xl object-cover mx-auto"
           />
           <div className="mt-6">
             <Link href="/apply">
-              <Button className="mb-20 px-6 py-6 text-lg font-semibold">
+              <Button className="bg-[#45973c] hover:bg-[#357a2e] text-white mb-20 px-6 py-6 text-lg font-semibold">
                 ỨNG TUYỂN NGAY
               </Button>
             </Link>

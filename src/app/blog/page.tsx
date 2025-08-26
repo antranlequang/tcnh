@@ -87,7 +87,7 @@ export default function BlogPage() {
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
             {/* Testimonials */}
-            <h2 className="text-2xl md:text-4xl font-anton font-medium mb-8 text-primary text-center">ĐÔI LỜI GỬI GẮM TỪ CỰU SINH VIÊN</h2>
+            <h2 className="text-2xl md:text-4xl font-anton font-medium mb-8 text-primary text-center">ĐÔI LỜI GỬI GẮM TỪ CỰU THÀNH VIÊN</h2>
             <div className="space-y-8">
               {testimonials.map((testimonial, index) => (
                 <ScrollReveal key={index} delayMs={60 * index}>
@@ -146,23 +146,22 @@ export default function BlogPage() {
       </main>
 
       <div className="container mx-auto px-9 text-center">
-      <h2 className="text-2xl md:text-5xl font-anton font-medium text-primary mt-5">CHƯƠNG TRÌNH TUYỂN TÂN THÀNH VIÊN</h2>
+        <h2 style={{ color: "#45973c" }} className="text-3xl md:text-5xl font-anton font-medium text-primary mt-0 md:mt-0">TUYỂN CỘNG TÁC VIÊN</h2>
           <Image
-            src="/images/banner-tuyen.png"
-            alt="Extra illustration"
-            width={1200}
-            height={600}
-            className="mt-10 w-full h-auto rounded-xl shadow-2xl object-cover"
+              src="/images/back-bia.jpg"
+              alt="Extra illustration"
+              width={800}
+              height={400}
+              className="mt-6 md:mt-10 w-auto h-auto rounded-xl shadow-2xl object-cover mx-auto"
           />
           <div className="mt-6">
-            <Link href="/apply">
-              <Button className="mb-20 px-6 py-6 text-lg font-semibold">
-                ỨNG TUYỂN NGAY
+              <Link href="/apply">
+              <Button className="bg-[#45973c] hover:bg-[#357a2e] text-white mb-20 px-6 py-6 text-lg font-semibold">
+                  ỨNG TUYỂN NGAY
               </Button>
-            </Link>
+              </Link>
           </div>
-      </div>
-      
+      </div>S
     </div>
   );
 }
