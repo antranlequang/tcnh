@@ -38,7 +38,7 @@ const testimonials = [
   },
   {
     name: 'ĐÀO THỊ THÙY DUNG - Khóa 21',
-    positions: ['Nguyên Bí thư Đoàn Khoa', 'Cựu Trưởng ban Tổ chức - Xây dựng Đoàn'],
+    positions: ['Nguyên Bí thư Đoàn Khoa', 'Nguyên Trưởng ban Tổ chức - Xây dựng Đoàn'],
     avatar: '/images/blog/thuydung.jpg',
     avatarHint: 'thuydung',
     comment: 'Hellu mấy bạn tân sinh diên nhó 🙋‍♀️. Chắc hẳn hành trình đại học của các bạn vừa mới bắt đầu thôi nhỉ, và Đoàn Khoa chính là nơi để bạn gieo những hạt mầm đầu tiên đấy 🌱. Chị sẽ chia sẻ xíu xíu với mấy bạn nhoa ^^. Đại học không chỉ là học hành và thi cử, mà còn là quãng thời gian để trải nghiệm, để gặp gỡ và để trưởng thành. Với chị, Đoàn Khoa chính là ‘cánh cửa’ đầu tiên mở ra những trải nghiệm ấy. Ở đây, mỗi thành viên đều có thể học được những kỹ năng mà sách vở không dạy, được sống trọn vẹn trong những hành trình đầy màu sắc của tuổi trẻ, và tìm thấy cảm giác luôn có ‘Nhà’ đồng hành nè. Đoàn Khoa không chỉ là hoạt động, mà còn là nơi lưu giữ những kỷ niệm quý giá nhất đời sinh viên. Ai đã một lần bước vào, chắc chắn sẽ mang về cho mình điều gì đó thật đặc biệt nè 🌷. "Đoàn Khoa không hứa cho bạn tất cả những gì bạn muốn, nhưng sẽ trao cho bạn tất cả những gì Đoàn Khoa có". Hãy thử một lần ‘ghé’ Đoàn Khoa, biết đâu bạn sẽ tìm thấy cho mình một ngôi nhà nhỏ của tuổi trẻ 🙆‍♀️'

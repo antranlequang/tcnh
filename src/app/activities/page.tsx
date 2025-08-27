@@ -124,10 +124,10 @@ const programs = [
         images: [
             { src: '/images/programn/12/1.jpg'},
             { src: '/images/programn/12/2.jpeg'},
-            { src: '/images/programn/12/3.heif'},
+
             { src: '/images/programn/12/4.jpeg'},
-            { src: '/images/programn/12/3.heif'},
-            { src: '/images/programn/12/4.jpeg'},
+
+            { src: '/images/programn/12/6.jpeg'},
         ],
     },
     {
