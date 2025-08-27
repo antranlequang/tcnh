@@ -192,9 +192,9 @@ const categories = [
         images: [
             { src: '/images/sections/6/1.jpg'},
             { src: '/images/sections/6/2.jpg'},
-            { src: '/images/sections/6/3jpg'},
+            { src: '/images/sections/6/3.jpg'},
             { src: '/images/sections/6/4.jpg'},
-            { src: '/images/sections/6/5jpg'},
+            { src: '/images/sections/6/5.jpg'},
         ],
     },
     {

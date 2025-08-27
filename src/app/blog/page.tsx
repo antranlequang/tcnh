@@ -64,13 +64,13 @@ const testimonials = [
     avatarHint: 'minhquan',
     comment: 'Chào các bạn tân sinh viên! Nếu hỏi anh quãng thời gian nào đẹp nhất trong 04 năm đại học, anh sẽ không ngần ngại trả lời: Đó chính là hành trình gắn bó với Đoàn Khoa. Từ những ngày đầu bước vào UEL, anh đã bị cuốn hút bởi ngọn lửa nhiệt huyết, sự năng động và sức trẻ của các anh chị Đoàn Khoa. Từ đó, anh biết rằng đây sẽ là nơi mình gửi gắm cả thanh xuân sinh viên. Ở Đoàn Khoa, anh không chỉ được học các kỹ năng, tích lũy kinh nghiệm, hay nhận được sự dìu dắt quý báu từ anh chị mà anh còn còn tìm thấy những người bạn tri kỷ, những người mà anh chưa từng nghĩ sẽ đồng hành cùng mình trong quãng đời sinh viên. Tìm thấy những đứa em vô cùng đáng yêu và tinh nghịch. Thiếu mọi người, có thể anh không làm được gì. Có thể nói, để có được những điều đó, chắc hẳn anh đã phải “tu 10 kiếp” mới gặp được. Và hơn tất cả, anh đã tìm thấy một đại gia đình mang tên Đoàn Khoa. Nơi đây không chỉ là một ngôi nhà ấm áp để trở về, mà còn là nơi thắp lên và giữ cho “ngọn lửa” nhiệt huyết của tuổi trẻ mãi mãi bùng cháy, để mỗi khi mỏi mệt, ta lại có một bến đỗ bình yên và biết rằng mình luôn có một đại gia đình để sẻ chia. Chào mừng các bạn đã về nhà! Hãy cùng nhau viết tiếp những trang sách thanh xuân thật rực rỡ nhé! 💙'
   },
-  // {
-  //   name: 'TRẦN LÊ QUANG AN',
-  //   positions: ['Chủ nhiệm Chuyên san Tài chính và Công nghệ ứng dụng Khóa 22', 'Nguyên UV.BCH Đoàn Khoa Khóa 22', 'Thành viên Ban Tổ chức - Xây dựng Đoàn Khóa 22'],
-  //   avatar: 'https://placehold.co/100x100.png',
-  //   avatarHint: 'quangan',
-  //   comment: 'Đang cập nhật...'
-  // },
+  {
+    name: 'TRẦN LÊ QUANG AN - Khóa K22',
+    positions: ['Chủ nhiệm Chuyên san Tài chính và Công nghệ ứng dụng', 'Nguyên UV.BCH Đoàn Khoa', 'Thành viên Ban Tổ chức - Xây dựng Đoàn'],
+    avatar: '/images/blog/quangan.jpg',
+    avatarHint: 'quangan',
+    comment: 'Hi các em, những người bạn nhỏ vừa đặt chân vào ngôi nhà chung Đoàn Khoa Tài chính - Ngân hàng. Ngày hôm nay, anh gửi lời chúc này không chỉ với tư cách của một người đi trước, mà còn là lời tâm sự từ trái tim một người từng gắn bó. Anh muốn các em biết rằng, hành trình ở Đoàn Khoa không chỉ là những ngày tháng làm việc, cống hiến, mà còn là một hành trình tìm thấy đam mê, chịu khó với những deadline gấp gáp, sự gắn bó và trân trọng những con người mình gặp gỡ, và tìm thấy giá trị của chính bản thân mình khi được sống hết mình với đam mê. Anh đã từng chứng kiến và cảm nhận được sự nhiệt huyết cháy bỏng trong từng ánh mắt các em, điều đó nhắc anh nhớ lại những năm tháng đầu tiên của mình. Anh tin rằng, chính ngọn lửa ấy sẽ đưa các em đi thật xa, vì vậy hãy cứ dấn thân, cứ dại khờ, cứ vấp ngã, rồi lại đứng lên mạnh mẽ. Sau tất cả, chính những kỷ niệm này sẽ làm nên một bản nhạc tuổi trẻ không bao giờ phai. Chúc các em sẽ có một hành trình thật đẹp, thật ý nghĩa và tìm thấy một phần thanh xuân rực rỡ nhất tại Đoàn khoa Tài chính - Ngân hàng 💙'
+  },
 ];
 
 export default function BlogPage() {
