@@ -63,9 +63,23 @@ export default function Home() {
     {
       image: "/images/blog.png",
       hint: "blog",
-      title: "Nhấn điii",
+      title: "Nhấn vào",
       // description: "Nhấn để tìm hiểu thêm",
       link: "/blog"
+    },
+    {
+      image: "/images/ai.png",
+      hint: "ai",
+      title: "Nhấn vào",
+      // description: "Nhấn để tìm hiểu thêm",
+      link: "/ai"
+    },
+    {
+      image: "/images/a80.png",
+      hint: "a80",
+      title: "Coming soon",
+      // description: "Nhấn để tìm hiểu thêm",
+      link: "/a80"
     },
   ];
 
