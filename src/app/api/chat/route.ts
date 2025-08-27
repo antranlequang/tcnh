@@ -10,10 +10,23 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Use Gemini AI for intelligent responses
+    // Use Gemini AI for intelligent responses with enhanced context
     const aiResult = await personalAdvisorChat({
       message,
-      context: context || {}
+      context: {
+        departmentInfo: context?.departmentInfo ? {
+          name: context.departmentInfo.name,
+          description: context.departmentInfo.description,
+          strengths: context.departmentInfo.strengths,
+          weaknesses: context.departmentInfo.weaknesses
+        } : undefined,
+        quizScores: context?.quizScores,
+        quizAnswers: context?.quizAnswers, // Include detailed quiz answers for AI analysis
+        department: context?.department,
+        isReturningUser: context?.isReturningUser,
+        previousDepartments: context?.previousDepartments,
+        chatCount: context?.chatCount
+      }
     });
 
     return NextResponse.json({ response: aiResult.response });

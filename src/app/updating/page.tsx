@@ -64,12 +64,12 @@ export default function UpdatingPage() {
                 
                 <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
                   <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-4 rounded-full animate-pulse" 
-                       style={{ width: '75%' }}></div>
+                       style={{ width: '99%' }}></div>
                 </div>
                 
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Bắt đầu</span>
-                  <span className="font-bold text-orange-600">75% Hoàn thành</span>
+                  <span className="font-bold text-orange-600">99% Hoàn thành</span>
                   <span>Kết thúc</span>
                 </div>
               </div>
@@ -77,7 +77,7 @@ export default function UpdatingPage() {
 
             {/* Bouncing Features List */}
             <div className="grid md:grid-cols-3 gap-6 mb-12">
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg animate-bounce delay-100">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg delay-100">
                 <div className="animate-spin-slow mb-4">
                   <Sparkles className="w-10 h-10 text-yellow-500 mx-auto" />
                 </div>
@@ -85,7 +85,7 @@ export default function UpdatingPage() {
                 <p className="text-gray-600 text-sm">Đang phát triển những tính năng tuyệt vời</p>
               </div>
 
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg animate-bounce delay-300">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg delay-300">
                 <div className="animate-pulse mb-4">
                   <Heart className="w-10 h-10 text-red-500 mx-auto" />
                 </div>
@@ -93,31 +93,13 @@ export default function UpdatingPage() {
                 <p className="text-gray-600 text-sm">Cải thiện giao diện và hiệu suất</p>
               </div>
 
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg animate-bounce delay-500">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg delay-500">
                 <div className="animate-bounce mb-4">
                   <Zap className="w-10 h-10 text-blue-500 mx-auto" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Hiệu suất cao</h3>
                 <p className="text-gray-600 text-sm">Tối ưu hóa tốc độ và độ ổn định</p>
               </div>
-            </div>
-
-            {/* Animated Message */}
-            <div className="bg-gradient-to-r from-blue-100 to-blue-100 rounded-2xl p-8 border-2 border-blue-200 animate-pulse">
-              <div className="flex items-center justify-center mb-4">
-                <div className="animate-bounce">
-                  <Coffee className="w-8 h-8 text-blue-600 mr-3" />
-                </div>
-                <h3 className="text-xl font-bold text-red-800">Chân thành cảm ơn vì sự chờ đợi của bạn</h3>
-                <div className="animate-bounce delay-200">
-                  <Heart className="w-8 h-8 text-blue-500 ml-3" />
-                </div>
-              </div>
-              <p className="text-blue-700 leading-relaxed">
-                Chúng tớ đang làm việc chăm chỉ để mang đến cho bạn những trải nghiệm tốt nhất.
-                <br />
-                <span className="font-semibold">Tính năng sẽ sớm được ra mắt thôi!</span>
-              </p>
             </div>
 
             {/* Floating Elements */}

@@ -13,20 +13,35 @@ interface Comment {
   email: string;
   faculty: string;
   className: string;
+  photo?: string;
   content: string;
   timestamp: number;
 }
 
+interface PostFormData {
+  name: string;
+  studentId: string;
+  email: string;
+  faculty: string;
+  className: string;
+  photo?: File | null;
+  content: string;
+}
+
 export default function A80Page() {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<PostFormData>({
     name: '',
     studentId: '',
     email: '',
     faculty: '',
     className: '',
+    photo: null,
     content: ''
   });
+  const [showPopupForm, setShowPopupForm] = useState(false);
+  const [currentDisplayIndex, setCurrentDisplayIndex] = useState(0);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
   const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -36,7 +51,6 @@ export default function A80Page() {
   const [selectionEnd, setSelectionEnd] = useState({ x: 0, y: 0 });
   const [selectionBox, setSelectionBox] = useState<{x: number, y: number, width: number, height: number} | null>(null);
   const [isDragMode, setIsDragMode] = useState(false);
-  const [isFormVisible, setIsFormVisible] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const canvasSize = { width: 8000, height: 6000 }; // Much larger canvas size
 
@@ -67,12 +81,33 @@ export default function A80Page() {
           className: 'TC21B',
           content: 'Việt Nam - Đất nước tôi, tình yêu bao la như biển cả!',
           timestamp: Date.now() - 200000
+        },
+        {
+          id: 'test-3',
+          name: 'Le Van C',
+          studentId: '20210003',
+          email: 'lvc@example.com',
+          faculty: 'Tài chính - Ngân hàng',
+          className: 'TC21C',
+          content: 'Tự hào là người Việt Nam! 🇻🇳',
+          timestamp: Date.now() - 300000
         }
       ];
       setComments(testComments);
       localStorage.setItem('a80-comments', JSON.stringify(testComments));
     }
   }, []);
+
+  // Auto-scroll through messages
+  useEffect(() => {
+    if (comments.length > 0 && isAutoScrolling) {
+      const interval = setInterval(() => {
+        setCurrentDisplayIndex(prev => (prev + 1) % comments.length);
+      }, 3000); // Change message every 3 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [comments.length, isAutoScrolling]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +117,21 @@ export default function A80Page() {
       return;
     }
 
+    // Convert photo to base64 if present
+    let photoBase64 = '';
+    if (formData.photo) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        photoBase64 = reader.result as string;
+        saveComment(photoBase64);
+      };
+      reader.readAsDataURL(formData.photo);
+    } else {
+      saveComment('');
+    }
+  };
+
+  const saveComment = (photoBase64: string) => {
     const newComment: Comment = {
       id: Date.now().toString(),
       name: formData.name.trim(),
@@ -89,6 +139,7 @@ export default function A80Page() {
       email: formData.email.trim(),
       faculty: formData.faculty.trim(),
       className: formData.className.trim(),
+      photo: photoBase64,
       content: formData.content.trim(),
       timestamp: Date.now()
     };
@@ -97,24 +148,35 @@ export default function A80Page() {
     setComments(updatedComments);
     localStorage.setItem('a80-comments', JSON.stringify(updatedComments));
     
+    // Reset form
     setFormData({
       name: '',
       studentId: '',
       email: '',
       faculty: '',
       className: '',
+      photo: null,
       content: ''
     });
     
     // Close form after successful submission
-    setIsFormVisible(false);
+    setShowPopupForm(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    if (e.target.type === 'file') {
+      const fileInput = e.target as HTMLInputElement;
+      const file = fileInput.files?.[0] || null;
+      setFormData({
+        ...formData,
+        photo: file
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    }
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -254,13 +316,75 @@ export default function A80Page() {
             <p className="text-xs text-gray-500 mt-2">Số cảm xúc: {comments.length}</p>
           </div>
 
-          {/* Floating Action Button for Form */}
+          {/* Main Display Area - Auto-scrolling Messages */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-red-200 flex flex-col overflow-hidden z-25">
+            <div className="bg-gradient-to-r from-red-600 to-yellow-500 text-white p-4 text-center">
+              <h2 className="text-xl font-bold">💝 Tình cảm của bạn</h2>
+              <p className="text-sm opacity-90">Những chia sẻ chân thành về Tổ quốc</p>
+            </div>
+            
+            <div className="flex-1 flex flex-col justify-center p-6 relative">
+              {comments.length > 0 && (
+                <div className="text-center space-y-4 animate-fade-in">
+                  <div className="text-lg font-semibold text-red-600">
+                    "{comments[currentDisplayIndex]?.name}"
+                  </div>
+                  <div className="text-gray-800 text-base leading-relaxed px-4">
+                    {comments[currentDisplayIndex]?.content}
+                  </div>
+                </div>
+              )}
+              
+              {comments.length === 0 && (
+                <div className="text-center text-gray-500">
+                  <p>Chưa có chia sẻ nào</p>
+                  <p className="text-sm mt-2">Hãy là người đầu tiên gửi tâm tư!</p>
+                </div>
+              )}
+              
+              {comments.length > 1 && (
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {comments.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setCurrentDisplayIndex(index);
+                        setIsAutoScrolling(false);
+                      }}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        index === currentDisplayIndex 
+                          ? 'bg-red-600 w-6' 
+                          : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Auto-scroll control */}
+            <div className="absolute top-2 right-2">
+              <button
+                onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+                className={`w-8 h-8 rounded-full text-xs ${
+                  isAutoScrolling 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-gray-300 text-gray-600'
+                }`}
+                title={isAutoScrolling ? 'Tắt tự động cuộn' : 'Bật tự động cuộn'}
+              >
+                {isAutoScrolling ? '⏸️' : '▶️'}
+              </button>
+            </div>
+          </div>
+
+          {/* Small Floating Post Button */}
           <button 
-            onClick={() => setIsFormVisible(!isFormVisible)}
-            className="absolute bottom-6 right-6 w-16 h-16 bg-gradient-to-r from-red-600 to-yellow-500 hover:from-red-700 hover:to-yellow-600 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center text-2xl z-30 hover:scale-110"
-            title={isFormVisible ? 'Ẩn form gửi cảm xúc' : 'Hiện form gửi cảm xúc'}
+            onClick={() => setShowPopupForm(true)}
+            className="absolute bottom-6 right-6 w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center text-2xl z-30 hover:scale-110"
+            title="Gửi tâm tư về Tổ quốc"
           >
-            {isFormVisible ? '✖️' : '✏️'}
+            ✏️
           </button>
 
           {/* Selection Box */}
@@ -422,23 +546,27 @@ export default function A80Page() {
               </div>
             </div>
           </div>
-          {/* Floating Form Overlay */}
-          {isFormVisible && (
-            <div className="absolute inset-4 bg-white/95 backdrop-blur-xl border-2 border-red-200 rounded-3xl shadow-2xl z-40 overflow-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <div className="text-center flex-1">
-                    <h3 className="text-2xl font-bold text-red-600 mb-2">🇻🇳 Gửi Tâm Tình Của Bạn</h3>
-                    <p className="text-gray-600 text-sm">Chia sẻ cảm xúc về Tổ quốc</p>
-                  </div>
-                  <button
-                    onClick={() => setIsFormVisible(false)}
-                    className="text-gray-500 hover:text-red-600 text-2xl font-bold p-2 hover:bg-red-50 rounded-full transition-colors"
-                    title="Đóng form"
-                  >
-                    ✕
-                  </button>
+        </div>
+      </div>
+
+      {/* Popup Form Modal */}
+      {showPopupForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div className="text-center flex-1">
+                  <h3 className="text-2xl font-bold text-red-600 mb-2">🇻🇳 Gửi Tâm Tình Của Bạn</h3>
+                  <p className="text-gray-600 text-sm">Chia sẻ cảm xúc về Tổ quốc</p>
                 </div>
+                <button
+                  onClick={() => setShowPopupForm(false)}
+                  className="text-gray-500 hover:text-red-600 text-2xl font-bold p-2 hover:bg-red-50 rounded-full transition-colors"
+                  title="Đóng form"
+                >
+                  ✕
+                </button>
+              </div>
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
@@ -507,6 +635,19 @@ export default function A80Page() {
                         className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-red-400 focus:outline-none transition-colors text-sm"
                       />
                     </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Ảnh (không bắt buộc)
+                      </label>
+                      <input
+                        type="file"
+                        name="photo"
+                        accept="image/*"
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-400 focus:outline-none transition-colors text-sm"
+                      />
+                    </div>
                   </div>
                   
                   <div>
@@ -535,55 +676,68 @@ export default function A80Page() {
                 </form>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-        </div>
+        {/* CSS Animations */}
+        <style jsx>{`
+          @keyframes fadeInBounce {
+            0% {
+              opacity: 0;
+              transform: translateY(30px) scale(0.8);
+            }
+            60% {
+              opacity: 1;
+              transform: translateY(-5px) scale(1.02);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+          }
+
+          .comment-card {
+            animation: fadeInBounce 0.8s ease-out both;
+          }
+
+          .comment-card:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+          }
+
+          @keyframes fade-in {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          .animate-fade-in {
+            animation: fade-in 0.5s ease-out;
+          }
+
+          /* Custom scrollbar for form area */
+          ::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+          }
+
+          ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #ef4444, #eab308);
+            border-radius: 3px;
+          }
+
+          ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #dc2626, #d97706);
+          }
+        `}</style>
       </div>
-
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes fadeInBounce {
-          0% {
-            opacity: 0;
-            transform: translateY(30px) scale(0.8);
-          }
-          60% {
-            opacity: 1;
-            transform: translateY(-5px) scale(1.02);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        .comment-card {
-          animation: fadeInBounce 0.8s ease-out both;
-        }
-
-        .comment-card:hover {
-          transform: translateY(-2px) scale(1.05);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-
-        /* Custom scrollbar for form area */
-        ::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-          background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, #ef4444, #eab308);
-          border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, #dc2626, #d97706);
-        }
-      `}</style>
-    </div>
-  );
-}
+    );
+  }

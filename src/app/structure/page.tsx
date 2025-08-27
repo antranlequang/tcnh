@@ -22,7 +22,7 @@ const departments = [
   },
   {
     name: "Ban Tuyên giáo - Sự kiện",
-    shortDescription: 'Nơi mọi “ý tưởng” đều được “chắp cánh vươn xa”',
+    shortDescription: 'Nơi mọi “ý tưởng” được “chắp cánh vươn xa”',
     content: "Ban Tuyên giáo – Sự kiện còn được gọi là “Bộ não” của Đoàn Khoa, là nơi giao thoa của sự sáng tạo, trí tưởng tượng và nhiệt huyết tuổi trẻ. Đúng với cái tên của mình, Ban là sự tổng hòa của 2 yếu tố quan trọng: Tuyên giáo và Sự kiện.\n- Về Tuyên giáo, Ban là nòng cốt trong việc tuyên truyền, triển khai các chủ trương, chính sách, tư tưởng của Đảng, của Nhà nước và của Đoàn - Hội và Nhà trường. Không chỉ tổ chức các buổi sinh hoạt chuyên đề tại những khu di tích lịch sử, bảo tàng, Ban Tuyên giáo - Sự kiện còn là tác giả của các tuyến bài tuyên truyền tư tưởng của Đảng, giáo dục đoàn viên, thanh niên học tập và làm theo tấm gương đạo đức, phong cách Hồ Chí Minh.\n- Về Sự kiện, Ban là nơi ấp ủ và ươm mầm những ý tưởng độc đáo nhất, chính là khởi nguồn của các chương trình Đoàn Khoa sau này. Nếu ví tổ chức mỗi hoạt động ở Đoàn Khoa như việc xây một căn nhà, thì Ban Tuyên giáo - Sự kiện chính là kiến trúc sư trưởng của căn nhà đó. Từ khâu xây dựng ý tưởng và kế hoạch, cho đến lên kịch bản và timeline cho những chương trình trong năm, tất cả đều không thể vắng mặt Tuyên giáo - Sự kiện chúng mình.",
     images: [
       { src: "/images/ban/tgsk/0.jpg"},

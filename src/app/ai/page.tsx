@@ -36,93 +36,93 @@ interface Department {
 
 const questions: Question[] = [
   {
-    id: 1,
-    text: "Trong một dự án nhóm, bạn hứng thú nhất với vai trò nào sau đây?",
-    options: {
-      A: "Nhà thiết kế sáng tạo, người tạo nội dung",
-      B: "Người điều phối cộng đồng, người tổ chức tình nguyện",
-      C: "Người quản lý dự án, quản trị viên",
-      D: "Nhà phân tích nghiên cứu, người lập kế hoạch chiến lược"
+    "id": 1,
+    "text": "Tưởng tượng một căn phòng trống cần được trang trí để tổ chức một bữa tiệc. Bạn sẽ chọn vai trò nào?",
+    "options": {
+      "A": "Người thiết kế không gian, chọn màu sắc, ánh sáng và sắp xếp các vật dụng.",
+      "B": "Người chuẩn bị đồ ăn, thức uống và đảm bảo mọi thứ sẵn sàng đúng giờ.",
+      "C": "Người viết kịch bản, lên ý tưởng trò chơi và các hoạt động để mọi người cùng tham gia.",
+      "D": "Người lên danh sách khách mời, gửi thiệp mời và sắp xếp chỗ ngồi cho từng người."
     }
   },
   {
-    id: 2,
-    text: "Bạn thích làm gì vào thời gian rảnh?",
-    options: {
-      A: "Chụp ảnh, vẽ, thiết kế, hoặc học các phần mềm chỉnh sửa",
-      B: "Tham gia các hoạt động xã hội, tình nguyện hoặc du lịch",
-      C: "Sắp xếp lại công việc, lên kế hoạch cho tuần tới hoặc giải quyết các công việc còn tồn đọng",
-      D: "Tìm hiểu tin tức, cập nhật thông tin hoặc đọc sách về lịch sử và chính trị"
+    "id": 2,
+    "text": "Nếu phải giới thiệu một bộ phim hay cho bạn bè, bạn sẽ làm gì?",
+    "options": {
+      "A": "Thiết kế một poster thật ấn tượng hoặc cắt một đoạn trailer ngắn để thu hút sự chú ý.",
+      "B": "Kể về những cảnh hành động hoặc tình huống thú vị nhất trong phim một cách đầy nhiệt huyết.",
+      "C": "Viết một bài đánh giá sâu sắc, phân tích các ý nghĩa ẩn dụ trong phim.",
+      "D": "Mời bạn bè đến nhà, sắp xếp thời gian cụ thể và chuẩn bị mọi thứ để cùng xem."
     }
   },
   {
-    id: 3,
-    text: "Khi chia sẻ một câu chuyện, bạn muốn nó được thể hiện theo cách nào?",
-    options: {
-      A: "Bằng hình ảnh trực quan, video hoặc một thiết kế ấn tượng",
-      B: "Bằng một sự kiện, một buổi workshop sôi nổi, đầy tính tương tác",
-      C: "Bằng văn bản rõ ràng, tỉ mỉ, đầy đủ dữ liệu và thông tin",
-      D: "Bằng một bài viết sâu sắc, phân tích logic"
+    "id": 3,
+    "text": "Khi nhận được một tin nhắn quan trọng, bạn sẽ xử lý như thế nào?",
+    "options": {
+      "A": "Lưu lại để sau này tìm cảm hứng sáng tạo từ nội dung hoặc hình ảnh trong đó.",
+      "B": "Dùng nó như một động lực để bắt đầu một hoạt động mới.",
+      "C": "Đọc kỹ, phân tích từng câu chữ để hiểu rõ ý đồ của người gửi.",
+      "D": "Đọc ngay, phản hồi nhanh chóng và chuyển tiếp cho những người có liên quan."
     }
   },
   {
-    id: 4,
-    text: "Bạn cảm thấy tự tin nhất khi làm việc với điều gì?",
-    options: {
-      A: "Phần mềm thiết kế đồ họa như Canva, Photoshop, hoặc các ứng dụng chỉnh sửa video",
-      B: "Giao tiếp, kết nối với mọi người và tạo không khí vui vẻ, hào hứng",
-      C: "Sắp xếp, quản lý tài liệu, làm việc với các văn bản hành chính",
-      D: "Viết lách, thuyết trình hoặc truyền tải các thông điệp ý nghĩa"
+    "id": 4,
+    "text": "Khi bắt đầu một dự án mới, điều gì khiến bạn hứng thú nhất?",
+    "options": {
+      "A": "Tạo ra hình ảnh trực quan, video hoặc các sản phẩm để quảng bá dự án.",
+      "B": "Dấn thân vào thực hiện, vượt qua thử thách và hoàn thành dự án.",
+      "C": "Xây dựng ý tưởng cốt lõi, nội dung và các nguyên tắc hoạt động.",
+      "D": "Tổ chức, sắp xếp công việc và đảm bảo mọi thứ diễn ra theo kế hoạch."
     }
   },
   {
-    id: 5,
-    text: "Khi đối mặt với một vấn đề, bạn có xu hướng giải quyết nó như thế nào?",
-    options: {
-      A: "Thông qua các giải pháp hình ảnh sáng tạo",
-      B: "Bằng cách tập hợp sự hỗ trợ và hợp tác của cả đội",
-      C: "Với việc lập kế hoạch và tổ chức một cách có hệ thống",
-      D: "Thông qua nghiên cứu và tư duy phân tích"
+    "id": 5,
+    "text": "Khi tham gia một buổi dã ngoại, bạn sẽ mang theo thứ gì?",
+    "options": {
+      "A": "Một chiếc máy ảnh để ghi lại những khoảnh khắc đẹp.",
+      "B": "Một chiếc loa di động để tạo không khí vui vẻ, sôi động.",
+      "C": "Một cuốn sách hay để chia sẻ hoặc một bộ cờ để chơi cùng.",
+      "D": "Một bộ sơ cứu hoặc bản đồ để đề phòng những tình huống bất ngờ."
     }
   },
   {
-    id: 6,
-    text: "Điểm mạnh lớn nhất của bạn là gì?",
-    options: {
-      A: "Sáng tạo, có gu thẩm mỹ tốt",
-      B: "Năng động, thích khám phá, có tinh thần trách nhiệm với cộng đồng",
-      C: "Có khả năng tổ chức, quản lý và sắp xếp công việc hiệu quả",
-      D: "Tư duy logic, viết tốt và làm việc tỉ mỉ, cẩn thận"
+    "id": 6,
+    "text": "Trong một buổi thuyết trình nhóm, bạn đảm nhận vị trí nào?",
+    "options": {
+      "A": "Thiết kế slide, tạo hình ảnh minh họa để bài thuyết trình trở nên sinh động.",
+      "B": "Trình bày, tương tác với khán giả và trả lời các câu hỏi.",
+      "C": "Soạn thảo nội dung chính, lên kịch bản và dẫn dắt câu chuyện xuyên suốt bài nói.",
+      "D": "Chuẩn bị tài liệu, phân công nhiệm vụ và đảm bảo mọi thành viên có đủ thông tin."
     }
   },
   {
-    id: 7,
-    text: "Bạn thường được bạn bè nhận xét là người như thế nào?",
-    options: {
-      A: "Hướng nội, thích quan sát và có nhiều ý tưởng độc đáo",
-      B: "Hướng ngoại, thích giao lưu, kết nối và dễ dàng hòa nhập",
-      C: "Kín đáo, cẩn thận, luôn làm mọi việc theo đúng quy tắc",
-      D: "Sâu sắc, có chiều sâu và thường suy nghĩ thấu đáo"
+    "id": 7,
+    "text": "Nếu là một nhân vật trong trò chơi điện tử, bạn sẽ chọn vai trò nào?",
+    "options": {
+      "A": "Người tạo ra các hiệu ứng hình ảnh, âm thanh ấn tượng để thu hút người chơi.",
+      "B": "Người tiên phong dấn thân, đối mặt với thử thách và chiến đấu.",
+      "C": "Người đưa ra các chiến lược, kế hoạch để dẫn dắt cả đội giành chiến thắng.",
+      "D": "Người quản lý tài nguyên, hậu cần và cơ sở vật chất cho cả đội."
     }
   },
   {
-    id: 8,
-    text: "Bạn cảm thấy thoải mái nhất khi làm việc trong môi trường nào?",
-    options: {
-      A: "Một không gian yên tĩnh, tập trung để có thể sáng tạo và thiết kế",
-      B: "Một nơi sôi động, nhiều hoạt động và có cơ hội tương tác với nhiều người",
-      C: "Một môi trường có tổ chức, mọi việc được sắp xếp và có kế hoạch rõ ràng",
-      D: "Một môi trường trí tuệ, nơi mọi người thường thảo luận và trao đổi kiến thức"
+    "id": 8,
+    "text": "Bạn thường được giao nhiệm vụ gì trong một chuyến đi chơi?",
+    "options": {
+      "A": "Quay phim, chụp ảnh và dựng video kỷ niệm.",
+      "B": "Hô hào, khuấy động không khí và dẫn dắt các trò chơi tập thể.",
+      "C": "Lên lịch trình, tìm hiểu các địa điểm thú vị và sắp xếp các hoạt động.",
+      "D": "Hậu cần, đặt vé xe, vé tàu và quản lý ngân sách."
     }
   },
   {
-    id: 9,
-    text: "Nếu phải đóng vai trò quan trọng nhất trong một hoạt động, bạn sẽ chọn vai trò nào?",
-    options: {
-      A: "Giám đốc sáng tạo, người kể chuyện bằng hình ảnh",
-      B: "Người dẫn dắt cộng đồng, người điều phối sự kiện",
-      C: "Người quản lý vận hành, người điều phối hậu cần",
-      D: "Nhà cố vấn chiến lược, người nghiên cứu nội dung"
+    "id": 9,
+    "text": "Khi đọc một tin tức quan trọng, bạn sẽ làm gì?",
+    "options": {
+      "A": "Chia sẻ nó lên mạng xã hội với một hình ảnh hoặc video minh họa độc đáo.",
+      "B": "Kêu gọi mọi người hành động hoặc tham gia vào một hoạt động có liên quan.",
+      "C": "Đọc và nghiên cứu kỹ các văn bản pháp lý, các tài liệu liên quan để hiểu rõ bản chất vấn đề.",
+      "D": "Trao đổi với bạn bè và người thân để tìm hiểu sâu hơn về vấn đề."
     }
   }
 ];
@@ -130,7 +130,7 @@ const questions: Question[] = [
 const departments: Record<string, Department> = {
   A: {
     name: "Ban Truyền thông - Kỹ thuật",
-    description: "Ban Truyền thông - Kỹ thuật",
+    description: 'Nơi "nghệ thuật" gặp gỡ tinh thần đoàn kết',
     icon: <Brain className="w-12 h-12" />,
     strengths: [
       "Khả năng học hỏi và ứng dụng công nghệ nhanh",
@@ -146,25 +146,25 @@ const departments: Record<string, Department> = {
     color: "from-blue-500 to-purple-600"
   },
   B: {
-    name: "Ban Phong trào - Tình nguyện",
-    description: "Ban Phong trào - Tình nguyện",
-    icon: <Users className="w-12 h-12" />,
+    name: "Ban Tổ chức - Xây dựng Đoàn",
+    description: 'Vững vàng "Thông tin", sẵn sàng "Gắn kết"',
+    icon: <Building className="w-12 h-12" />,
     strengths: [
-      "Tinh thần tình nguyện và lòng nhân ái cao",
-      "Kỹ năng kết nối và làm việc nhóm tốt",
-      "Khả năng thấu hiểu và hỗ trợ người khác",
-      "Năng lực tổ chức các hoạt động cộng đồng"
+      "Khả năng lãnh đạo và quản lý xuất sắc",
+      "Tư duy chiến lược và nhìn xa trông rộng",
+      "Kỹ năng phân tích và ra quyết định tốt",
+      "Năng lực xây dựng và phát triển đội ngũ"
     ],
     weaknesses: [
-      "Đôi khi quá tập trung vào cảm xúc mà thiếu tính thực tế",
-      "Cần cải thiện kỹ năng quản lý thời gian",
-      "Có thể gặp khó khăn trong việc đưa ra quyết định khó khăn"
+      "Đôi khi quá tập trung vào mục tiêu mà thiếu sự linh hoạt",
+      "Cần phát triển thêm kỹ năng lắng nghe và thấu hiểu",
+      "Có thể gặp khó khăn trong việc cân bằng work-life"
     ],
-    color: "from-green-500 to-teal-600"
+    color: "from-purple-500 to-indigo-600"
   },
   C: {
-    name: "Propaganda Department - Events",
-    description: "Ban Tuyên truyền - Sự kiện chuyên về tổ chức sự kiện, truyền thông và quảng bá",
+    name: "Ban Tuyên giáo - Sự kiện",
+    description: 'Nơi mọi “ý tưởng” được “chắp cánh vươn xa”',
     icon: <Megaphone className="w-12 h-12" />,
     strengths: [
       "Khả năng sáng tạo và đổi mới cao",
@@ -180,22 +180,22 @@ const departments: Record<string, Department> = {
     color: "from-orange-500 to-red-600"
   },
   D: {
-    name: "Organizing Committee - Building Youth Union",
-    description: "Ban Tổ chức - Xây dựng Đoàn chuyên về quản lý, phát triển tổ chức và xây dựng đội ngũ",
-    icon: <Building className="w-12 h-12" />,
+    name: "Ban Phong trào - Tình nguyện",
+    description: "Phong trào vững bước, Tình nguyện vươn xa",
+    icon: <Users className="w-12 h-12" />,
     strengths: [
-      "Khả năng lãnh đạo và quản lý xuất sắc",
-      "Tư duy chiến lược và nhìn xa trông rộng",
-      "Kỹ năng phân tích và ra quyết định tốt",
-      "Năng lực xây dựng và phát triển đội ngũ"
+      "Tinh thần tình nguyện và lòng nhân ái cao",
+      "Kỹ năng kết nối và làm việc nhóm tốt",
+      "Khả năng thấu hiểu và hỗ trợ người khác",
+      "Năng lực tổ chức các hoạt động cộng đồng"
     ],
     weaknesses: [
-      "Đôi khi quá tập trung vào mục tiêu mà thiếu sự linh hoạt",
-      "Cần phát triển thêm kỹ năng lắng nghe và thấu hiểu",
-      "Có thể gặp khó khăn trong việc cân bằng work-life"
+      "Đôi khi quá tập trung vào cảm xúc mà thiếu tính thực tế",
+      "Cần cải thiện kỹ năng quản lý thời gian",
+      "Có thể gặp khó khăn trong việc đưa ra quyết định khó khăn"
     ],
-    color: "from-purple-500 to-indigo-600"
-  }
+    color: "from-green-500 to-teal-600"
+  },
 };
 
 export default function AIPage() {
@@ -212,6 +212,12 @@ export default function AIPage() {
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   const [personalizedContext, setPersonalizedContext] = useState<any>(null);
   const [testStartTime, setTestStartTime] = useState<number>(0);
+  const [quizAnswers, setQuizAnswers] = useState<Array<{
+    questionId: number;
+    selectedOption: string;
+    questionText: string;
+    selectedAnswerText: string;
+  }>>([]);
 
   // Load user progress on component mount
   useEffect(() => {
@@ -231,6 +237,8 @@ export default function AIPage() {
     setCurrentStep('quiz');
     setCurrentQuestion(0);
     setScores({ A: 0, B: 0, C: 0, D: 0 });
+    setQuizAnswers([]); // Reset quiz answers
+    setSelectedAnswer('');
     setTestStartTime(Date.now());
   };
 
@@ -241,6 +249,19 @@ export default function AIPage() {
   const handleNextQuestion = () => {
     if (!selectedAnswer) return;
 
+    // Capture current answer details
+    const currentQuestionData = questions[currentQuestion];
+    const answerDetail = {
+      questionId: currentQuestionData.id,
+      selectedOption: selectedAnswer,
+      questionText: currentQuestionData.text,
+      selectedAnswerText: currentQuestionData.options[selectedAnswer as keyof typeof currentQuestionData.options]
+    };
+
+    // Add to quiz answers
+    const updatedQuizAnswers = [...quizAnswers, answerDetail];
+    setQuizAnswers(updatedQuizAnswers);
+
     // Update scores
     const newScores = { ...scores };
     newScores[selectedAnswer as keyof Scores] += 1;
@@ -250,7 +271,7 @@ export default function AIPage() {
     if (currentQuestion === questions.length - 1) {
       // Calculate result
       const highestScore = Math.max(newScores.A, newScores.B, newScores.C, newScores.D);
-      const resultKey = Object.entries(newScores).find(([key, score]) => score === highestScore)?.[0] || 'A';
+      const resultKey = Object.entries(newScores).find(([, score]) => score === highestScore)?.[0] || 'A';
       setResult(resultKey);
       
       // Save test results
@@ -262,7 +283,7 @@ export default function AIPage() {
       setPersonalizedContext(updatedContext);
       
       // Generate action plan based on result
-      generateActionPlan(resultKey, newScores);
+      generateActionPlan(resultKey);
       setCurrentStep('result');
     } else {
       // Move to next question
@@ -294,6 +315,7 @@ export default function AIPage() {
             department: result,
             departmentInfo: departments[result],
             quizScores: scores,
+            quizAnswers: quizAnswers, // Include detailed quiz answers for AI analysis
             personalizedContext: personalizedContext,
             isReturningUser: personalizedContext?.isReturningUser || false,
             previousDepartments: personalizedContext?.previousDepartments || [],
@@ -318,7 +340,7 @@ export default function AIPage() {
     }
   };
 
-  const generateActionPlan = (departmentKey: string, scores: Scores) => {
+  const generateActionPlan = (departmentKey: string) => {
     const plans: Record<string, string[]> = {
       A: [
         "Tham gia khóa học HTML/CSS cơ bản",
@@ -398,14 +420,18 @@ export default function AIPage() {
               <div className="text-center space-y-8">
                 <div className="mb-8">
                   <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6">
-                    <Brain className="w-12 h-12 text-white" />
+                    <img 
+                      src="/images/background.png" 
+                      alt="Biểu tượng" 
+                      className="w-20 h-20 rounded-full object-cover"
+                    />
                   </div>
                   <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                    FB BOT (AI TƯ VẤN CÁ NHÂN)
+                    FaBi 
                   </h1>
                   <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                     {personalizedContext?.isReturningUser 
-                      ? `Chào mừng trở lại! Bạn đã thực hiện ${personalizedContext.chatCount} cuộc trò chuyện và ${personalizedContext.previousDepartments.length} bài test.`
+                      ? `AI Chat bot của Đoàn khoa Tài chính - Ngân hàng, với nhiệm vụ hỗ trợ sinh viên định hướng chuyên môn phù hợp với Đoàn Khoa.`
                       : 'Chào mừng bạn đến với hệ thống tư vấn cá nhân thông minh! Hãy cùng khám phá ban phù hợp nhất với bạn trong Đoàn Khoa.'
                     }
                   </p>
@@ -434,7 +460,7 @@ export default function AIPage() {
                       onClick={startQuiz}
                       className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                     >
-                      🚀 {personalizedContext?.isReturningUser ? 'Làm lại bài test' : 'Bắt đầu khám phá'}
+                      {personalizedContext?.isReturningUser ? 'Làm bài test' : 'Bắt đầu khám phá'}
                     </Button>
                     
                     {personalizedContext?.isReturningUser && (
@@ -443,7 +469,7 @@ export default function AIPage() {
                         variant="outline"
                         className="px-8 py-4 text-lg font-semibold rounded-xl border-2 hover:bg-blue-50 transition-all duration-200"
                       >
-                        📊 Xem tiến độ
+                        Xem tiến độ
                       </Button>
                     )}
                   </div>
@@ -573,7 +599,7 @@ export default function AIPage() {
                   </Card>
                 )}
 
-                <div className="grid md:grid-cols-2 gap-6">
+                {/* <div className="grid md:grid-cols-2 gap-6">
                   <Card className="bg-green-50 border-green-200">
                     <CardContent className="p-6">
                       <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center">
@@ -605,9 +631,9 @@ export default function AIPage() {
                       </ul>
                     </CardContent>
                   </Card>
-                </div>
+                </div> */}
 
-                <Card className="bg-blue-50 border-blue-200">
+                {/* <Card className="bg-blue-50 border-blue-200">
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center">
                       🎯 Kế hoạch phát triển cá nhân
@@ -621,7 +647,7 @@ export default function AIPage() {
                       ))}
                     </div>
                   </CardContent>
-                </Card>
+                </Card> */}
 
                 <Card className="bg-white/70 backdrop-blur-sm border border-white/20">
                   <CardContent className="p-6 text-center">
@@ -659,7 +685,7 @@ export default function AIPage() {
             {currentStep === 'chat' && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">💬 Chat với FB Bot (AI Tư vấn cá nhân)</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 mb-2 italic">"Sinh viên hỏi - FaBi trả lời"</h1>
                   <p className="text-gray-600">
                     Tớ đã phân tích kết quả của bạn. Hỏi tớ bất cứ điều gì mà bạn đang thắc mắc nè!
                   </p>
@@ -690,14 +716,14 @@ export default function AIPage() {
                     <div className="h-96 overflow-y-auto space-y-4 mb-4 p-4 bg-gray-50 rounded-lg">
                       {chatHistory.length === 0 && (
                         <div className="text-center text-gray-500 py-8">
-                          <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                          <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50 text-justify" />
                           <p>Bắt đầu cuộc trò chuyện bằng cách gửi câu hỏi của bạn!</p>
                         </div>
                       )}
                       
                       {chatHistory.map((chat, index) => (
                         <div key={index} className={`flex ${chat.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg text-justify ${
                             chat.type === 'user' 
                               ? 'bg-blue-600 text-white' 
                               : 'bg-white border border-gray-200 text-gray-900'
@@ -709,7 +735,7 @@ export default function AIPage() {
 
                       {isLoading && (
                         <div className="flex justify-start">
-                          <div className="bg-white border border-gray-200 text-gray-900 px-4 py-2 rounded-lg">
+                          <div className="bg-white border border-gray-200 text-gray-900 px-4 py-2 rounded-lg text-justify">
                             <div className="flex space-x-1">
                               <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                               <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -725,7 +751,7 @@ export default function AIPage() {
                         type="text"
                         value={currentMessage}
                         onChange={(e) => setCurrentMessage(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleChatSubmit()}
+                        onKeyDown={(e) => e.key === 'Enter' && handleChatSubmit()}
                         placeholder="Hỏi AI về kết quả của bạn..."
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         disabled={isLoading}
