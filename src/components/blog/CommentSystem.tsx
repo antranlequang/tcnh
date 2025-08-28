@@ -286,7 +286,7 @@ export function CommentSystem() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-anton text-primary font-medium">
           <MessageCircle className="w-6 h-6" />
-          Diễn đàn thảo luận ({comments.length} bình luận)
+          Diễn đàn thảo luận
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">

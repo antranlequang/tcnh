@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Quote } from 'lucide-react';
-import { CommentSection } from '@/components/blog/CommentSection';
+import { CommentSystem } from '@/components/blog/CommentSystem';
 
 const testimonials = [
   {
@@ -86,8 +86,14 @@ export default function BlogPage() {
       <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
+
+            {/* Comment Section */}
+            <div className="mt-16">
+              <CommentSystem />
+            </div>
+
             {/* Testimonials */}
-            <h2 className="text-2xl md:text-4xl font-headline font-semibold mb-8 text-primary text-center">Đôi lời gửi gắm từ cựu thành viên</h2>
+            <h2 className="text-2xl md:text-4xl font-anton font-medium mb-8 text-primary text-center mt-12">Đôi lời gửi gắm từ cựu thành viên</h2>
             <div className="space-y-8">
               {testimonials.map((testimonial, index) => (
                 <Card key={index} className="overflow-hidden shadow-lg">
@@ -111,11 +117,7 @@ export default function BlogPage() {
               ))}
             </div>
             
-            {/* Comment Section */}
-            {/* <div className="mt-16">
-              <h2 className="text-3xl font-headline font-semibold mb-8">Để lại bình luận</h2>
-              <CommentSection />
-            </div> */}
+
           </div>
 
           {/* Fanpage Card */}
