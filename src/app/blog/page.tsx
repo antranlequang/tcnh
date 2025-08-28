@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Quote } from 'lucide-react';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
+import { CommentSystem } from '@/components/blog/CommentSystem';
 
 const testimonials = [
   {
@@ -114,6 +115,11 @@ export default function BlogPage() {
                 </ScrollReveal>
               ))}
             </div>
+
+            {/* Comment System */}
+            <ScrollReveal delayMs={200}>
+              <CommentSystem />
+            </ScrollReveal>
           
           </div>
 
