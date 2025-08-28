@@ -214,7 +214,7 @@ export function CommentSystem() {
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-3">
             <Avatar className="w-10 h-10">
-              <AvatarFallback className="bg-[#45973c] text-white">
+              <AvatarFallback className=" text-white">
                 {comment.is_anonymous ? (
                   <UserX className="w-5 h-5" />
                 ) : (
@@ -309,7 +309,7 @@ export function CommentSystem() {
             <div className="text-center py-12 text-gray-500">
               <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p className="text-lg">Chưa có bình luận nào</p>
-              <p className="text-sm">Hãy là người đầu tiên chia sẻ ý kiến!</p>
+              <p className="text-sm">Hãy là người đầu tiên bình luận!</p>
             </div>
           ) : (
             <div className="space-y-6">
