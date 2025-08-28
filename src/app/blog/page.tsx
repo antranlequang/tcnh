@@ -87,8 +87,14 @@ export default function BlogPage() {
       <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
+
+            {/* Comment System */}
+            <ScrollReveal delayMs={200}>
+              <CommentSystem />
+            </ScrollReveal>
             {/* Testimonials */}
-            <h2 className="text-2xl md:text-4xl font-anton font-medium mb-8 text-primary text-center">ĐÔI LỜI GỬI GẮM TỪ CỰU THÀNH VIÊN</h2>
+
+            <h2 className="text-2xl md:text-4xl font-anton font-medium mb-8 mt-20 text-primary text-center">ĐÔI LỜI GỬI GẮM TỪ CỰU THÀNH VIÊN</h2>
             <div className="space-y-8">
               {testimonials.map((testimonial, index) => (
                 <ScrollReveal key={index} delayMs={60 * index}>
@@ -115,11 +121,6 @@ export default function BlogPage() {
                 </ScrollReveal>
               ))}
             </div>
-
-            {/* Comment System */}
-            <ScrollReveal delayMs={200}>
-              <CommentSystem />
-            </ScrollReveal>
           
           </div>
 
