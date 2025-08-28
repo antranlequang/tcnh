@@ -78,7 +78,7 @@ export default function BlogPage() {
     <div>
       <PageBanner
         title="GÓC TÂM SỰ"
-        subtitle="Đang bí văn..."
+        subtitle="Nơi chia sẻ những cảm xúc thầm kín..."
         imageUrl="/images/back-ocean.jpg"
         imageHint="community discussion"
       />
