@@ -283,3 +283,13 @@ n {
   opacity: 0.3;
   z-index: -1;
 }
+
+html, body {
+  height: 100%;
+  min-height: 100%;
+  overflow-x: hidden; /* tránh xuất hiện thanh cuộn ngang ngoài ý muốn */
+}
+
+body {
+  overflow-y: auto; /* đảm bảo vẫn cuộn dọc được */
+}

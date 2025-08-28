@@ -1,0 +1,11 @@
+<svg width="48" height="32" xmlns="http://www.w3.org/2000/svg" style="image-rendering: pixelated; image-rendering: crisp-edges;">
+  <!-- Red background -->
+  <rect width="48" height="32" fill="#DA251D"/>
+  
+  <!-- Yellow star - 5-pointed star centered -->
+  <g transform="translate(24,16)">
+    <!-- Star using polygon points for clean pixels -->
+    <polygon points="0,-8 2.35,-2.47 7.61,-2.47 3.63,1.53 4.7,6.94 0,3.71 -4.7,6.94 -3.63,1.53 -7.61,-2.47 -2.35,-2.47" 
+             fill="#FFFF00"/>
+  </g>
+</svg>

@@ -15,9 +15,9 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   if (isA80Page) {
     // A80 page with header but no footer, full height minus header
     return (
-      <div className="h-screen flex flex-col overflow-hidden">
+      <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow overflow-hidden">
+        <main className="flex-grow overflow-y-auto">
           {children}
         </main>
       </div>
