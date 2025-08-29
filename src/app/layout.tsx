@@ -1,16 +1,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import { PageTransition } from '@/components/shared/PageTransition';
-import { Sparkles } from '@/components/shared/Sparkles';
-import { ConditionalLayout } from '@/components/layout/ConditionalLayout';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   title: 'ĐK-TCNH',
   description: 'Trang web của Đoàn khoa Tài chính - Ngân hàng',
-  icons: {
-    icon: '/favicon.ico',
-  },
 };
 
 export default function RootLayout({
@@ -25,19 +21,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased">
-        <div className="aurora-container" aria-hidden>
-          <div className="aurora a"></div>
-          <div className="aurora b"></div>
-          <div className="aurora c"></div>
-        </div>
-        <Sparkles />
+      <body className="font-body antialiased flex flex-col min-h-screen">
         <Toaster />
-        <ConditionalLayout>
-          <PageTransition>
-            {children}
-          </PageTransition>
-        </ConditionalLayout>
+        <Header />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

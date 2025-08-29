@@ -15,7 +15,7 @@ const navItems = [
   { href: '/structure', label: 'Cơ cấu' },
   { href: '/blog', label: 'Diễn đàn' },
   { href: '/apply', label: 'Ứng tuyển' },
-  { href: '/updating', label: 'Tổ quốc Tôi' },
+  { href: '/a80', label: 'Tổ quốc Tôi' },
   { href: '/ai', label: 'Chatbot' },
 ];
 

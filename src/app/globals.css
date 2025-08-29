@@ -108,15 +108,36 @@
 }
 
 /* Font */
+@font-face {
+  font-family: 'FC-Daytonica';
+  src: url('/FC-Daytonica.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DFVN-OceanRush';
+  src: url('/DFVN-OceanRush-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-nunito {
   font-family: 'Nunito', sans-serif;
 }
 .font-passions {
   font-family: 'Passions Conflict', cursive;
 }
-.font-anton
-n {
+.font-anton {
   font-family: 'Anton', sans-serif;
+}
+.font-daytonica {
+  font-family: 'FC-Daytonica', sans-serif;
+}
+.font-ocean-rush {
+  font-family: 'DFVN-OceanRush', sans-serif;
 }
 
 

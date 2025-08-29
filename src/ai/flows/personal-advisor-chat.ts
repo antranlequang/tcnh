@@ -171,7 +171,7 @@ const personalAdvisorChatPrompt = ai.definePrompt({
 		9	Trần Lê Gia Hân	CTV Đoàn Khoa
 - BAN TTKT:
 + K22:
-    10	Lâm Hồng Minh Quân	Nguyên Phó Bí thư, Nguyên Trưởng ban
+    10	Lâm Hồng Minh Quân Nguyên Trưởng ban
 		11	Võ Hoàng Uyên Nhy	Nguyên Phó ban
 + K23:
     12	Nguyễn Ngọc Khánh Nhi	UV. BCH, Trưởng ban
@@ -192,7 +192,7 @@ const personalAdvisorChatPrompt = ai.definePrompt({
 		25	Nguyễn Ngọc Tâm Anh	CTV Đoàn Khoa
 - BAN PTTN:
 + K22:
-    26	Nguyễn Hạo	Bí thư
+    26	Nguyễn Hạo	Bí thư Đoàn Khoa, Nguyên phó ban
 		27	Huỳnh Thị Ngọc Nhi	Nguyên Thủ quỹ
 		28	Trần Nhật Linh	CTV Đoàn Khoa
 + K23:

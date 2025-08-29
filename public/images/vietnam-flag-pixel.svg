@@ -1,11 +1,2 @@
-<svg width="48" height="32" xmlns="http://www.w3.org/2000/svg" style="image-rendering: pixelated; image-rendering: crisp-edges;">
-  <!-- Red background -->
-  <rect width="48" height="32" fill="#DA251D"/>
-  
-  <!-- Yellow star - 5-pointed star centered -->
-  <g transform="translate(24,16)">
-    <!-- Star using polygon points for clean pixels -->
-    <polygon points="0,-8 2.35,-2.47 7.61,-2.47 3.63,1.53 4.7,6.94 0,3.71 -4.7,6.94 -3.63,1.53 -7.61,-2.47 -2.35,-2.47" 
-             fill="#FFFF00"/>
-  </g>
-</svg>
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1063 708.66"> <path d="m0 0h1063v708.66h-1063z" fill="#ec0015" fill-rule="evenodd"/> <path transform="matrix(11.912 0 0 12.458 -2509.8 -6130.7)" d="m266.186,534.45-10.408-7.432-10.357,7.505 3.852-12.196-10.338-7.531 12.79-.105 3.967-12.159 4.052,12.131 12.79.016-10.285,7.602 3.937,12.169z" fill="#ff0" fill-rule="evenodd"/> </svg>
