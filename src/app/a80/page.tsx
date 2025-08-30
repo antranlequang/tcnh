@@ -968,7 +968,10 @@ export default function A80Page() {
                         </h3>
                         <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
                           <p className="text-white leading-relaxed text-justify font-nunito">
-                          Không có gì quý hơn độc lập - tự do. Đến ngày thắng lợi, nhân dân ta sẽ xây dựng lại đất nước ta đàng hoàng hơn, to đẹp hơn. Trích lời Tổng Bí thư Nguyễn Phú Trọng
+                          “... Chiến tranh có thể kéo dài 5 năm, 10 năm, 20 năm hoặc lâu hơn nữa, Hà Nội, Hải Phòng và một số thành phố, xí nghiệp có thể bị tàn phá, song nhân dân Việt Nam quyết không sợ! Không có gì quý hơn độc lập tự do. Đến ngày thắng lợi, nhân dân ta sẽ xây dựng lại đất nước ta đàng hoàng hơn, to đẹp hơn!”.
+                          </p>
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          Là lời của Chủ tịch Hồ Chí Minh trích trong lời kêu gọi chống Mỹ, cứu nước, được Đài Tiếng nói Việt Nam truyền đi sáng ngày 17 tháng 7 năm 1966 trong thời điểm đế quốc Mỹ ồ ạt đưa quân viễn chinh Mỹ và quân các nước chư hầu vào tham chiến trực tiếp trên chiến trường miền Nam
                           </p>
                         </div>
                       </div>
