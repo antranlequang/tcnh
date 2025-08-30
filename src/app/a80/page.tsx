@@ -955,43 +955,13 @@ export default function A80Page() {
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="p-4 sm:p-6 lg:p-8">
-                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
-                      {/* Image Left - Order changes on mobile */}
-                      <div className="w-full md:w-1/2 order-2 md:order-2">
-                        <div className="relative">
-                          <img 
-                            src="/images/a80/2.jpg" 
-                            alt="Lịch sử Việt Nam" 
-                            className="w-full h-auto rounded-lg shadow-lg"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
-                        </div>
-                        <p className="text-center text-base md:text-lg text-gray-300 mt-2 italic mt-3 font-bold">
-                        Bức ảnh “Nụ cười chiến thắng bên Thành cổ Quảng Trị” của phóng viên Đoàn Công Tính
-                        </p>
-                      </div>
-                      {/* Text Right - Show first on mobile */}
-                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-1">
-                        <h3 className="text-2xl md:text-exl font-medium text-yellow-300 text-center md:text-left font-anton">
-                        “Nụ cười chiến thắng bên Thành cổ Quảng Trị”
-                        </h3>
-                        <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
-                          <p className="text-white leading-relaxed text-justify font-nunito">
-                          Nghệ sĩ nhiếp ảnh Đoàn Công Tính kể rằng, trong cuộc đời làm phóng viên chiến trường của ông có những kỷ niệm mãi in đậm trong ký ức như việc chụp bức ảnh “Nụ cười chiến thắng bên Thành cổ Quảng Trị”. Thời điểm đó, nhà báo, chiến sĩ Đoàn Công Tính khát khao ghi lại những khoảnh khắc của chiến trường nên đã tìm mọi cách để vào được trong Thành cổ, nơi chiến sự ác liệt nhất. Và rồi bức ảnh chụp người chiến sĩ ở Thành cổ là đồng chí Lê Xuân Chinh vào khoảng cuối tháng 8-1972 được ra đời, khi cuộc chiến tại Thành cổ Quảng Trị vẫn đang tiếp diễn ác liệt.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="space-y-8 mt-4">
                   <div className="p-4 sm:p-6 lg:p-8">
                     <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
                       {/* Text block: order-1 md:order-1 */}
-                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-2">
+                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-1">
                         <h3 className="text-2xl md:text-3xl font-medium text-yellow-300 text-center md:text-left font-anton">
                           "Không có gì quý hơn độc lập và tự do..."
                         </h3>
@@ -1002,7 +972,7 @@ export default function A80Page() {
                         </div>
                       </div>
                       {/* Image block: order-2 md:order-2 */}
-                      <div className="w-full md:w-1/2 order-2 md:order-1">
+                      <div className="w-full md:w-1/2 order-2 md:order-2">
                         <div className="relative">
                           <video 
                             autoPlay 
