@@ -45,6 +45,7 @@ export default function A80Page() {
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [floatingNames, setFloatingNames] = useState<FloatingName[]>([]);
+  const [selectedSection, setSelectedSection] = useState<'historical' | 'next-gen'>('historical');
   const [formData, setFormData] = useState<FormData>({
     name: '',
     studentId: '',
@@ -55,16 +56,24 @@ export default function A80Page() {
     isAnonymous: false
   });
 
+  // Pagination state for next-gen submissions
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 28;
+
   const flagCanvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
   const flagImageRef = useRef<HTMLImageElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Vietnamese flag dimensions and colors
   const RED_COLOR = '#DA251D';
   const YELLOW_COLOR = '#FFD700';
   
   // 🎯 CONFIGURABLE: Change this number to adjust total pixels for testing
-  const TOTAL_PIXELS = 1000;
+  const TOTAL_PIXELS = 864;
+
+  // Music files
+  const musicFiles = ['/music/1.mp3', '/music/2.mp3', '/music/3.mp3', '/music/4.mp3'];
 
   // Deterministic PRNG for stable random ordering per grid size
   const mulberry32 = (seed: number) => {
@@ -75,10 +84,52 @@ export default function A80Page() {
       return ((t ^ (t >>> 14)) >>> 0) / 4294967295;
     };
   };
+
+  // Music management functions
+  const getRandomMusic = () => {
+    const randomIndex = Math.floor(Math.random() * musicFiles.length);
+    return musicFiles[randomIndex];
+  };
+
+  const playRandomMusic = () => {
+    if (audioRef.current) {
+      const randomMusic = getRandomMusic();
+      audioRef.current.src = randomMusic;
+      audioRef.current.play().catch(console.error);
+    }
+  };
+
+  const initializeAudio = () => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.volume = 0.3;
+      audioRef.current.addEventListener('ended', playRandomMusic);
+    }
+    playRandomMusic();
+  };
   
 
   useEffect(() => {
     fetchSubmissions();
+    
+    // Initialize music with user interaction
+    const handleFirstInteraction = () => {
+      initializeAudio();
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+    };
+    
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('keydown', handleFirstInteraction);
+    
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -314,14 +365,14 @@ export default function A80Page() {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   
     // 2) Grid cố định, ví dụ 50x33
-    const rows = 46;
-    const cols = 69;
-    const cellW = Math.floor(canvasWidth / cols);
-    const cellH = Math.floor(canvasHeight / rows);
+    const rows = 24;
+    const cols = 36;
+    const cellW = canvasWidth / cols;
+    const cellH = canvasHeight / rows;
     
     // 1) Draw blurred Vietnamese flag as background - fill entire canvas
     ctx.save();
-    ctx.globalAlpha = 0.005;
+    ctx.globalAlpha = 0.05;
     ctx.filter = 'blur(0.5px)';
     ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
     ctx.restore();
@@ -364,7 +415,7 @@ export default function A80Page() {
       ctx.drawImage(
         img,
         sx, sy, sw, sh, // Source rectangle from flag image
-        dx, dy, cellW, cellH // Destination rectangle on canvas
+        dx, dy, cellW + 1, cellH + 1 // Destination rectangle on canvas, expanded by 1px
       );
       
       ctx.restore();
@@ -374,6 +425,12 @@ export default function A80Page() {
       ctx.lineWidth = 0.5;
       ctx.strokeRect(dx, dy, cellW, cellH);
     }
+    // Vẽ khung màu trắng bao quanh toàn bộ lá cờ
+    ctx.save();
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = 'white';
+    ctx.strokeRect(0, 0, canvasWidth, canvasHeight);
+    ctx.restore();
   };
 
   const drawFallbackFlag = (ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number) => {
@@ -491,7 +548,18 @@ export default function A80Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 relative overflow-hidden">
+    <div
+      className="min-h-screen relative overflow-hidden backdrop-blur-sm"
+      style={{
+        backgroundImage: "url('/images/background-a80.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+
+
       {/* Animated floating stars */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {[...Array(20)].map((_, i) => (
@@ -514,205 +582,533 @@ export default function A80Page() {
         ))}
       </div>
       
-      {/* Red gradient overlay at top */}
-      <div className="absolute top-0 left-0 w-full h-[30vh] md:h-[60vh] bg-gradient-to-b from-red-500 via-red-400/15 to-transparent pointer-events-none z-5"></div>
+      
 
-        {/* Header */}
-        <div className="text-center py-6 relative z-10">
-          <h1 className="text-3xl md:text-8xl font-medium text-yellow-300 mb-4 md:mb-6 mt-4 md:mt-12 flex items-center justify-center font-ocean-rush transform hover:scale-105 transition-all duration-500 drop-shadow-2xl" style={{textShadow: '4px 4px 8px rgba(0,0,0,0.3), 0 0 20px rgba(255,215,0,0.5)'}}>
-            <img src="/images/quocky.png" alt="Việt Nam" className="w-8 md:w-20 h-auto object-cover rounded-lg mx-4 md:mx-8 transform hover:rotate-12 hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-yellow-400/50"/>
-            RẠNG RỠ VIỆT NAM
-            <img src="/images/quocky.png" alt="Việt Nam" className="w-8 md:w-20 h-auto object-cover rounded-lg mx-4 md:mx-8 transform hover:-rotate-12 hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-yellow-400/50"/>
-          </h1>
+      {/* Red gradient overlay at top */}
+      <div className="absolute top-0 left-0 w-full h-[30vh] md:h-[60vh] bg-gradient-to-b from-red-500 via-red-400/15 to-transparent pointer-events-none"></div>
+
+        {/* Banner */}
+        <div className="w-full relative">
+          <div className="relative overflow-hidden">
+            <img 
+              src="/images/banner-a80.png" 
+              alt="Banner A80" 
+              className="w-full h-auto object-cover"
+            />
+          </div>
         </div>
 
         {/* Flag Canvas and Form - Responsive Layout */}
-        <ScrollReveal>
-          <div className="container mx-auto px-4 mb-10">
-            {/* Unified Responsive Layout */}
-            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-              {/* Form Section - Responsive Width */}
-              <div className="w-full lg:w-[35%] xl:w-[30%] order-2 lg:order-1">
-                <Card className="bg-white shadow-xl h-fit transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 hover:shadow-2xl hover:shadow-red-200/50 border-2 hover:border-red-300">
-                  <CardContent className="p-4 sm:p-6">
-                    <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 text-center lg:text-left">Nhập lời chúc của bạn</h2>
-                    
-                    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                      <div className="flex items-center justify-center lg:justify-start space-x-2 mb-4">
-                        <input
-                          type="checkbox"
-                          id="isAnonymous"
-                          name="isAnonymous"
-                          checked={formData.isAnonymous}
-                          onChange={handleInputChange}
-                          className="rounded"
-                        />
-                        <label htmlFor="isAnonymous" className="text-sm text-gray-600">
-                          Gửi ẩn danh
-                        </label>
-                      </div>
+        <div className="bg-red/30 py-14">
+          <div className="flex items-center justify-center gap-4 md:gap-14 mb-5 md:mb-14">
+              <img 
+                src="/images/quocky.png" 
+                alt="Cờ Việt Nam" 
+                className="w-12 h-auto sm:w-20 md:w-32 object-contain rounded-xl"
+              />
+              <h1 className="text-4xl sm:text-9xl font-medium font-anton text-yellow-300 text-center">
+              RẠNG RỠ VIỆT NAM
+              </h1>
+              <img 
+                src="/images/quocky.png" 
+                alt="Cờ Việt Nam" 
+                className="w-12 h-auto sm:w-20 md:w-32 object-contain rounded-xl"
+              />
+          </div>
 
-                      {!formData.isAnonymous && (
-                        <div className="space-y-3 sm:space-y-4">
-                          <Input
-                            name="name"
-                            placeholder="Họ và tên *"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            required={!formData.isAnonymous}
-                            className="w-full"
-                          />
+          <p className="text-red-100 font-medium text-sm md:text-4xl font-anton mb-1 md:mb-3 mt-0 text-center">
+                Mỗi lời chúc là một phần giúp tô điểm nên lá cờ Tổ quốc
+          </p>
+          <p className="text-red-100 font-medium text-sm md:text-4xl font-anton mb-8 md:mb-14 text-center">
+                Cùng Đoàn khoa Tài chính - Ngân hàng gửi những lời chúc tới Thủ Đô
+          </p>
 
-                          <Input
-                            name="studentId"
-                            placeholder="Mã số sinh viên"
-                            value={formData.studentId}
+          <ScrollReveal>
+            <div className="container mx-auto px-4 mb-10">
+              {/* Unified Responsive Layout */}
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+                {/* Form Section - Responsive Width */}
+                <div className="w-full lg:w-[35%] xl:w-[30%] order-2 lg:order-1">
+                  <Card className="bg-white shadow-xl h-fit border-2">
+                    <CardContent className="p-4 sm:p-6">
+                      <h2 className="text-lg sm:text-xl font-bold text-red-600 mb-4 text-center lg:text-left">Nhập lời chúc của bạn</h2>
+                      
+                      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+                        <div className="flex items-center justify-center lg:justify-start space-x-2 mb-4">
+                          <input
+                            type="checkbox"
+                            id="isAnonymous"
+                            name="isAnonymous"
+                            checked={formData.isAnonymous}
                             onChange={handleInputChange}
-                            className="w-full"
+                            className="rounded"
                           />
-
-                          <Input
-                            name="className"
-                            placeholder="Lớp"
-                            value={formData.className}
-                            onChange={handleInputChange}
-                            className="w-full"
-                          />
-
-                          <Input
-                            name="faculty"
-                            placeholder="Khoa"
-                            value={formData.faculty}
-                            onChange={handleInputChange}
-                            className="w-full"
-                          />
-
-                          <Input
-                            name="email"
-                            type="email"
-                            placeholder="Email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            className="w-full"
-                          />
+                          <label htmlFor="isAnonymous" className="text-sm text-gray-600">
+                            Gửi ẩn danh
+                          </label>
                         </div>
-                      )}
 
-                      <Textarea
-                        name="content"
-                        placeholder="Nội dung lời chúc *"
-                        value={formData.content}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full"
-                        rows={4}
-                      />
+                        {!formData.isAnonymous && (
+                          <div className="space-y-3 sm:space-y-4">
+                            <Input
+                              name="name"
+                              placeholder="Họ và tên *"
+                              value={formData.name}
+                              onChange={handleInputChange}
+                              required={!formData.isAnonymous}
+                              className="w-full"
+                            />
 
-                      <div className="flex justify-center lg:justify-start">
-                        <Button
-                          type="submit"
-                          disabled={isLoading}
-                          className="bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white px-6 sm:px-8 py-2 sm:py-3 lg:w-full transform hover:scale-110 hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-red-400/50 border-2 border-red-600 hover:border-red-400"
-                          size="lg"
-                          style={{textShadow: '1px 1px 2px rgba(0,0,0,0.3)'}}
-                        >
-                          {isLoading ? 'Đang gửi...' : 'Gửi lời chúc'}
-                        </Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              {/* Flag Canvas - Responsive Size and Position */}
-              <div className="w-full lg:w-[65%] xl:w-[70%] order-1 lg:order-2">
-                <div className="relative bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-[280px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[900px] mx-auto aspect-[3/2] transform hover:scale-105 hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl hover:shadow-red-300/30 border-2 hover:border-red-400">
-                  <canvas
-                    ref={flagCanvasRef}
-                    width={1000}
-                    height={667}
-                    className="w-full h-auto block"
-                  />
+                            <Input
+                              name="studentId"
+                              placeholder="Mã số sinh viên"
+                              value={formData.studentId}
+                              onChange={handleInputChange}
+                              className="w-full"
+                            />
+
+                            <Input
+                              name="className"
+                              placeholder="Lớp"
+                              value={formData.className}
+                              onChange={handleInputChange}
+                              className="w-full"
+                            />  
+
+                            <Input
+                              name="faculty"
+                              placeholder="Khoa"
+                              value={formData.faculty}
+                              onChange={handleInputChange}
+                              className="w-full"
+                            />
+
+                            <Input
+                              name="email"
+                              type="email"
+                              placeholder="Email"
+                              value={formData.email}
+                              onChange={handleInputChange}
+                              className="w-full"
+                            />
+                          </div>
+                        )}
+
+                        <Textarea
+                          name="content"
+                          placeholder="Nội dung lời chúc *"
+                          value={formData.content}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full"
+                          rows={4}
+                        />
+
+                        <div className="flex justify-center lg:justify-start">
+                          <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className="bg-gradient-to-r from-red-500 to-red-700 text-white px-6 sm:px-8 py-2 sm:py-3 lg:w-full shadow-lg border-2 border-red-600"
+                            size="lg"
+                            style={{textShadow: '1px 1px 2px rgba(0,0,0,0.3)'}}
+                          >
+                            {isLoading ? 'Đang gửi...' : 'Gửi lời chúc'}
+                          </Button>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
                 </div>
+                
+                {/* Flag Canvas - Responsive Size and Position */}
+                <div className="w-full lg:w-[65%] xl:w-[70%] order-1 lg:order-2">
+                <div className="relative rounded-lg shadow-xl overflow-hidden w-full max-w-[280px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[900px] mx-auto aspect-[3/2] transform hover:scale-105 hover:-translate-y-2 transition-all duration-500  hover:shadow-red-300/0">
+                    <canvas
+                      ref={flagCanvasRef}
+                      width={1000}
+                      height={667}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* Call to Action */}
+          <div className="container mx-auto mb-0">
+            <div className=" text-white p-4 text-center ">
+              <h2 className="text-3xl md:text-6xl mt-0 md:mt-10 font-medium font-anton mb-4">TỔNG SỐ LỜI CHÚC HIỆN TẠI</h2>
+              <div className="text-8xl md:text-9xl mt-5 md:mt-10 font-extrabold text-yellow-300 font-ocean-rush animate-pulse" style={{textShadow: '4px 4px 8px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.8)'}}>
+                {totalCount ?? submissions.length}
               </div>
             </div>
           </div>
-        </ScrollReveal>
-
-        {/* Call to Action */}
-        <div className="container mx-auto px-4 mb-8">
-          <Card className="bg-gradient-to-r from-red-600 via-red-500 to-red-700 text-white transform hover:scale-105 transition-all duration-500 shadow-2xl hover:shadow-red-400/30 border-2 border-red-400 hover:border-yellow-300">
-            <CardContent className="p-8 text-center">
-              <h2 className="text-2xl md:text-3xl font-medium font-anton mb-4">TỔNG SỐ LỜI CHÚC HIỆN TẠI</h2>
-              <div className="text-6xl md:text-8xl font-extrabold text-yellow-300 mb-4 font-ocean-rush transform hover:scale-110 transition-all duration-300 animate-pulse" style={{textShadow: '4px 4px 8px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.8)'}}>
-                {totalCount ?? submissions.length}
-              </div>
-              <p className="text-red-100 font-bold">
-                Mỗi lời chúc là một phần giúp tô điểm lá cờ Tổ quốc Việt Nam.
-              </p>
-            </CardContent>
-          </Card>
         </div>
 
+        <div className="bg-orange-100 py-6 md:py-10 px-4 md:px-8 text-center text-4xl md:text-9xl font-anton font-medium text-red-700 shadow-lg rounded-lg">
+          TỰ HÀO LÀ NGƯỜI VIỆT NAM
+        </div>
 
-        {/* Submissions Display */}
-        <ScrollReveal delayMs={400}>
-          <div className="container mx-auto px-4 mb-8">
-            <Card className="bg-white/90 backdrop-blur-sm shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:shadow-2xl hover:shadow-blue-200/30 border-2 hover:border-blue-300">
-              <CardContent className="p-6">
-              <div className="flex justify-center items-center gap-2 mb-7 mt-2">
-                <img 
-                  src="/images/quocky.png" 
-                  alt="Việt Nam" 
-                  className="w-6 h-auto object-cover rounded-sm" 
-                />
-                <span className="text-2xl md:text-5xl font-passions font-medium text-center">
-                  Độc lập - Tự do - Hạnh phúc
-                </span>
-                <img 
-                  src="/images/quocky.png" 
-                  alt="Việt Nam" 
-                  className="w-6 h-auto object-cover rounded-sm" 
-                />
-              </div>
-              {submissions.length === 0 ? (
-                <div className="text-gray-500 text-center py-4">
-                  Chưa có lời chúc nào. Hãy là người đầu tiên!
-                </div>
-              ) : (
-                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-0">
-                  {[...submissions].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((submission) => (
-                    <div key={submission.id} className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 border border-gray-200 mb-4 break-inside-avoid transform hover:scale-105 hover:-translate-y-1 transition-all duration-200 hover:shadow-lg hover:shadow-gray-300/50 hover:border-red-300">
-                      <div className="mb-2">
-                        <div className="flex items-center gap-2 mb-1">
-                          <User className="w-4 h-4 text-red-600" />
-                          <span className="font-semibold text-red-600 text-sm">{submission.name}</span>
+        {/* Section Selector and Historical/Next Gen Section */}
+        <div
+          className="py-8"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(220,38,38,0.5), rgba(220,38,38,0.5) 50%)'
+          }}
+        >
+          {/* Section Selector */}
+          <div className="container mx-auto mt-0 mb-8">
+            <div className="flex flex-row flex-wrap justify-center gap-3 sm:gap-6">
+              <Button
+                onClick={() => setSelectedSection('historical')}
+                className={`px-4 sm:px-auto md:px-10 py-2 sm:py-8 font-anton font-medium text-xl sm:text-2xl transition-all duration-300 ${
+                  selectedSection === 'historical'
+                    ? 'bg-red-600 text-yellow-200 shadow-lg'
+                    : 'bg-white text-red-700'
+                }`}
+              >
+                HÀNH TRÌNH LỊCH SỬ
+              </Button>
+              <Button
+                onClick={() => setSelectedSection('next-gen')}
+                className={`px-4 sm:px-auto md:px-10 py-2 sm:py-8 font-anton font-medium text-xl sm:text-2xl transition-all duration-300 ${
+                  selectedSection === 'next-gen'
+                    ? 'bg-red-600 text-yellow-200 shadow-lg'
+                    : 'bg-white text-red-700'
+                }`}
+              >
+                THẾ HỆ TIẾP BƯỚC
+              </Button>
+            </div>
+          </div>
+
+          {/* Historical Journey Section */}
+          {selectedSection === 'historical' && (
+            <ScrollReveal>
+              <div className="mx-auto px-4 mb-8">
+                <h1 className="text-3xl md:text-7xl font-passions font-medium text-center md:mb-10 mb-4 text-white">
+                    Để có được độc lập như ngày hôm nay, ông cha ta đã đánh đổi rất nhiều
+                </h1>
+
+                <div className="space-y-8 px-2 sm:px-4">
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                      {/* Text block: order-1 md:order-1 */}
+                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-2">
+                        <h3 className="text-2xl md:text-exl font-medium text-yellow-300 text-center md:text-left font-anton">
+                          "Chiến tranh kết thúc nhưng vết thương vẫn còn đó...""
+                        </h3>
+                        <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          “Xung phong!....”; "A.....hòa bình... hòa bình rồi tụi bây ơi!".
+                          </p>
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          Nhìn cảnh này mới hiểu hết giá trị của sự hi sinh cho độc lập, tự do! Chiến tranh đã qua đi, đất nước đã không còn tiếng bom đạn, thế nhưng với những người thương bệnh binh tâm thần thì nỗi đau, nỗi ám ảnh về những trận đánh khốc liệt hôm qua vẫn luôn dày vò tâm trí họ.
+                          Ở Trung tâm chăm sóc và phục hồi chức năng (PHCN) cho người tâm thần, đôi khi, những ký ức chiến tranh vọng về, khiến cho người thương bệnh binh lên cơn tái phát tâm thần. Người thì la hét, ra lệnh xung phong, chỉ tay phối hợp trong chiến đấu; người thì đột ngột chào cờ và hát vang ca khúc "Như có Bác Hồ trong ngày vui đại thắng"; cũng có người bỗng nửa đêm bật dậy khóc thương cho đồng đội vừa mới hy sinh. Có anh khi tỉnh khi mê lui ra sau nhà vệ sinh khóc. 
+                          </p>
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          Có những vết thương không bao giờ chữa lành, có những con người ra khỏi trận chiến là một con người khác, không nhớ nổi bản thân mình. Chiến tranh khốc liệt và đau đớn là vậy, xin hãy đừng quên. Hôm nay những thế hệ sau được hưởng cuộc sống hòa bình phải luôn biết ơn những người đã hy sinh cuộc đời mình, giành hết cho Tổ quốc, cho cuộc sống độc lập tự do mà thế hệ cha anh không tiếc máu xương gìn giữ.
+                          </p>
                         </div>
                       </div>
-                      
-                      <p className="text-gray-700 text-sm mb-3 break-words">{submission.content}</p>
-                      
-                      
-                      
-                      {/* Vietnamese flag at the end of each comment */}
-                      <div className="mt-2 relative">
-                        <img 
-                          src="/images/quocky.png"  
-                          alt="Việt Nam" 
-                          className="w-full h-auto object-cover aspect-[3/2] rounded-sm"
-                          style={{
-                            filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.1))'
-                          }}
-                        />
+                      {/* Image block: order-2 md:order-2 */}
+                      <div className="w-full md:w-1/2 order-2 md:order-1">
+                        <div className="relative">
+                          <img 
+                            src="/images/a80/1.jpg" 
+                            alt="Lịch sử Việt Nam" 
+                            className="w-full h-auto rounded-lg shadow-lg"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
+                        </div>
+                        <p className="text-center text-base md:text-lg text-gray-300 mt-2 italic mt-3 font-bold">
+                        Các cựu chiến binh ở Trung tâm chăm sóc và phục hồi chức năng (PHCN)
+                        </p>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                  
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                      {/* Image Left - Order changes on mobile */}
+                      <div className="w-full md:w-1/2 order-2 md:order-2">
+                        <div className="relative">
+                          <img 
+                            src="/images/a80/2.jpg" 
+                            alt="Lịch sử Việt Nam" 
+                            className="w-full h-auto rounded-lg shadow-lg"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
+                        </div>
+                        <p className="text-center text-base md:text-lg text-gray-300 mt-2 italic mt-3 font-bold">
+                        Bức ảnh “Nụ cười chiến thắng bên Thành cổ Quảng Trị” của phóng viên Đoàn Công Tính
+                        </p>
+                      </div>
+                      {/* Text Right - Show first on mobile */}
+                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-1">
+                        <h3 className="text-2xl md:text-exl font-medium text-yellow-300 text-center md:text-left font-anton">
+                        “Nụ cười chiến thắng bên Thành cổ Quảng Trị”
+                        </h3>
+                        <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          Nghệ sĩ nhiếp ảnh Đoàn Công Tính kể rằng, trong cuộc đời làm phóng viên chiến trường của ông có những kỷ niệm mãi in đậm trong ký ức như việc chụp bức ảnh “Nụ cười chiến thắng bên Thành cổ Quảng Trị”. Thời điểm đó, nhà báo, chiến sĩ Đoàn Công Tính khát khao ghi lại những khoảnh khắc của chiến trường nên đã tìm mọi cách để vào được trong Thành cổ, nơi chiến sự ác liệt nhất. Và rồi bức ảnh chụp người chiến sĩ ở Thành cổ là đồng chí Lê Xuân Chinh vào khoảng cuối tháng 8-1972 được ra đời, khi cuộc chiến tại Thành cổ Quảng Trị vẫn đang tiếp diễn ác liệt.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-              </CardContent>
-            </Card>
+
+                <div className="space-y-8 mt-4">
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                      {/* Text block: order-1 md:order-1 */}
+                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-2">
+                        <h3 className="text-2xl md:text-3xl font-medium text-yellow-300 text-center md:text-left font-anton">
+                          "Giữ con lại thì mất nước, nên để cho hắn đi..."
+                        </h3>
+                        <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          Mẹ Lang là thân nhân của hai liệt sĩ, chồng và con trai lần lượt hy sinh trong 2 cuộc kháng chiến chống Pháp, chống Mỹ cứu nước.
+                          Bàn thờ con trai không di ảnh, không một tờ lịch đánh dấu ngày mất, người mẹ già nước mắt lăn dài trên khuôn mặt nhăn nheo, khóc vì xót xa: "Không còn chi hết con à. Ảnh nó cũng mất hết trơn". Gọi là "giỗ vọng" là vì thế.
+                          Mẹ Lang không biết con trai hy sinh ngày nào, không một tấm ảnh thờ, không kỷ vật nào còn sót lại, bàn thờ chỉ treo tấm bằng Tổ quốc ghi công. Mẹ lấy ngày nhà nước cấp bằng Tổ quốc ghi công và ngày Thương binh - Liệt sĩ hàng năm làm ngày cúng giỗ con trai.
+                          </p>
+                        </div>
+                      </div>
+                      {/* Image block: order-2 md:order-2 */}
+                      <div className="w-full md:w-1/2 order-2 md:order-1">
+                        <div className="relative">
+                          <img 
+                            src="/images/a80/3.png" 
+                            alt="Lịch sử Việt Nam" 
+                            className="w-full h-auto rounded-lg shadow-lg"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
+                        </div>
+                        <p className="text-center text-base md:text-lg text-gray-300 mt-2 italic mt-3 font-bold">
+                        Mẹ Việt Nam Anh hùng Ngô Thị Lang
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                      {/* Image Left - Order changes on mobile */}
+                      <div className="w-full md:w-1/2 order-2 md:order-2">
+                        <div className="relative">
+                          <img 
+                            src="/images/a80/4.webp" 
+                            alt="Lịch sử Việt Nam" 
+                            className="w-full h-auto rounded-lg shadow-lg"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
+                        </div>
+                        <p className="text-center text-base md:text-lg text-gray-300 mt-2 italic mt-3 font-bold">
+                            Hình ảnh được lấy từ phim "Mưa đỏ"
+                        </p>
+                      </div>
+                      {/* Text Right - Show first on mobile */}
+                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-1">
+                        <h3 className="text-2xl md:text-3xl font-medium text-yellow-300 text-center md:text-left font-anton">
+                        "Thành Cổ thì rộng nhưng đồng đội tôi nằm chật"
+                        </h3>
+                        <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          Người ta nói Thành Cổ Quảng Trị là nghĩa trang không bia mộ. Bởi trong lòng đất này, dưới từng thớ gạch vụn và từng thảm cỏ mềm, là máu xương của hàng vạn người lính tuổi mười tám, đôi mươi. Đó là một sự thật khiến tim tôi nhói lên: họ chính những người trẻ như tôi, nhưng không có cơ hội để đi qua tuổi hai mươi, không có dịp mơ mộng về tương lai, không được sống cuộc đời bình thường mà tôi đang có. Họ dừng lại mãi ở đây đóng khung hình mãi ở cái tuổi đẹp nhất 18-20, để lịch sử vận hành chuyển tiếp.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-8">
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                      {/* Text block: order-1 md:order-1 */}
+                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-2">
+                        <h3 className="text-2xl md:text-3xl font-medium text-yellow-300 text-center md:text-left font-anton">
+                          "9 lần nhận giấy báo tử từ con"
+                        </h3>
+                        <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          “Hiếm có người mẹ nào trên thế giới này mang nhiều nỗi đau và sự hy sinh cho Tổ quốc như mẹ Nguyễn Thị Thứ. Trong chống Pháp và Mỹ, mẹ Thứ lần lượt nhận 9 giấy báo tử của 9 con trai và nhận tin con rể cùng 2 cháu ngoại hy sinh.
+                          </p>
+                        </div>
+                      </div>
+                      {/* Image block: order-2 md:order-2 */}
+                      <div className="w-full md:w-1/2 order-2 md:order-1">
+                        <div className="relative">
+                          <img 
+                            src="/images/a80/5.jpg" 
+                            alt="Lịch sử Việt Nam" 
+                            className="w-full h-auto rounded-lg shadow-lg"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
+                        </div>
+                        <p className="text-center text-base md:text-lg text-gray-300 mt-2 italic mt-3 font-bold">
+                        Mẹ Việt Nam Anh hùng Nguyễn Thị Thứ
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                      {/* Image Left - Order changes on mobile */}
+                      <div className="w-full md:w-1/2 order-2 md:order-2">
+                        <div className="relative">
+                          <img 
+                            src="/images/a80/2.jpg" 
+                            alt="Lịch sử Việt Nam" 
+                            className="w-full h-auto rounded-lg shadow-lg"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
+                        </div>
+                        <p className="text-center text-base md:text-lg text-gray-300 mt-2 italic mt-3 font-bold">
+                        Bức ảnh “Nụ cười chiến thắng bên Thành cổ Quảng Trị” của phóng viên Đoàn Công Tính
+                        </p>
+                      </div>
+                      {/* Text Right - Show first on mobile */}
+                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-1">
+                        <h3 className="text-2xl md:text-exl font-medium text-yellow-300 text-center md:text-left font-anton">
+                        “Nụ cười chiến thắng bên Thành cổ Quảng Trị”
+                        </h3>
+                        <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          Nghệ sĩ nhiếp ảnh Đoàn Công Tính kể rằng, trong cuộc đời làm phóng viên chiến trường của ông có những kỷ niệm mãi in đậm trong ký ức như việc chụp bức ảnh “Nụ cười chiến thắng bên Thành cổ Quảng Trị”. Thời điểm đó, nhà báo, chiến sĩ Đoàn Công Tính khát khao ghi lại những khoảnh khắc của chiến trường nên đã tìm mọi cách để vào được trong Thành cổ, nơi chiến sự ác liệt nhất. Và rồi bức ảnh chụp người chiến sĩ ở Thành cổ là đồng chí Lê Xuân Chinh vào khoảng cuối tháng 8-1972 được ra đời, khi cuộc chiến tại Thành cổ Quảng Trị vẫn đang tiếp diễn ác liệt.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-8 mt-4">
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center">
+                      {/* Text block: order-1 md:order-1 */}
+                      <div className="w-full md:w-1/2 space-y-3 sm:space-y-4 md:space-y-6 order-1 md:order-2">
+                        <h3 className="text-2xl md:text-3xl font-medium text-yellow-300 text-center md:text-left font-anton">
+                          "Không có gì quý hơn độc lập và tự do..."
+                        </h3>
+                        <div className="space-y-3 sm:space-y-4 text-lg sm:text-2xl">
+                          <p className="text-white leading-relaxed text-justify font-nunito">
+                          Không có gì quý hơn độc lập - tự do. Đến ngày thắng lợi, nhân dân ta sẽ xây dựng lại đất nước ta đàng hoàng hơn, to đẹp hơn. Trích lời Tổng Bí thư Nguyễn Phú Trọng
+                          </p>
+                        </div>
+                      </div>
+                      {/* Image block: order-2 md:order-2 */}
+                      <div className="w-full md:w-1/2 order-2 md:order-1">
+                        <div className="relative">
+                          <video 
+                            autoPlay 
+                            loop 
+                            muted 
+                            playsInline 
+                            className="w-full h-auto object-cover rounded-lg shadow-lg"
+                          >
+                            <source src="/images/a80/6.mp4" type="video/mp4" />
+                            Trình duyệt của bạn không hỗ trợ video.
+                          </video>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg pointer-events-none"></div>
+                        </div>
+                        <p className="text-center text-base md:text-lg text-gray-300 mt-2 italic mt-3 font-bold">
+                          Đại lễ 30/4/2025 - 50 năm giải phóng miền Nam, thống nhất đất nước
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+              </ScrollReveal>
+          )}
+
+          {/* Next Generation Section (Current Wishes Display) */}
+          {selectedSection === 'next-gen' && (
+          <ScrollReveal>
+            <div className="container mx-auto px-4 mb-8">
+              <h1 className="text-2xl md:text-7xl font-passions font-medium text-center mb-4 md:mb-10 text-white">
+                      Tuổi trẻ Việt Nam tự hào, vững tin theo Đảng
+                  </h1> 
+              <Card className="bg-white/90 ">
+
+                <CardContent className="p-6">
+                <div className="flex justify-center items-center gap-2  mt-2 md:mt-2">
+                </div>
+                {submissions.length === 0 ? (
+                  <div className="text-gray-500 text-center py-4">
+                    Chưa có lời chúc nào. Hãy là người đầu tiên!
+                  </div>
+                ) : (
+                  <>
+                  {(() => {
+                    const totalPages = Math.ceil(submissions.length / itemsPerPage);
+                    return (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {[...submissions]
+                            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                            .map((submission) => (
+                              <div key={submission.id} className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 border border-gray-200 mb-4 break-inside-avoid transform hover:scale-105 transition-transform duration-200">
+                                <div className="mb-2">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <User className="w-4 h-4 text-red-600" />
+                                    <span className="font-semibold text-red-600 text-sm">{submission.name}</span>
+                                  </div>
+                                </div>
+                                
+                                <p className="text-gray-700 text-sm mb-3 break-words">{submission.content}</p>
+
+                                {/* Vietnamese flag at the end of each comment */}
+                                <div className="mt-2 relative">
+                                  <img 
+                                    src="/images/quocky.png"  
+                                    alt="Việt Nam" 
+                                    className="w-full h-auto object-cover aspect-[3/2] rounded-sm"
+                                    style={{
+                                      filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.1))'
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                        <div className="flex justify-center items-center gap-4 mt-6">
+                          <Button
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="px-4 py-2 bg-red-500 text-white rounded disabled:opacity-50"
+                          >
+                            ← Trang trước
+                          </Button>
+                          <span className="text-gray-700 font-medium">
+                            Trang {currentPage} / {totalPages}
+                          </span>
+                          <Button
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="px-4 py-2 bg-red-500 text-white rounded disabled:opacity-50"
+                          >
+                            Trang sau →
+                          </Button>
+                        </div>
+                      </>
+                    );
+                  })()}
+                  </>
+                )}
+                  </CardContent>
+                </Card>
+              </div>
+            </ScrollReveal>
+            )}
           </div>
-        </ScrollReveal>
 
 
     </div>

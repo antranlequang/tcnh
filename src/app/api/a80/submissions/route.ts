@@ -9,17 +9,21 @@ const supabase = createClient(
 // GET - Fetch all submissions
 export async function GET() {
   try {
-    const { data: submissions, error } = await supabase
+    const { data: submissions, error, count } = await supabase
       .from('submissions')
-      .select('*')
-      .order('created_at', { ascending: true });
+      .select('*', { count: 'exact' })  // yêu cầu trả về total count
+      .order('created_at', { ascending: true })
+      .range(0, 4999); // có thể tăng giới hạn lên bao nhiêu tùy bạn
 
     if (error) {
       console.error('Error fetching submissions:', error);
       return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 });
     }
 
-    return NextResponse.json(submissions);
+    return NextResponse.json({
+      total: count,
+      submissions
+    });
   } catch (error) {
     console.error('Error in GET /api/a80/submissions:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -312,7 +312,7 @@ export function CommentSystem() {
               <p className="text-sm">Hãy là người đầu tiên bình luận!</p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-6 text-justify">
               {comments.map((comment) => (
                 <CommentItem key={comment.id} comment={comment} />
               ))}

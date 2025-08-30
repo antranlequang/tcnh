@@ -7,6 +7,27 @@ import { Footer } from '@/components/layout/Footer';
 export const metadata: Metadata = {
   title: 'ĐK-TCNH',
   description: 'Trang web của Đoàn khoa Tài chính - Ngân hàng',
+  openGraph: {
+    title: 'Đoàn khoa Tài chính - Ngân hàng',
+    description: 'Trang web chính thức của Đoàn khoa Tài chính - Ngân hàng',
+    siteName: 'ĐK-TCNH',
+    images: [
+      {
+        url: '/images/backkipu.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Đoàn khoa Tài chính - Ngân hàng',
+      },
+    ],
+    locale: 'vi_VN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Đoàn khoa Tài chính - Ngân hàng',
+    description: 'Trang web chính thức của Đoàn khoa Tài chính - Ngân hàng',
+    images: ['/images/backkipu.jpg'], 
+  },
 };
 
 export default function RootLayout({
