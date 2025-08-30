@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Flag
 } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface Submission {
   id: string;
@@ -402,6 +403,7 @@ export default function AdminA80Page() {
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

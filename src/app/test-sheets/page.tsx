@@ -1,4 +1,5 @@
 import { GoogleSheetsTest } from '@/components/shared/GoogleSheetsTest';
+import { Footer } from '@/components/layout/Footer';
 
 export default function TestSheetsPage() {
   return (
@@ -27,6 +28,7 @@ export default function TestSheetsPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

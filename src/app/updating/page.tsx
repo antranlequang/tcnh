@@ -1,6 +1,7 @@
 "use client";
 
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
+import { Footer } from '@/components/layout/Footer';
 import { Wrench, Hammer, Cog, Sparkles, Clock, Heart, Coffee, Zap } from 'lucide-react';
 
 export default function UpdatingPage() {
@@ -31,7 +32,7 @@ export default function UpdatingPage() {
               {/* Bouncing Message */}
               <div className="animate-bounce delay-100">
                 <p className="text-xl md:text-2xl text-gray-700 font-medium leading-relaxed">
-                  Chúng tớ đang cố gắng phát triển tính năng này thêm xịn xịn tí nữa,
+                  Admin đang đi bệnh viện,...
                   <br />
                   <span className="text-orange-600 font-bold">bạn hãy ráng chờ thêm tí nữa nhaa</span>
                 </p>
@@ -54,53 +55,9 @@ export default function UpdatingPage() {
               </div>
             </div>
 
-            {/* Progress Bar Animation */}
-            <div className="mb-12">
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/30 shadow-xl">
-                <div className="flex items-center justify-center mb-4">
-                  <Clock className="w-6 h-6 text-orange-500 mr-2 animate-pulse" />
-                  <span className="text-lg font-semibold text-gray-700">Tiến độ phát triển</span>
-                </div>
-                
-                <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-4 rounded-full animate-pulse" 
-                       style={{ width: '99%' }}></div>
-                </div>
-                
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Bắt đầu</span>
-                  <span className="font-bold text-orange-600">99% Hoàn thành</span>
-                  <span>Kết thúc</span>
-                </div>
-              </div>
-            </div>
+            
 
-            {/* Bouncing Features List */}
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg delay-100">
-                <div className="animate-spin-slow mb-4">
-                  <Sparkles className="w-10 h-10 text-yellow-500 mx-auto" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">Tính năng mới</h3>
-                <p className="text-gray-600 text-sm">Đang phát triển những tính năng tuyệt vời</p>
-              </div>
-
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg delay-300">
-                <div className="animate-pulse mb-4">
-                  <Heart className="w-10 h-10 text-red-500 mx-auto" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">Trải nghiệm tốt hơn</h3>
-                <p className="text-gray-600 text-sm">Cải thiện giao diện và hiệu suất</p>
-              </div>
-
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-lg delay-500">
-                <div className="animate-bounce mb-4">
-                  <Zap className="w-10 h-10 text-blue-500 mx-auto" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">Hiệu suất cao</h3>
-                <p className="text-gray-600 text-sm">Tối ưu hóa tốc độ và độ ổn định</p>
-              </div>
-            </div>
+            
 
             {/* Floating Elements */}
             <div className="fixed top-20 left-10 animate-bounce delay-1000 opacity-30">
@@ -119,6 +76,7 @@ export default function UpdatingPage() {
           </div>
         </ScrollReveal>
       </div>
+      <Footer />
     </div>
   );
 }

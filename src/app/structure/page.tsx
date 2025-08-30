@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PageBanner } from '@/components/shared/PageBanner';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
+import { Footer } from '@/components/layout/Footer';
 
 const departments = [
   {
@@ -131,6 +132,7 @@ export default function StructurePage() {
               </Link>
           </div>
       </div>
+      <Footer />
     </div>
   );
 }

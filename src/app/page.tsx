@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ArrowRight } from 'lucide-react';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
+import { Footer } from '@/components/layout/Footer';
 import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
@@ -276,6 +277,7 @@ export default function Home() {
 
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

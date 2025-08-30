@@ -2,6 +2,7 @@ import { PageBanner } from '@/components/shared/PageBanner';
 import { ApplicationForm } from '@/components/apply/ApplicationForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
+import { Footer } from '@/components/layout/Footer';
 import Image from "next/image";
 
 export default function ApplyPage() {
@@ -38,6 +39,7 @@ export default function ApplyPage() {
           </ScrollReveal>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

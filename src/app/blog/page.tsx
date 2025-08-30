@@ -75,7 +75,7 @@ const testimonials = [
 
 export default function BlogPage() {
   return (
-    <div>
+    <>
       <PageBanner
         title="GÓC TÂM SỰ"
         subtitle="Nơi chia sẻ những cảm xúc thầm kín..."
@@ -83,7 +83,7 @@ export default function BlogPage() {
         imageHint="community discussion"
       />
 
-      <main className="container mx-auto px-4 py-16 md:py-24">
+      <div className="container mx-auto px-4 py-16 md:py-24">
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
 
@@ -145,7 +145,7 @@ export default function BlogPage() {
             </Card>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
