@@ -622,7 +622,7 @@ export default function A80Page() {
                 Mỗi lời chúc là một phần giúp tô điểm nên lá cờ Tổ quốc
           </p>
           <p className="text-red-100 font-medium text-sm md:text-4xl font-anton mb-8 md:mb-14 text-center">
-                Cùng Đoàn khoa Tài chính - Ngân hàng gửi những lời chúc tới Thủ Đô
+                Cùng Đoàn khoa Tài chính - Ngân hàng gửi những lời chúc tới Thủ Đô nhé
           </p>
 
           <ScrollReveal>
