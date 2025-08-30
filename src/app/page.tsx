@@ -181,11 +181,10 @@ export default function Home() {
         </div>
       </section>
       
-      <h2 className="text-center text-2xl md:text-5xl font-anton font-medium text-primary mt-0">LÀ MỘT TÂN SINH VIÊN, BẠN SẼ CHỌN GÌ?</h2>
+      {/* <h2 className="text-center text-2xl md:text-5xl font-anton font-medium text-primary mt-0">LÀ MỘT TÂN SINH VIÊN, BẠN SẼ CHỌN GÌ?</h2> */}
       {/* Video Section */}
-      <section className="py-8 md:py-16">
+      {/* <section className="py-8 md:py-16">
         <div className="container mx-auto px-4">
-          {/* Giới hạn toàn bộ khung video */}
           <div className="relative max-w-5xl mx-auto overflow-hidden rounded-xl shadow-2xl aspect-video">
             <video
               ref={videoRef}
@@ -204,7 +203,7 @@ export default function Home() {
             </video>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Carousel Section */}
       <section id="explore-section" className="py-16 md:py-24">

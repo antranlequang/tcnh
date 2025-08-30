@@ -39,3 +39,6 @@ yarn.lock
 
 # env
 .env.local
+
+#large video
+public/videos/video.mp4
