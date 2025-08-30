@@ -555,9 +555,10 @@ export default function A80Page() {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
+        backgroundAttachment: 'scroll',
       }}
     >
+    <div className="absolute inset-0  bg-black/30 backdrop-blur-sm z-[-1]"></div>
 
 
       {/* Animated floating stars */}
@@ -1033,7 +1034,7 @@ export default function A80Page() {
                                   </div>
                                 </div>
                                 
-                                <p className="text-gray-700 text-sm mb-3 break-words">{submission.content}</p>
+                                <p className="text-gray-700 text-sm mb-3 break-words text-justify">{submission.content}</p>
 
                                 {/* Vietnamese flag at the end of each comment */}
                                 <div className="mt-2 relative">

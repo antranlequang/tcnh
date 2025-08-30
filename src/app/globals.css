@@ -314,3 +314,9 @@ html, body {
 body {
   overflow-y: auto; /* đảm bảo vẫn cuộn dọc được */
 }
+
+@media (max-width: 768px) {
+  .background-fixed {
+    background-attachment: scroll !important;
+  }
+}
