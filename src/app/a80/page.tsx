@@ -73,7 +73,7 @@ export default function A80Page() {
   const TOTAL_PIXELS = 864;
 
   // Music files
-  const musicFiles = ['/music/1.mp3', '/music/2.mp3', '/music/3.mp3', '/music/4.mp3'];
+  const musicFiles = ['/music/2.mp3', '/music/3.mp3', '/music/4.mp3'];
 
   // Deterministic PRNG for stable random ordering per grid size
   const mulberry32 = (seed: number) => {
