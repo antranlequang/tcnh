@@ -555,7 +555,7 @@ export default function A80Page() {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'scroll',
+        backgroundAttachment: 'fixed',
       }}
     >
     <div className="absolute inset-0  bg-black/30 backdrop-blur-sm z-[-1]"></div>
