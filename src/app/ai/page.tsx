@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
 import { Brain, MessageCircle, Sparkles, Users, Megaphone, Calendar, Building, Trophy, Clock, TrendingUp } from 'lucide-react';
 import { userProgressManager, type UserProgress } from '@/lib/userProgress';
-import { Footer } from '@/components/layout/Footer';
 
 interface Question {
   id: number;
@@ -913,7 +912,6 @@ export default function AIPage() {
           </div>
         </ScrollReveal>
       </div>
-      <Footer />
     </div>
   );
 }

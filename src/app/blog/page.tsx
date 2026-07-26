@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CommentSystem } from '@/components/blog/CommentSystem';
 import { TestimonialsSection } from '@/components/blog/TestimonialsSection';
+import { TestimonialSubmissionForm } from '@/components/blog/TestimonialSubmissionForm';
 
 export default function BlogPage() {
   return (
     <>
       <PageBanner
-        title="GÓC TÂM SỰ"
-        subtitle="Nơi chia sẻ những cảm xúc thầm kín..."
-        imageUrl="/images/back-ocean.jpg"
+        title="Cộng đồng"
+        subtitle="Nơi chia sẻ, thảo luận và kết nối các thành viên trong Khoa Tài chính - Ngân hàng."
+        imageUrl="/images/banner-page/uel.jpg"
         imageHint="community discussion"
       />
 
@@ -26,7 +27,12 @@ export default function BlogPage() {
             </div>
 
             {/* Testimonials */}
-            <h2 className="text-2xl md:text-4xl font-anton font-medium mb-8 text-primary text-center mt-12">Góc chia sẻ</h2>
+            <div className="mb-8 mt-12 flex items-center justify-between gap-4 border-b border-slate-200 pb-5">
+              <div>
+                <h2 className="mt-1 text-3xl font-anton font-medium text-[#F05A23] md:text-4xl">Góc chia sẻ</h2>
+              </div>
+              <TestimonialSubmissionForm />
+            </div>
             <TestimonialsSection />
             
 

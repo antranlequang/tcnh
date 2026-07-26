@@ -10,7 +10,7 @@ import { serializeError } from "@/lib/utils";
 
 export async function GET(req: Request) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {
@@ -35,7 +35,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {

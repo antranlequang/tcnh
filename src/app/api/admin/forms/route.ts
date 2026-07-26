@@ -14,9 +14,29 @@ function normalizeDepartmentQuestions(input: any): Record<Department, string[]> 
   return out;
 }
 
+function isMissingClassOptionsColumn(error: any): boolean {
+  const message = String(error?.message || "").toLowerCase();
+  return (
+    error?.code === "PGRST204" &&
+    message.includes("class_options") &&
+    message.includes("application_form_templates")
+  );
+}
+
+function missingClassOptionsResponse() {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        "Danh sách lớp chưa thể lưu vì Supabase thiếu cột class_options. Hãy chạy file docs/sql/2026-07-26_add_application_form_class_options.sql trong SQL Editor.",
+    },
+    { status: 503 }
+  );
+}
+
 export async function GET(req: Request) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {
@@ -38,7 +58,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {
@@ -81,22 +101,36 @@ export async function POST(req: Request) {
 
     // Upsert by id when provided (client uses same endpoint for create/edit)
     if (id) {
-      const { data, error } = await supabaseAdmin
+      const updateData = {
+        name: payload.name,
+        open_at: payload.open_at,
+        close_at: payload.close_at,
+        optional_personal_questions: payload.optional_personal_questions,
+        department_questions: payload.department_questions,
+        illustrations: payload.illustrations,
+      };
+      let saveResult = await supabaseAdmin
         .from("application_form_templates")
         .update({
-          name: payload.name,
-          open_at: payload.open_at,
-          close_at: payload.close_at,
-          optional_personal_questions: payload.optional_personal_questions,
-          department_questions: payload.department_questions,
-          illustrations: payload.illustrations,
+          ...updateData,
           class_options: payload.class_options,
         })
         .eq("id", String(id))
         .select("*")
         .single();
 
-      if (error) throw error;
+      if (isMissingClassOptionsColumn(saveResult.error)) {
+        if (payload.class_options.length > 0) return missingClassOptionsResponse();
+        saveResult = await supabaseAdmin
+          .from("application_form_templates")
+          .update(updateData)
+          .eq("id", String(id))
+          .select("*")
+          .single();
+      }
+
+      if (saveResult.error) throw saveResult.error;
+      const data = { ...saveResult.data, class_options: saveResult.data?.class_options || [] };
 
       // Record history snapshot (fire-and-forget; never block the response)
       supabaseAdmin
@@ -109,21 +143,34 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, data });
     }
 
-    const { data, error } = await supabaseAdmin
+    const insertData = {
+      name: payload.name,
+      open_at: payload.open_at,
+      close_at: payload.close_at,
+      optional_personal_questions: payload.optional_personal_questions,
+      department_questions: payload.department_questions,
+      illustrations: payload.illustrations,
+    };
+    let saveResult = await supabaseAdmin
       .from("application_form_templates")
       .insert({
-        name: payload.name,
-        open_at: payload.open_at,
-        close_at: payload.close_at,
-        optional_personal_questions: payload.optional_personal_questions,
-        department_questions: payload.department_questions,
-        illustrations: payload.illustrations,
+        ...insertData,
         class_options: payload.class_options,
       })
       .select("*")
       .single();
 
-    if (error) throw error;
+    if (isMissingClassOptionsColumn(saveResult.error)) {
+      if (payload.class_options.length > 0) return missingClassOptionsResponse();
+      saveResult = await supabaseAdmin
+        .from("application_form_templates")
+        .insert(insertData)
+        .select("*")
+        .single();
+    }
+
+    if (saveResult.error) throw saveResult.error;
+    const data = { ...saveResult.data, class_options: saveResult.data?.class_options || [] };
 
     // Record history snapshot (fire-and-forget; never block the response)
     supabaseAdmin
@@ -138,4 +185,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, message: serializeError(e) }, { status: 500 });
   }
 }
-

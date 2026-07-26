@@ -36,7 +36,7 @@ function normalizeSlot(input: string): IllustrationSlot {
 
 export async function POST(req: Request) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {

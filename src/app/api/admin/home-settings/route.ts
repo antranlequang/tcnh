@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: Request) {
-  const authError = assertAdminRequest(request);
+  const authError = await assertAdminRequest(request);
   if (authError) return authError;
 
   const settings = await readHomeSettings();
@@ -18,18 +18,29 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const authError = assertAdminRequest(request);
+  const authError = await assertAdminRequest(request);
   if (authError) return authError;
 
   try {
     const payload = await request.json();
     const update: Partial<HomeSettings> = {};
 
-    if (payload.homeBannerImage !== undefined) update.homeBannerImage = String(payload.homeBannerImage || '');
-    if (payload.homeImageOne !== undefined) update.homeImageOne = String(payload.homeImageOne || '');
-    if (payload.homeImageTwo !== undefined) update.homeImageTwo = String(payload.homeImageTwo || '');
-    if (payload.homeImageThree !== undefined) update.homeImageThree = String(payload.homeImageThree || '');
-    if (payload.youtubeVideoUrl !== undefined) update.youtubeVideoUrl = String(payload.youtubeVideoUrl || '');
+    if (payload.youtubeVideoUrl === undefined) {
+      return NextResponse.json(
+        { success: false, message: 'youtubeVideoUrl is required' },
+        { status: 400 }
+      );
+    }
+
+    const youtubeVideoUrl = String(payload.youtubeVideoUrl || '').trim();
+    if (youtubeVideoUrl && !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(youtubeVideoUrl)) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid YouTube URL' },
+        { status: 400 }
+      );
+    }
+
+    update.youtubeVideoUrl = youtubeVideoUrl;
 
     const saved = await saveHomeSettings(update);
 

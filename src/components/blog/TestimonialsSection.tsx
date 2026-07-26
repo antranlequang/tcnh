@@ -1,64 +1,173 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Quote } from "lucide-react";
+import {
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Send,
+} from "lucide-react";
 import type { AlumniTestimonialRow } from "@/lib/blog";
+
+function TestimonialPost({ item }: { item: AlumniTestimonialRow }) {
+  const [activeImage, setActiveImage] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const images = item.image_urls || [];
+  const hasImages = images.length > 0;
+  const initials = item.full_name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(-2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+
+  const showPrevious = () => {
+    setActiveImage((current) => (current === 0 ? images.length - 1 : current - 1));
+  };
+
+  const showNext = () => {
+    setActiveImage((current) => (current + 1) % images.length);
+  };
+
+  return (
+    <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.07)]">
+      <header className="flex items-center gap-3 px-4 py-3">
+        <div className="rounded-full bg-gradient-to-tr from-[#F05A23] via-pink-500 to-violet-600 p-[2px]">
+          <div className="grid h-10 w-10 place-items-center rounded-full border-2 border-white bg-[#144E8C] text-xs font-bold text-white">
+            {initials || "DK"}
+          </div>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-bold text-slate-900">{item.full_name}</p>
+          {item.positions.length > 0 && (
+            <p className="truncate text-xs text-slate-500">{item.positions.join(" · ")}</p>
+          )}
+        </div>
+        <MoreHorizontal className="h-5 w-5 text-slate-500" aria-hidden="true" />
+      </header>
+
+      {hasImages && (
+        <div className="relative aspect-square overflow-hidden bg-black">
+          <img
+            src={images[activeImage]}
+            alt={`Bài chia sẻ của ${item.full_name}, hình ${activeImage + 1}`}
+            className="h-full w-full object-cover"
+          />
+
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={showPrevious}
+                className="absolute left-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition hover:bg-black/70"
+                aria-label="Xem hình trước"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={showNext}
+                className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition hover:bg-black/70"
+                aria-label="Xem hình tiếp theo"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+              <span className="absolute right-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-xs font-semibold text-white">
+                {activeImage + 1}/{images.length}
+              </span>
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="px-4 pb-4 pt-3">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setLiked((current) => !current)}
+            className={liked ? "text-red-500" : "text-slate-900 hover:text-slate-500"}
+            aria-label={liked ? "Bỏ thích bài viết" : "Thích bài viết"}
+          >
+            <Heart className="h-6 w-6" fill={liked ? "currentColor" : "none"} />
+          </button>
+          <MessageCircle className="h-6 w-6 text-slate-900" aria-hidden="true" />
+          <Send className="h-6 w-6 text-slate-900" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={() => setSaved((current) => !current)}
+            className="ml-auto text-slate-900 hover:text-slate-500"
+            aria-label={saved ? "Bỏ lưu bài viết" : "Lưu bài viết"}
+          >
+            <Bookmark className="h-6 w-6" fill={saved ? "currentColor" : "none"} />
+          </button>
+        </div>
+
+        {images.length > 1 && (
+          <div className="-mt-4 flex justify-center gap-1.5" aria-label={`Hình ${activeImage + 1} trên ${images.length}`}>
+            {images.map((_, index) => (
+              <button
+                key={`${item.id}-dot-${index}`}
+                type="button"
+                onClick={() => setActiveImage(index)}
+                className={`h-1.5 rounded-full transition-all ${
+                  index === activeImage ? "w-4 bg-[#144E8C]" : "w-1.5 bg-slate-300"
+                }`}
+                aria-label={`Xem hình ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
+        <p className={`whitespace-pre-wrap text-sm leading-6 text-slate-800 ${hasImages ? "mt-4" : "mt-5 text-base leading-7"}`}>
+          <span className="mr-2 font-bold text-slate-950">{item.full_name}</span>
+          {item.message}
+        </p>
+        <time className="mt-3 block text-[11px] uppercase tracking-wide text-slate-400" dateTime={item.created_at}>
+          {new Intl.DateTimeFormat("vi-VN", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }).format(new Date(item.created_at))}
+        </time>
+      </div>
+    </article>
+  );
+}
 
 export function TestimonialsSection() {
   const [rows, setRows] = useState<AlumniTestimonialRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const refresh = async () => {
-    try {
-      const res = await fetch("/api/blog/testimonials", { cache: "no-store" });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json?.message || "Không tải được lời gửi gắm.");
-      setRows(Array.isArray(json?.data) ? json.data : []);
-    } catch (error) {
-      console.error(error);
-      setRows([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    refresh();
+    fetch("/api/blog/testimonials", { cache: "no-store" })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload?.message || "Không tải được lời gửi gắm.");
+        setRows(Array.isArray(payload?.data) ? payload.data : []);
+      })
+      .catch((error) => {
+        console.error(error);
+        setRows([]);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground text-center">Đang tải lời gửi gắm...</p>;
+    return <p className="text-center text-sm text-muted-foreground">Đang tải lời gửi gắm...</p>;
   }
 
   if (rows.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center">Bạn hãy là người đầu tiên chia sẻ cảm nghĩ của mình nào...</p>;
+    return <p className="text-center text-sm text-muted-foreground">Bạn hãy là người đầu tiên chia sẻ cảm nghĩ của mình nào...</p>;
   }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-xl space-y-6">
       {rows.map((item) => (
-        <Card key={item.id} className="overflow-hidden shadow-lg">
-          <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-center">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={item.avatar_url || ""} alt={item.full_name} />
-              <AvatarFallback>{item.full_name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="relative text-center md:text-left">
-              <Quote className="absolute -top-2 left-0 h-8 w-8 text-primary/20 transform -translate-x-4" />
-              <p className="font-bold font-headline text-lg text-primary">{item.full_name}</p>
-              <div className="mb-4 space-y-1">
-                {item.positions.map((pos, index) => (
-                  <p key={`${item.id}-${index}`} className="text-sm font-semibold text-muted-foreground">
-                    {pos}
-                  </p>
-                ))}
-              </div>
-              <blockquote className="text-muted-foreground italic text-justify">{item.message}</blockquote>
-            </div>
-          </CardContent>
-        </Card>
+        <TestimonialPost key={item.id} item={item} />
       ))}
     </div>
   );

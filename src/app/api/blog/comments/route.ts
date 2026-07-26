@@ -46,7 +46,7 @@ function toCommentTree(rows: ReturnType<typeof mapBlogCommentRow>[]): CommentNod
 
 export async function GET() {
   try {
-    const db = supabaseAdmin ?? supabase;
+    const db = supabase ?? supabaseAdmin;
 
     if (!db) {
       return NextResponse.json({ success: false, message: "Supabase not configured." }, { status: 500 });
@@ -69,7 +69,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const db = supabaseAdmin ?? supabase;
+    const db = supabase ?? supabaseAdmin;
 
     if (!db) {
       return NextResponse.json({ success: false, message: "Supabase not configured." }, { status: 500 });

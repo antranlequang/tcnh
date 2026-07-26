@@ -14,7 +14,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Footer } from '@/components/layout/Footer';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ApplicationFormsAdmin } from '@/components/admin/ApplicationFormsAdmin';
 import { AchievementsAdmin } from '@/components/admin/AchievementsAdmin';
 import { ActivitiesAdmin } from '@/components/admin/ActivitiesAdmin';
@@ -24,14 +24,21 @@ import { StructureAdmin } from '@/components/admin/StructureAdmin';
 import { BlogTestimonialsAdmin } from '@/components/admin/BlogTestimonialsAdmin';
 import { BlogDiscussionAdmin } from '@/components/admin/BlogDiscussionAdmin';
 import { SchoolMapAdmin } from '@/components/admin/SchoolMapAdmin';
+import { SuperAdminPanel } from '@/components/admin/SuperAdminPanel';
 import { formatDateTime } from '@/lib/utils';
+import { DEPARTMENTS } from '@/lib/applicationForms';
+import { supabase } from '@/lib/supabaseClient';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from 'recharts';
 import {
   LayoutDashboard, Wrench, FolderOpen, Home, Trophy, Activity, FileText,
   ChevronDown, ChevronRight, ExternalLink, CheckCircle2, Loader2,
   Database, Bot, ShieldCheck, GraduationCap,
   LogOut, Eye, ClipboardList, Users, MessageSquare, Quote, Menu, X, Upload, MapPinned,
+  RefreshCw, Sparkles, ArrowUpRight, CircleDot,
+  UserRound, Pencil, Save, LockKeyhole, Mail, Phone, Building2, IdCard,
+  Car, MapPin,
 } from 'lucide-react';
+
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -102,10 +109,80 @@ type AdminTab =
   | 'category-youth-school-map'
   | 'category-apply'
   | 'category-partners'
+  | 'category-forum'
   | 'category-blog-testimonials'
   | 'category-blog-discussions';
 
+const ADMIN_TAB_META: Record<AdminTab, { eyebrow: string; title: string; description: string }> = {
+  overview: {
+    eyebrow: 'Trung tâm điều hành',
+    title: 'Tổng quan',
+    description: 'Ghi chú: Đây là trang tổng quan, hiển thị các thông tin về đơn đăng ký và các số liệu thống kê cơ bản. Các chức năng quản trị khác có thể được truy cập thông qua menu bên trái.',
+  },
+  function: {
+    eyebrow: 'Hệ thống',
+    title: 'Kiểm thử kết nối',
+    description: 'Kiểm tra nhanh tình trạng các dịch vụ đang vận hành.',
+  },
+  schema: {
+    eyebrow: 'Hệ thống',
+    title: 'Schema Visualizer',
+    description: 'Quan sát cấu trúc dữ liệu và các mối quan hệ.',
+  },
+  'category-home': { eyebrow: 'Nội dung', title: 'Trang chủ', description: 'Quản lý nội dung hiển thị trên trang chủ.' },
+  'category-structure': { eyebrow: 'Nội dung', title: 'Cơ cấu', description: 'Cập nhật các ban và thành viên trong cơ cấu.' },
+  'category-achievements': { eyebrow: 'Nội dung', title: 'Thành tích', description: 'Ghi nhận và quản lý các dấu mốc nổi bật.' },
+  'category-activities': { eyebrow: 'Nội dung', title: 'Hoạt động', description: 'Đăng tải và cập nhật các chương trình hoạt động.' },
+  'category-youth-activities': { eyebrow: 'Tuổi trẻ', title: 'Hoạt động', description: 'Tạo nội dung mới cho chuyên mục Tuổi trẻ.' },
+  'category-youth-student-info': { eyebrow: 'Tuổi trẻ', title: 'Thông tin sinh viên', description: 'Tra cứu các tiện ích và thông tin dành cho sinh viên.' },
+  'category-youth-school-map': { eyebrow: 'Tuổi trẻ', title: 'School Map', description: 'Quản lý điểm đến và dữ liệu bản đồ trường.' },
+  'category-apply': { eyebrow: 'Tuyển thành viên', title: 'Đơn đăng ký', description: 'Tạo biểu mẫu và quản lý hồ sơ ứng viên.' },
+  'category-partners': { eyebrow: 'Nội dung', title: 'Đơn vị hợp tác', description: 'Quản lý danh sách đối tác và đơn vị đồng hành.' },
+  'category-forum': { eyebrow: 'Cộng đồng', title: 'Diễn đàn', description: 'Duyệt lời gửi gắm và theo dõi các cuộc thảo luận.' },
+  'category-blog-testimonials': { eyebrow: 'Diễn đàn', title: 'Lời gửi gắm', description: 'Kiểm duyệt những lời nhắn từ cộng đồng.' },
+  'category-blog-discussions': { eyebrow: 'Diễn đàn', title: 'Thảo luận', description: 'Theo dõi và quản lý nội dung trao đổi.' },
+};
+
 type ServiceStatus = 'idle' | 'loading' | 'ok' | 'error';
+type AdminRole = 'admin' | 'super_admin';
+type AdminSection = 'general' | 'profile';
+
+interface AdminProfile {
+  accountEmail?: string;
+  fullName: string;
+  position: string;
+  unit: string;
+  className: string;
+  transportation: string;
+  address: string;
+  schoolEmail: string;
+  personalEmail: string;
+  phone: string;
+  studentId: string;
+}
+
+const DEFAULT_ADMIN_PROFILE: AdminProfile = {
+  fullName: '',
+  position: '',
+  unit: '',
+  className: '',
+  transportation: '',
+  address: '',
+  schoolEmail: '',
+  personalEmail: '',
+  phone: '',
+  studentId: '',
+};
+
+const ADMIN_POSITION_OPTIONS = [
+  'Bí thư',
+  'Phó Bí thư',
+  'Trưởng ban',
+  'Phó Trưởng ban',
+  'Ủy viên Ban Thường vụ',
+  'Ủy viên Ban Chấp hành',
+  'Cộng tác viên',
+] as const;
 
 const DEFAULT_COLUMN_WIDTHS: Record<string, number> = {
   submit_index: 60,
@@ -209,14 +286,19 @@ function SidebarBtn({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-colors text-left ${
+      className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all duration-200 ${
         active
-          ? 'bg-blue-50 text-blue-700 font-medium'
-          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+          ? 'bg-white text-[#0b3767] font-bold shadow-[0_8px_24px_rgba(0,0,0,0.16)]'
+          : 'text-white/65 hover:bg-white/[0.08] hover:text-white'
       }`}
     >
-      <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-blue-600' : ''}`} />
-      {label}
+      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg transition-colors ${
+        active ? 'bg-[#F05A23] text-white' : 'bg-white/[0.07] text-white/70 group-hover:bg-white/10 group-hover:text-white'
+      }`}>
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      {active && <span className="h-1.5 w-1.5 rounded-full bg-[#F05A23]" />}
     </button>
   );
 }
@@ -233,12 +315,340 @@ function StatusBadge({ status }: { status: ServiceStatus }) {
   return <Badge className="text-xs bg-red-100 text-red-700 border border-red-200 hover:bg-red-100">Unsuccessful</Badge>;
 }
 
+function AdminWorkspaceHeader({
+  section,
+  showPersonalProfile,
+  onSectionChange,
+  onLogout,
+}: {
+  section: AdminSection;
+  showPersonalProfile: boolean;
+  onSectionChange: (section: AdminSection) => void;
+  onLogout: () => void;
+}) {
+  const items: Array<{ id: AdminSection; label: string; icon: LucideIcon }> = [
+    { id: 'general', label: 'Chung', icon: LayoutDashboard },
+    ...(showPersonalProfile
+      ? [{ id: 'profile' as const, label: 'Hồ sơ cá nhân', icon: UserRound }]
+      : []),
+  ];
+
+  return (
+    <header className="sticky top-0 z-50 h-[112px] shrink-0 bg-white text-[#144E8C] shadow-[0_4px_24px_rgba(11,31,51,0.08)] sm:h-[60px] xl:h-[104px]">
+      <div className="relative mx-auto h-full max-w-[1600px] px-4 sm:px-6 xl:px-8">
+        <button
+          type="button"
+          onClick={() => onSectionChange('general')}
+          className="absolute left-4 top-3 flex h-10 items-center sm:inset-y-0 sm:top-auto xl:left-8 xl:h-auto"
+          aria-label="Mở trang quản trị tổng quan"
+        >
+          <img src="/images/logo.png" alt="" className="h-9 w-[138px] object-contain xl:h-14 xl:w-[168px]" />
+          <span className="ml-4 hidden border-l border-[#144E8C]/15 pl-4 leading-none xl:block">
+            <span className="block whitespace-nowrap text-xs font-bold uppercase tracking-[0.14em]">Đoàn Khoa</span>
+            <span className="mt-1.5 block whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.08em] text-[#144E8C]/60">
+              Không gian quản trị
+            </span>
+          </span>
+        </button>
+
+        <div className="absolute left-[380px] right-[calc((100vw-100%)/-2)] top-0 hidden h-10 items-center justify-end rounded-bl-[3.5rem] bg-[#144E8C] px-8 text-white xl:flex">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/90">
+            Đi đâu cũng được, miễn là đi cùng nhau!
+          </span>
+          <span className="ml-5 h-1.5 w-1.5 rounded-full bg-[#F05A23]" />
+        </div>
+
+        <nav
+          className="absolute inset-x-4 bottom-0 flex h-14 items-center justify-center gap-1 border-t border-slate-100 sm:inset-y-0 sm:left-auto sm:right-14 sm:h-auto sm:border-0 xl:bottom-0 xl:right-20 xl:top-auto xl:h-16"
+          aria-label="Các khu vực quản trị"
+        >
+          {items.map(({ id, label, icon: Icon }) => {
+            const active = section === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onSectionChange(id)}
+                aria-current={active ? 'page' : undefined}
+                className={`relative flex h-full items-center gap-2 px-3 text-xs font-bold transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:origin-left after:bg-[#F05A23] after:transition-transform sm:px-4 sm:text-sm xl:after:bottom-3 ${
+                  active
+                    ? 'text-[#144E8C] after:scale-x-100'
+                    : 'text-[#144E8C]/50 after:scale-x-0 hover:text-[#144E8C] hover:after:scale-x-100'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <button
+          type="button"
+          onClick={onLogout}
+          className="absolute right-4 top-3 grid h-10 w-10 place-items-center rounded-full border border-[#144E8C]/15 text-[#144E8C] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 sm:inset-y-0 sm:my-auto xl:right-8 xl:bottom-3 xl:top-auto"
+          aria-label="Đăng xuất"
+          title="Đăng xuất"
+        >
+          <LogOut className="h-4 w-4" />
+        </button>
+      </div>
+    </header>
+  );
+}
+
+function PersonalProfilePanel({ authHeaders }: { authHeaders: Record<string, string> }) {
+  const [profile, setProfile] = useState<AdminProfile>(DEFAULT_ADMIN_PROFILE);
+  const [draft, setDraft] = useState<AdminProfile>(DEFAULT_ADMIN_PROFILE);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetch('/api/admin/profile', { headers: authHeaders, cache: 'no-store' })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload?.message || 'Không tải được hồ sơ cá nhân.');
+        if (!mounted || !payload?.data) return;
+        setProfile(payload.data);
+        setDraft(payload.data);
+      })
+      .catch((error) => {
+        if (mounted) setProfileError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => {
+        if (mounted) setLoadingProfile(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [authHeaders]);
+
+  const fields: Array<{
+    key: keyof AdminProfile;
+    label: string;
+    type?: string;
+    icon: LucideIcon;
+    control?: 'input' | 'select' | 'textarea';
+    options?: readonly string[];
+    fullWidth?: boolean;
+  }> = [
+    { key: 'fullName', label: 'Họ và tên', icon: UserRound },
+    { key: 'position', label: 'Chức vụ', icon: IdCard, control: 'select', options: ADMIN_POSITION_OPTIONS },
+    { key: 'unit', label: 'Ban/Đơn vị', icon: Building2, control: 'select', options: DEPARTMENTS },
+    { key: 'className', label: 'Lớp', icon: GraduationCap },
+    { key: 'transportation', label: 'Phương tiện di chuyển', icon: Car },
+    { key: 'address', label: 'Địa chỉ', icon: MapPin, control: 'textarea', fullWidth: true },
+    { key: 'schoolEmail', label: 'Email trường', type: 'email', icon: Mail },
+    { key: 'personalEmail', label: 'Email cá nhân', type: 'email', icon: Mail },
+    { key: 'phone', label: 'Số điện thoại', type: 'tel', icon: Phone },
+    { key: 'studentId', label: 'Mã số sinh viên', icon: IdCard },
+  ];
+
+  const startEditing = () => {
+    setDraft(profile);
+    setSaved(false);
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setDraft(profile);
+    setIsEditing(false);
+  };
+
+  const saveProfile = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSavingProfile(true);
+    setProfileError(null);
+    setSaved(false);
+    try {
+      const response = await fetch('/api/admin/profile', {
+        method: 'PUT',
+        headers: { ...authHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.message || 'Không lưu được hồ sơ cá nhân.');
+      setProfile(payload.data);
+      setDraft(payload.data);
+      setIsEditing(false);
+      setSaved(true);
+    } catch (error) {
+      setProfileError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  return (
+    <main className="min-w-0 flex-1 bg-[#f3f6fa]">
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 md:py-10">
+        <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <h1 className="mt-2 font-headline text-3xl font-semibold tracking-[-0.03em] text-[#0b1f33]">
+              Hồ sơ cá nhân
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">Thông tin tài khoản và quyền truy cập của bạn.</p>
+          </div>
+          <Badge variant="outline" className="w-fit rounded-full border-amber-200 bg-amber-50 px-3 py-1 text-amber-700">
+            {loadingProfile ? 'Đang tải dữ liệu' : profileError ? 'Lỗi kết nối dữ liệu' : 'Đã kết nối cơ sở dữ liệu'}
+          </Badge>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <form onSubmit={saveProfile} className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+              <div>
+                <h2 className="font-semibold text-[#0b1f33]">Thông tin cơ bản</h2>
+              </div>
+              {!isEditing && (
+                <Button type="button" variant="outline" size="sm" onClick={startEditing} disabled={loadingProfile} className="rounded-lg">
+                  <Pencil className="h-3.5 w-3.5" />
+                  Chỉnh sửa
+                </Button>
+              )}
+            </div>
+
+            {profileError && (
+              <p className="mx-5 mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 sm:mx-6">
+                {profileError}
+              </p>
+            )}
+
+            <div className="grid gap-x-5 gap-y-4 p-5 sm:grid-cols-2 sm:p-6">
+              {fields.map(({ key, label, type = 'text', icon: Icon, control = 'input', options, fullWidth }) => (
+                <div key={key} className={fullWidth ? 'sm:col-span-2' : undefined}>
+                  <label htmlFor={`profile-${key}`} className="mb-2 flex items-center gap-2 text-xs font-bold text-slate-600">
+                    <Icon className="h-3.5 w-3.5 text-slate-400" />
+                    {label}
+                  </label>
+                  {control === 'select' ? (
+                    <select
+                      id={`profile-${key}`}
+                      value={isEditing ? draft[key] : profile[key]}
+                      onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
+                      disabled={!isEditing}
+                      className={`h-11 w-full rounded-lg border px-3 text-sm outline-none transition-shadow focus:ring-2 focus:ring-[#0b4f8a] focus:ring-offset-2 disabled:cursor-default disabled:opacity-100 ${
+                        isEditing
+                          ? 'border-slate-200 bg-white text-slate-900'
+                          : 'border-slate-100 bg-slate-50 text-slate-600'
+                      }`}
+                    >
+                      <option value="">Chưa cập nhật</option>
+                      {options?.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  ) : control === 'textarea' ? (
+                    <Textarea
+                      id={`profile-${key}`}
+                      value={isEditing ? draft[key] : profile[key]}
+                      onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
+                      readOnly={!isEditing}
+                      rows={3}
+                      className={`resize-none rounded-lg ${
+                        isEditing ? 'bg-white' : 'border-slate-100 bg-slate-50 text-slate-600'
+                      }`}
+                    />
+                  ) : (
+                    <Input
+                      id={`profile-${key}`}
+                      type={type}
+                      value={isEditing ? draft[key] : profile[key]}
+                      onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
+                      readOnly={!isEditing}
+                      className={`h-11 rounded-lg ${isEditing ? 'bg-white' : 'border-slate-100 bg-slate-50 text-slate-600'}`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {(isEditing || saved) && (
+              <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-5 py-4 sm:px-6">
+                <p className={`text-xs ${saved ? 'text-emerald-600' : 'text-slate-400'}`}>
+                  {saved ? 'Đã lưu thay đổi vào cơ sở dữ liệu.' : 'Kiểm tra thông tin trước khi lưu.'}
+                </p>
+                {isEditing && (
+                  <div className="flex gap-2">
+                    <Button type="button" variant="ghost" size="sm" onClick={cancelEditing} className="rounded-lg">
+                      Hủy
+                    </Button>
+                    <Button type="submit" size="sm" disabled={savingProfile} className="rounded-lg bg-[#0b4f8a] text-white hover:bg-[#073e70]">
+                      {savingProfile ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                      {savingProfile ? 'Đang lưu...' : 'Lưu thay đổi'}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </form>
+
+          <aside className="space-y-5">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="grid h-12 w-12 place-items-center rounded-full bg-[#0b3767] text-sm font-bold text-white">QT</div>
+                <div className="min-w-0">
+                  <p className="truncate font-bold text-[#0b1f33]">{profile.fullName}</p>
+                  <p className="mt-0.5 truncate text-xs text-slate-400">
+                    {profile.accountEmail || profile.schoolEmail}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-5 border-t border-slate-100 pt-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Vai trò</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-[#F05A23]" />
+                  <span className="text-sm font-semibold text-slate-700">{profile.position}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <LockKeyhole className="h-4 w-4 text-[#0b4f8a]" />
+                <h2 className="font-semibold text-[#0b1f33]">Quyền truy cập</h2>
+              </div>
+              <div className="mt-4 divide-y divide-slate-100">
+                {[
+                  ['Nội dung website', 'Đọc và chỉnh sửa'],
+                  ['Đơn đăng ký', 'Toàn quyền'],
+                  ['Cấu hình hệ thống', 'Toàn quyền'],
+                  ['Quản lý tài khoản', 'Toàn quyền'],
+                ].map(([name, access]) => (
+                  <div key={name} className="py-3 first:pt-0 last:pb-0">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm text-slate-600">{name}</span>
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+                    </div>
+                    <p className="mt-1 text-xs text-slate-400">{access}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authenticating, setAuthenticating] = useState(false);
+  const [checkingGoogleSession, setCheckingGoogleSession] = useState(true);
+  const [authMethod, setAuthMethod] = useState<'password' | 'google' | null>(null);
+  const [authRole, setAuthRole] = useState<AdminRole>('admin');
+  const [googleEmail, setGoogleEmail] = useState('');
+  const [adminDisplayName, setAdminDisplayName] = useState('Admin');
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const [metrics, setMetrics] = useState<VisitMetrics | null>(null);
@@ -249,6 +659,7 @@ export default function AdminPage() {
   const [loadingData, setLoadingData] = useState(false);
 
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [adminSection, setAdminSection] = useState<AdminSection>('general');
   const [categoryOpen, setCategoryOpen] = useState(true);
   const [youthSubOpen, setYouthSubOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -257,8 +668,84 @@ export default function AdminPage() {
 
   // ── Auth ──────────────────────────────────────────────────────────────────
 
+  useEffect(() => {
+    let active = true;
+
+    const authenticateGoogleSession = async (accessToken: string) => {
+      setAuthenticating(true);
+      try {
+        const response = await fetch('/api/admin/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken }),
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          if (active) {
+            setLoginError(payload?.message || 'Tài khoản Google không có quyền truy cập.');
+            setIsAuthenticated(false);
+          }
+          await supabase?.auth.signOut();
+          return;
+        }
+
+        if (active) {
+          setPassword(accessToken);
+          setGoogleEmail(String(payload?.email || ''));
+          setAdminDisplayName(String(payload?.fullName || payload?.email?.split('@')[0] || 'Admin'));
+          setAuthMethod('google');
+          setAuthRole(payload?.role === 'super_admin' ? 'super_admin' : 'admin');
+          setLoginError(null);
+          setIsAuthenticated(true);
+        }
+      } catch {
+        if (active) setLoginError('Không thể xác thực tài khoản Google. Vui lòng thử lại.');
+      } finally {
+        if (active) {
+          setAuthenticating(false);
+          setCheckingGoogleSession(false);
+        }
+      }
+    };
+
+    if (!supabase) {
+      setCheckingGoogleSession(false);
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      if (data.session?.access_token) {
+        void authenticateGoogleSession(data.session.access_token);
+      } else {
+        setCheckingGoogleSession(false);
+      }
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active || !session?.access_token) return;
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        window.setTimeout(() => {
+          if (active) void authenticateGoogleSession(session.access_token);
+        }, 0);
+      }
+    });
+
+    return () => {
+      active = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
   const handleLogin = async () => {
     setLoginError(null);
+
+    if (!password.trim()) {
+      setLoginError('Vui lòng nhập mật khẩu quản trị.');
+      return;
+    }
+
     setAuthenticating(true);
     try {
       const res = await fetch('/api/admin/auth', {
@@ -271,12 +758,54 @@ export default function AdminPage() {
         setLoginError(payload?.message || 'Mật khẩu sai, vui lòng nhập lại!');
         return;
       }
+      setAuthMethod('password');
+      setAuthRole('admin');
+      setGoogleEmail('');
+      setAdminDisplayName('Admin');
       setIsAuthenticated(true);
     } catch {
       setLoginError('Không thể xác thực admin. Vui lòng thử lại.');
     } finally {
       setAuthenticating(false);
     }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoginError(null);
+
+    if (!supabase) {
+      setLoginError('Supabase chưa được cấu hình nên chưa thể đăng nhập Google.');
+      return;
+    }
+
+    setAuthenticating(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/admin`,
+        queryParams: {
+          prompt: 'select_account',
+        },
+      },
+    });
+
+    if (error) {
+      setLoginError(`Không thể mở đăng nhập Google: ${error.message}`);
+      setAuthenticating(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (authMethod === 'google') {
+      await supabase?.auth.signOut();
+    }
+    setIsAuthenticated(false);
+    setPassword('');
+    setGoogleEmail('');
+    setAdminDisplayName('Admin');
+    setAuthMethod(null);
+    setAuthRole('admin');
+    setAdminSection('general');
   };
 
   // ── Data loading ──────────────────────────────────────────────────────────
@@ -319,35 +848,119 @@ export default function AdminPage() {
 
   // ── Login screen ──────────────────────────────────────────────────────────
 
+  if (checkingGoogleSession) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-[#06182b] text-white">
+        <div className="flex items-center gap-3 text-sm font-semibold">
+          <Loader2 className="h-5 w-5 animate-spin text-[#F05A23]" />
+          Đang kiểm tra phiên đăng nhập…
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 flex flex-col items-center justify-center p-4">
-        <img src="/images/logo.png" alt="ĐKTCNH Logo" className="h-14 w-auto mb-8" />
-        <Card className="w-full max-w-sm shadow-2xl">
-          <CardHeader className="text-center pb-2">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <ShieldCheck className="w-6 h-6 text-white" />
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#06182b] p-5">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(32,100,168,0.35),transparent_34%),radial-gradient(circle_at_82%_82%,rgba(240,90,35,0.2),transparent_32%)]" />
+        <div className="pointer-events-none absolute -left-32 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full border-[80px] border-white/[0.025]" />
+        <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full border-[70px] border-[#F05A23]/10" />
+
+        <div className="relative grid w-full max-w-5xl overflow-hidden rounded-[32px] border border-white/10 bg-white shadow-[0_40px_120px_rgba(0,0,0,0.45)] lg:grid-cols-[1.08fr_0.92fr]">
+          <div className="relative hidden min-h-[610px] overflow-hidden bg-[#0b3767] p-12 text-white lg:flex lg:flex-col lg:justify-between">
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),transparent_45%)]" />
+            <div className="absolute -bottom-28 -right-28 h-80 w-80 rounded-full border-[64px] border-white/[0.05]" />
+            <div className="relative">
+              <div className="inline-flex rounded-2xl bg-white px-4 py-3 shadow-xl">
+                <img src="/images/logo.png" alt="ĐKTCNH Logo" className="h-10 w-auto" />
+              </div>
             </div>
-            <CardTitle className="text-xl">Đăng nhập Admin</CardTitle>
-            <CardDescription className="text-sm mt-1">Nhập mật khẩu để truy cập bảng điều khiển</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
+            <div className="relative">
+              <div className="mb-6 grid h-12 w-12 place-items-center rounded-2xl bg-[#F05A23] shadow-lg shadow-black/20">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <p className="max-w-md font-headline text-4xl font-semibold leading-tight tracking-[-0.04em]">
+                THẲNG CÁI LƯNG LÊN!
+              </p>
+              <p className="max-w-md font-headline text-4xl font-semibold leading-tight tracking-[-0.04em]">
+                THẲNG CÁI LƯNG LÊN!
+              </p>
+              <p className="max-w-md font-headline text-4xl font-semibold leading-tight tracking-[-0.04em]">
+                THẲNG CÁI LƯNG LÊN!
+              </p>
+            </div>
+            <div className="relative flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+              <CircleDot className="h-3.5 w-3.5 text-emerald-400" />
+              Đoàn Khoa Tài chính — Ngân hàng
+            </div>
+          </div>
+
+          <form
+            className="flex min-h-[560px] flex-col justify-center px-7 py-12 sm:px-14 lg:min-h-[610px]"
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleLogin();
+            }}
+          >
+            <div className="mb-10 inline-flex w-fit rounded-2xl bg-slate-50 p-3 lg:hidden">
+              <img src="/images/logo.png" alt="ĐKTCNH Logo" className="h-9 w-auto" />
+            </div>
+            <div className="mb-8">
+              <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-[#eaf2fa] text-[#0b4f8a]">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <h1 className="mt-3 font-extrabold text-3xl tracking-[-0.03em] text-[#F05A23]">
+                ADMIN WORKSPACE
+              </h1>
+            </div>
+
             <Input
+              id="admin-password"
               type="password"
-              placeholder="Mật khẩu"
+              placeholder="Nhập mật khẩu quản trị"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-              className="mb-3"
+              autoComplete="current-password"
+              className="h-12 rounded-xl border-slate-200 bg-slate-50 px-4 focus-visible:ring-[#0b4f8a]"
             />
-            {loginError && <p className="text-sm text-red-600 mb-3">{loginError}</p>}
-            <Button onClick={handleLogin} disabled={authenticating} className="w-full">
+            {loginError && (
+              <p role="alert" className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
+                {loginError}
+              </p>
+            )}
+            <Button
+              type="submit"
+              disabled={authenticating}
+              className="mt-5 h-12 w-full rounded-xl bg-[#0b4f8a] font-bold text-white shadow-lg shadow-[#0b4f8a]/20 hover:bg-[#073e70]"
+            >
               {authenticating
                 ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Đang xác thực…</>
-                : 'Đăng nhập'}
+                : <>Đăng nhập bằng mật khẩu<ArrowUpRight className="ml-2 h-4 w-4" /></>}
             </Button>
-          </CardContent>
-        </Card>
+
+            <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
+              <span className="h-px flex-1 bg-slate-200" />
+              hoặc
+              <span className="h-px flex-1 bg-slate-200" />
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              disabled={authenticating}
+              onClick={handleGoogleLogin}
+              className="h-12 w-full rounded-xl border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50"
+            >
+              <span className="mr-3 grid h-6 w-6 place-items-center rounded-full border border-slate-200 font-extrabold text-[#4285F4]">
+                G
+              </span>
+              Đăng nhập bằng Google
+            </Button>
+            <p className="mt-4 text-center text-xs leading-relaxed text-slate-400">
+              Chỉ các tài khoản super admin đã được cấp quyền mới có thể truy cập.
+            </p>
+          </form>
+        </div>
       </div>
     );
   }
@@ -357,13 +970,7 @@ export default function AdminPage() {
   // Sidebar content (shared between desktop and mobile drawer)
   const sidebarContent = (
     <>
-      <div className="p-4 border-b flex flex-col items-center gap-2">
-        <img src="/images/logo.png" alt="ĐKTCNH Logo" className="h-8 w-auto" />
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Admin Panel</p>
-        <h2 className="text-base font-bold text-slate-800">Bảng điều khiển</h2>
-      </div>
-
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5 bg-[#144E8C] text-white/90">
         {/* Overview */}
         <SidebarBtn
           icon={LayoutDashboard}
@@ -374,8 +981,6 @@ export default function AdminPage() {
             setSidebarOpen(false);
           }}
         />
-
-        {/* Function */}
         <SidebarBtn
           icon={Wrench}
           label="Kiểm thử kết nối"
@@ -386,21 +991,11 @@ export default function AdminPage() {
           }}
         />
 
-        <SidebarBtn
-          icon={Database}
-          label="Schema Visualizer"
-          active={activeTab === 'schema'}
-          onClick={() => {
-            setActiveTab('schema');
-            setSidebarOpen(false);
-          }}
-        />
-
         {/* Category — collapsible */}
-        <div className="pt-3">
+        <div className="pt-4">
           <button
             onClick={() => setCategoryOpen(o => !o)}
-            className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-50"
+            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-white/90 transition-colors hover:bg-white/[0.05] hover:text-white/60"
           >
             <span className="flex items-center gap-1.5">
               <FolderOpen className="w-3.5 h-3.5" />
@@ -449,92 +1044,30 @@ export default function AdminPage() {
                   setSidebarOpen(false);
                 }}
               />
-              {/* Youth — collapsible sub-menu */}
-              <div>
-                <button
-                  onClick={() => setYouthSubOpen((o) => !o)}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors text-left ${
-                    activeTab === 'category-youth-activities' || activeTab === 'category-youth-student-info' || activeTab === 'category-youth-school-map'
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <Bot className={`w-4 h-4 flex-shrink-0 ${
-                      activeTab === 'category-youth-activities' || activeTab === 'category-youth-student-info' || activeTab === 'category-youth-school-map'
-                        ? 'text-blue-600' : ''
-                    }`} />
-                    Tuổi trẻ
-                  </span>
-                  {youthSubOpen
-                    ? <ChevronDown className="w-3.5 h-3.5" />
-                    : <ChevronRight className="w-3.5 h-3.5" />}
-                </button>
-                {youthSubOpen && (
-                  <div className="mt-1 space-y-0.5 pl-4">
-                    <SidebarBtn
-                      icon={Activity}
-                      label="Thêm mới"
-                      active={activeTab === 'category-youth-activities'}
-                      onClick={() => {
-                        setActiveTab('category-youth-activities');
-                        setSidebarOpen(false);
-                      }}
-                    />
-                    <SidebarBtn
-                      icon={GraduationCap}
-                      label="Thông tin sinh viên"
-                      active={activeTab === 'category-youth-student-info'}
-                      onClick={() => {
-                        setActiveTab('category-youth-student-info');
-                        setSidebarOpen(false);
-                      }}
-                    />
-                    <SidebarBtn
-                      icon={MapPinned}
-                      label="School Map"
-                      active={activeTab === 'category-youth-school-map'}
-                      onClick={() => {
-                        setActiveTab('category-youth-school-map');
-                        setSidebarOpen(false);
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
               <SidebarBtn
-                icon={FileText}
-                label="Đơn đăng ký"
-                active={activeTab === 'category-apply'}
+                icon={Sparkles}
+                label="Tuổi trẻ"
+                active={activeTab === 'category-youth-activities'}
                 onClick={() => {
-                  setActiveTab('category-apply');
-                  setSidebarOpen(false);
-                }}
-              />
-              <SidebarBtn
-                icon={Users}
-                label="Đơn vị hợp tác"
-                active={activeTab === 'category-partners'}
-                onClick={() => {
-                  setActiveTab('category-partners');
-                  setSidebarOpen(false);
-                }}
-              />
-              <SidebarBtn
-                icon={Quote}
-                label="Lời gửi gắm"
-                active={activeTab === 'category-blog-testimonials'}
-                onClick={() => {
-                  setActiveTab('category-blog-testimonials');
+                  setActiveTab('category-youth-activities');
                   setSidebarOpen(false);
                 }}
               />
               <SidebarBtn
                 icon={MessageSquare}
                 label="Diễn đàn"
-                active={activeTab === 'category-blog-discussions'}
+                active={activeTab === 'category-forum'}
                 onClick={() => {
-                  setActiveTab('category-blog-discussions');
+                  setActiveTab('category-forum');
+                  setSidebarOpen(false);
+                }}
+              />
+              <SidebarBtn
+                icon={FileText}
+                label="Tạo đơn đăng ký"
+                active={activeTab === 'category-apply'}
+                onClick={() => {
+                  setActiveTab('category-apply');
                   setSidebarOpen(false);
                 }}
               />
@@ -544,21 +1077,26 @@ export default function AdminPage() {
       </nav>
 
       {/* Sidebar footer */}
-      <div className="p-3 border-t space-y-0.5">
+      <div className="space-y-1 border-t border-white/50 bg-[#144E8C] p-3">
+        {authMethod === 'google' && googleEmail && (
+          <p className="truncate px-3 pb-2 text-xs font-semibold text-white/45" title={googleEmail}>
+            {googleEmail}
+          </p>
+        )}
         {siteConfig?.showAdminLink && (
           <a
             href={siteConfig.frontendUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 transition-colors hover:bg-white/[0.08] hover:text-white"
           >
             <ExternalLink className="w-4 h-4" />
             Xem website
           </a>
         )}
         <button
-          onClick={() => { setIsAuthenticated(false); setPassword(''); }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          onClick={() => void handleLogout()}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 transition-colors hover:bg-red-500/10 hover:text-red-300"
         >
           <LogOut className="w-4 h-4" />
           Đăng xuất
@@ -567,37 +1105,92 @@ export default function AdminPage() {
     </>
   );
 
+  const activeTabMeta = ADMIN_TAB_META[activeTab];
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-[#f3f6fa] text-[#0b1f33]">
+      <AdminWorkspaceHeader
+        section={adminSection}
+        showPersonalProfile={authMethod === 'google'}
+        onSectionChange={setAdminSection}
+        onLogout={() => void handleLogout()}
+      />
+
+      {adminSection === 'general' ? (
+      <>
       {/* Mobile header with hamburger button */}
-      <div className="md:hidden bg-white border-b border-slate-200 flex items-center justify-between px-4 py-3">
+      <div className="sticky top-[112px] z-40 flex items-center justify-between border-b border-white/10 bg-[#071d33] px-4 py-3 text-white sm:top-[60px] md:hidden">
         <div className="flex items-center gap-3">
           <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="p-2">
+              <Button variant="ghost" size="icon" className="p-2 text-white hover:bg-white/10 hover:text-white">
                 {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-60 p-0 overflow-y-auto">
-              <div className="h-full flex flex-col bg-white">
+            <SheetContent side="left" className="w-72 overflow-y-auto border-r-0 bg-[#071d33] p-0 text-white">
+              <div className="flex h-full flex-col bg-[#071d33]">
                 {sidebarContent}
               </div>
             </SheetContent>
           </Sheet>
-          <img src="/images/logo.png" alt="ĐKTCNH Logo" className="h-6 w-auto" />
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#F05A23]">{activeTabMeta.eyebrow}</p>
+            <p className="font-headline text-sm font-semibold">{activeTabMeta.title}</p>
+          </div>
         </div>
-        <p className="text-xs font-semibold text-slate-500">Bảng điều khiển</p>
+        <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          Online
+        </span>
       </div>
 
-      <div className="flex flex-1">
+      <div className="flex min-h-[calc(100vh-60px)] xl:min-h-[calc(100vh-104px)]">
         {/* Desktop Sidebar */}
-        <aside className="w-60 bg-white border-r border-slate-200 flex flex-col shrink-0 max-md:hidden overflow-y-auto">
+        <aside className="sticky top-[60px] hidden h-[calc(100vh-60px)] w-72 shrink-0 flex-col overflow-y-auto bg-[#071d33] md:flex xl:top-[104px] xl:h-[calc(100vh-104px)]">
           {sidebarContent}
         </aside>
 
         {/* ── Main content ────────────────────────────────────────────────── */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-3 md:p-6 max-w-6xl mx-auto w-full pb-12">
+        <main className="min-w-0 flex-1">
+          <header className="sticky top-[60px] z-30 hidden border-b border-slate-200/80 bg-white/90 px-8 py-4 backdrop-blur-xl md:block xl:top-[104px]">
+            <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-6">
+              <div className="min-w-0">
+                <h1 className="mt-1 truncate uppercase text-xl font-extrabold tracking-[-0.02em] text-[#F05A23]">
+                  TRANG "{activeTabMeta.title}"
+                </h1>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="hidden text-right lg:block">
+                  <p className="text-xs font-bold text-slate-600">
+                    {new Intl.DateTimeFormat('vi-VN', {
+                      weekday: 'long',
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      timeZone: 'Asia/Ho_Chi_Minh',
+                    }).format(new Date())}
+                  </p>
+                  <p className="mt-0.5 flex items-center justify-end gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    Hệ thống hoạt động
+                  </p>
+                </div>
+                {siteConfig?.showAdminLink && (
+                  <a
+                    href={siteConfig.frontendUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#0b4f8a]/25 hover:text-[#0b4f8a] hover:shadow-md"
+                  >
+                    Xem website
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </header>
+
+          <div className="mx-auto w-full max-w-[1440px] p-4 pb-16 sm:p-6 md:p-8">
             {activeTab === 'overview' && (
               <OverviewPanel
                 metrics={metrics}
@@ -605,6 +1198,7 @@ export default function AdminPage() {
                 submissions={formSubmissions}
                 templates={formTemplates}
                 authHeaders={authHeaders}
+                displayName={adminDisplayName}
                 onReload={() => reloadData(authHeaders)}
                 loadingData={loadingData}
               />
@@ -626,12 +1220,20 @@ export default function AdminPage() {
               <ApplicationFormsAdmin adminPassword={password} />
             )}
             {activeTab === 'category-partners' && <CategoryPartnersPanel adminPassword={password} />}
+            {activeTab === 'category-forum' && (
+              <ForumManagementPanel adminPassword={password} />
+            )}
             {activeTab === 'category-blog-testimonials' && <CategoryBlogTestimonialsPanel adminPassword={password} />}
             {activeTab === 'category-blog-discussions' && <CategoryBlogDiscussionsPanel adminPassword={password} />}
           </div>
         </main>
       </div>
-      <Footer />
+      </>
+      ) : authRole === 'super_admin' ? (
+        <SuperAdminPanel authHeaders={authHeaders} />
+      ) : (
+        <PersonalProfilePanel authHeaders={authHeaders} />
+      )}
     </div>
   );
 }
@@ -646,6 +1248,7 @@ function OverviewPanel({
   submissions,
   templates,
   authHeaders,
+  displayName,
   onReload,
   loadingData,
 }: {
@@ -654,6 +1257,7 @@ function OverviewPanel({
   submissions: FormSubmission[];
   templates: FormTemplateSummary[];
   authHeaders: Record<string, string>;
+  displayName: string;
   onReload: () => void;
   loadingData: boolean;
 }) {
@@ -679,7 +1283,6 @@ function OverviewPanel({
   const [detailTemplate, setDetailTemplate] = useState<FormTemplateSummary | null>(null);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [showFormsAnalytics, setShowFormsAnalytics] = useState(false);
-
   const selectedTemplate = useMemo(
     () => templates.find(t => t.id === selectedTemplateId) || null,
     [templates, selectedTemplateId]
@@ -965,111 +1568,95 @@ function OverviewPanel({
 
   return (
     <div>
-      <div className="mb-6 flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Tổng quan</h1>
-          <p className="text-sm text-slate-500 mt-1">Thống kê và tổng hợp dữ liệu</p>
+      <div className="relative mb-6 overflow-hidden rounded-[28px] bg-[#0b3767] px-6 py-7 text-white shadow-[0_24px_60px_rgba(11,55,103,0.2)] sm:px-8 sm:py-9">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(240,90,35,0.32),transparent_25%),linear-gradient(120deg,rgba(255,255,255,0.06),transparent_48%)]" />
+        <div className="pointer-events-none absolute -bottom-24 right-8 h-64 w-64 rounded-full border-[50px] border-white/[0.04]" />
+        <div className="relative flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+          <div>
+            <h2 className="max-w-2xl font-headline text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">
+              Hề lố {displayName}!
+            </h2>
+          </div>
+          <Button
+            variant="outline"
+            onClick={onReload}
+            disabled={loadingData}
+            className="h-11 shrink-0 rounded-xl border-white/15 bg-white/10 px-5 font-bold text-white backdrop-blur-sm hover:bg-white hover:text-[#0b3767]"
+          >
+            {loadingData
+              ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Đang tải…</>
+              : <><RefreshCw className="mr-2 h-4 w-4" />Làm mới dữ liệu</>}
+          </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={onReload} disabled={loadingData} className="shrink-0 mt-1">
-          {loadingData
-            ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Đang tải…</>
-            : <><svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>Reload</>}
-        </Button>
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <Card>
-          <CardContent className="pt-5">
+      <div className="mb-9 grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+        <Card className="overflow-hidden rounded-2xl border-0 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
+          <CardContent className="p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Lượt truy cập</p>
-                <p className="text-3xl font-bold text-slate-800 mt-1">{metrics?.visits ?? '—'}</p>
-                <p className="text-xs text-slate-400 mt-1">Cập nhật: {metrics?.lastUpdated ?? 'N/A'}</p>
+                <p className="text-base font-bold tracking-[0.12em] text-slate-400">Số lượng đơn đã nộp</p>
+                <p className="mt-2 font-headline text-3xl font-semibold tracking-tight text-[#0b1f33]">{totalSubmissions}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                <Eye className="w-6 h-6 text-blue-500" />
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#fff0ea]">
+                <ClipboardList className="h-5 w-5 text-[#F05A23]" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Đơn đã nộp</p>
-                <p className="text-3xl font-bold text-slate-800 mt-1">{totalSubmissions}</p>
-                <p className="text-xs text-slate-400 mt-1">Tổng số đơn đăng ký</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                <ClipboardList className="w-6 h-6 text-purple-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Trạng thái hệ thống</p>
-                <p className="text-lg font-semibold text-green-600 mt-1">Hoạt động</p>
-                <p className="text-xs text-slate-400 mt-1">Các dịch vụ bình thường</p>
-              </div>
-              <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-green-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Visual navigation */}
-      <h2 className="text-base font-semibold text-slate-700 mb-3">Tính năng</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <button
           onClick={handleOpenFormsAnalytics}
-          className="p-4 bg-white rounded-xl border hover:border-blue-200 hover:shadow-sm transition-all text-left group"
+          className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.045)] transition-all hover:-translate-y-1 hover:border-[#0b4f8a]/15 hover:shadow-[0_18px_40px_rgba(15,23,42,0.09)]"
         >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3 bg-blue-50 text-blue-600">
+          <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-slate-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#F05A23]" />
+          <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl bg-[#eaf2fa] text-[#0b4f8a]">
             <FileText className="w-5 h-5" />
           </div>
-          <p className="text-sm font-medium text-slate-700 group-hover:text-blue-700">Đơn đăng ký</p>
-          <p className="text-xs text-slate-400 mt-0.5">Hiển thị danh sách và phân tích đơn</p>
+          <p className="text-sm font-bold text-slate-700 group-hover:text-[#0b4f8a]">Đơn đăng ký</p>
+          <p className="mt-1 text-xs leading-5 text-slate-400">Hiển thị danh sách và phân tích đơn</p>
         </button>
 
         <button
           onClick={() => scrollToSection('candidate-stats-section')}
-          className="p-4 bg-white rounded-xl border hover:border-violet-200 hover:shadow-sm transition-all text-left group"
+          className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.045)] transition-all hover:-translate-y-1 hover:border-violet-200 hover:shadow-[0_18px_40px_rgba(15,23,42,0.09)]"
         >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3 bg-violet-50 text-violet-600">
+          <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-slate-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-violet-500" />
+          <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
             <Activity className="w-5 h-5" />
           </div>
-          <p className="text-sm font-medium text-slate-700 group-hover:text-violet-700">Dữ liệu ứng viên</p>
-          <p className="text-xs text-slate-400 mt-0.5">Theo ban, giới tính và lớp</p>
+          <p className="text-sm font-bold text-slate-700 group-hover:text-violet-700">Dữ liệu ứng viên</p>
+          <p className="mt-1 text-xs leading-5 text-slate-400">Theo ban, giới tính và lớp</p>
         </button>
 
         <button
           onClick={() => scrollToSection('recruitment-results-section')}
-          className="p-4 bg-white rounded-xl border hover:border-emerald-200 hover:shadow-sm transition-all text-left group"
+          className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.045)] transition-all hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_18px_40px_rgba(15,23,42,0.09)]"
         >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3 bg-emerald-50 text-emerald-600">
+          <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-slate-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-emerald-500" />
+          <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
             <CheckCircle2 className="w-5 h-5" />
           </div>
-          <p className="text-sm font-medium text-slate-700 group-hover:text-emerald-700">Kết quả tuyển</p>
-          <p className="text-xs text-slate-400 mt-0.5">Thống kê trạng thái ứng viên</p>
+          <p className="text-sm font-bold text-slate-700 group-hover:text-emerald-700">Kết quả tuyển</p>
+          <p className="mt-1 text-xs leading-5 text-slate-400">Thống kê trạng thái ứng viên</p>
         </button>
 
         <button
           onClick={() => scrollToSection('accepted-candidates-section')}
-          className="p-4 bg-white rounded-xl border hover:border-amber-200 hover:shadow-sm transition-all text-left group"
+          className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.045)] transition-all hover:-translate-y-1 hover:border-amber-200 hover:shadow-[0_18px_40px_rgba(15,23,42,0.09)]"
         >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3 bg-amber-50 text-amber-600">
+          <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-slate-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-amber-500" />
+          <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
             <ClipboardList className="w-5 h-5" />
           </div>
-          <p className="text-sm font-medium text-slate-700 group-hover:text-amber-700">Tân cộng tác viên</p>
-          <p className="text-xs text-slate-400 mt-0.5">Danh sách trúng tuyển theo ban</p>
+          <p className="text-sm font-bold text-slate-700 group-hover:text-amber-700">Tân cộng tác viên</p>
+          <p className="mt-1 text-xs leading-5 text-slate-400">Danh sách trúng tuyển theo ban</p>
         </button>
       </div>
 
@@ -1876,7 +2463,7 @@ function OverviewPanel({
 
 function FunctionPanel({ authHeaders }: { authHeaders: Record<string, string> }) {
   const [statuses, setStatuses] = useState<Record<string, ServiceStatus>>({
-    supabase: 'idle', ai: 'idle', admin: 'idle',
+    supabase: 'idle', publicApi: 'idle', ai: 'idle', admin: 'idle',
   });
   const [messages, setMessages] = useState<Record<string, string>>({});
   const [pageStatuses, setPageStatuses] = useState<Record<string, ServiceStatus>>({
@@ -1958,15 +2545,31 @@ function FunctionPanel({ authHeaders }: { authHeaders: Record<string, string> })
       key: 'supabase',
       icon: Database,
       label: 'Database',
-      desc: 'Kiểm tra kết nối cơ sở dữ liệu Supabase',
+      desc: 'Kiểm tra kết nối cơ sở dữ liệu',
       bgColor: 'bg-emerald-50',
       iconColor: 'text-emerald-600',
       onTest: async () => {
-        const res = await fetch('/api/admin/application-form-submissions?page=1&pageSize=1', { headers: authHeaders });
+        const res = await fetch('/api/admin/health', { headers: authHeaders, cache: 'no-store' });
         return {
           ok: res.ok,
-          msg: res.ok ? 'Kết nối Supabase thành công' : await getErrorMessage(res),
+          msg: res.ok ? 'Kết nối thành công' : await getErrorMessage(res),
         };
+      },
+    },
+    {
+      key: 'publicApi',
+      icon: Wrench,
+      label: 'Public APIs',
+      desc: 'Kiểm tra API dữ liệu được các trang công khai sử dụng',
+      bgColor: 'bg-cyan-50',
+      iconColor: 'text-cyan-600',
+      onTest: async () => {
+        const endpoints = ['/api/home-settings', '/api/achievements', '/api/activities', '/api/structure', '/api/youth'];
+        const responses = await Promise.all(endpoints.map((endpoint) => fetch(endpoint, { cache: 'no-store' })));
+        const failed = responses.findIndex((response) => !response.ok);
+        return failed === -1
+          ? { ok: true, msg: `${endpoints.length}/${endpoints.length} API công khai phản hồi thành công` }
+          : { ok: false, msg: `${endpoints[failed]} trả về HTTP ${responses[failed].status}` };
       },
     },
     {
@@ -2010,28 +2613,45 @@ function FunctionPanel({ authHeaders }: { authHeaders: Record<string, string> })
     label: string;
     desc: string;
     path: string;
+    apiPath?: string;
   }[] = [
-    { key: 'home', label: 'Trang chủ', desc: 'Danh mục trang: Trang chủ', path: '/' },
-    { key: 'achievements', label: 'Thành tích', desc: 'Danh mục trang: Thành tích', path: '/achievements' },
-    { key: 'activities', label: 'Hoạt động', desc: 'Danh mục trang: Hoạt động', path: '/activities' },
-    { key: 'apply', label: 'Đơn đăng ký', desc: 'Danh mục trang: Đơn đăng ký', path: '/apply' },
-    { key: 'blog', label: 'Blog', desc: 'Trang khác: Blog', path: '/blog' },
-    { key: 'structure', label: 'Cơ cấu', desc: 'Trang khác: Cơ cấu', path: '/structure' },
-    { key: 'youth', label: 'Tuổi trẻ', desc: 'Trang khác: Tuổi trẻ', path: '/youth' },
+    { key: 'home', label: 'Trang chủ', desc: 'Trang và dữ liệu video', path: '/', apiPath: '/api/home-settings' },
+    { key: 'achievements', label: 'Thành tích', desc: 'Trang và dữ liệu thành tích', path: '/achievements', apiPath: '/api/achievements' },
+    { key: 'activities', label: 'Hoạt động', desc: 'Trang và dữ liệu hoạt động', path: '/activities', apiPath: '/api/activities' },
+    { key: 'apply', label: 'Đơn đăng ký', desc: 'Trang và biểu mẫu đang mở', path: '/apply', apiPath: '/api/forms/active' },
+    { key: 'blog', label: 'Diễn đàn', desc: 'Trang và dữ liệu góc chia sẻ', path: '/blog', apiPath: '/api/blog/testimonials' },
+    { key: 'structure', label: 'Cơ cấu', desc: 'Trang và dữ liệu cơ cấu', path: '/structure', apiPath: '/api/structure' },
+    { key: 'youth', label: 'Tuổi trẻ', desc: 'Trang và dữ liệu Tuổi trẻ', path: '/youth', apiPath: '/api/youth' },
     { key: 'aiPage', label: 'AI', desc: 'Trang khác: AI', path: '/ai' },
   ];
 
+  const testPageConnection = async (page: typeof pageChecks[number]) => {
+    const [pageResponse, apiResponse] = await Promise.all([
+      fetch(page.path, { cache: 'no-store' }),
+      page.apiPath ? fetch(page.apiPath, { cache: 'no-store' }) : Promise.resolve(null),
+    ]);
+    if (!pageResponse.ok) return { ok: false, msg: `Trang ${page.path} trả về HTTP ${pageResponse.status}` };
+    if (apiResponse && !apiResponse.ok) return { ok: false, msg: `${page.apiPath} trả về HTTP ${apiResponse.status}` };
+
+    if (apiResponse) {
+      try {
+        await apiResponse.json();
+      } catch {
+        return { ok: false, msg: `${page.apiPath} không trả về dữ liệu JSON hợp lệ` };
+      }
+    }
+
+    return {
+      ok: true,
+      msg: page.apiPath
+        ? `Trang ${page.path} và nguồn dữ liệu ${page.apiPath} đều hoạt động`
+        : `Trang ${page.path} hoạt động`,
+    };
+  };
+
   const testAll = () => {
     services.forEach((svc) => runTest(svc.key, svc.label, svc.onTest));
-    pageChecks.forEach((page) =>
-      runPageTest(page.key, page.label, async () => {
-        const res = await fetch(page.path, { cache: 'no-store' });
-        return {
-          ok: res.ok,
-          msg: res.ok ? `Kết nối trang ${page.path} thành công` : await getErrorMessage(res),
-        };
-      })
-    );
+    pageChecks.forEach((page) => runPageTest(page.key, page.label, () => testPageConnection(page)));
   };
 
   return (
@@ -2106,7 +2726,9 @@ function FunctionPanel({ authHeaders }: { authHeaders: Record<string, string> })
                       <StatusBadge status={pageStatuses[page.key] as ServiceStatus} />
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">{page.desc}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{page.path}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {page.path}{page.apiPath ? ` ↔ ${page.apiPath}` : ''}
+                    </p>
                     {pageMessages[page.key] && (
                       <p className={`text-xs mt-2 ${pageStatuses[page.key] === 'ok' ? 'text-green-600' : 'text-red-600'}`}>
                         {pageMessages[page.key]}
@@ -2117,15 +2739,7 @@ function FunctionPanel({ authHeaders }: { authHeaders: Record<string, string> })
                       variant="outline"
                       className="mt-3"
                       disabled={pageStatuses[page.key] === 'loading'}
-                      onClick={() =>
-                        runPageTest(page.key, page.label, async () => {
-                          const res = await fetch(page.path, { cache: 'no-store' });
-                          return {
-                            ok: res.ok,
-                            msg: res.ok ? `Kết nối trang ${page.path} thành công` : await getErrorMessage(res),
-                          };
-                        })
-                      }
+                      onClick={() => runPageTest(page.key, page.label, () => testPageConnection(page))}
                     >
                       {pageStatuses[page.key] === 'loading'
                         ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Đang kiểm tra…</>
@@ -2669,6 +3283,13 @@ function CategoryHomePanel({ authHeaders }: { authHeaders: Record<string, string
   const handleSave = async () => {
     setSaveError(null);
     setSaveSuccess(false);
+
+    const youtubeUrl = settings.youtubeVideoUrl.trim();
+    if (youtubeUrl && !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(youtubeUrl)) {
+      setSaveError('Vui lòng nhập một đường dẫn YouTube hợp lệ.');
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await fetch('/api/admin/home-settings', {
@@ -2678,11 +3299,7 @@ function CategoryHomePanel({ authHeaders }: { authHeaders: Record<string, string
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          homeBannerImage: settings.homeBannerImage.trim(),
-          homeImageOne: settings.homeImageOne.trim(),
-          homeImageTwo: settings.homeImageTwo.trim(),
-          homeImageThree: settings.homeImageThree.trim(),
-          youtubeVideoUrl: settings.youtubeVideoUrl.trim(),
+          youtubeVideoUrl: youtubeUrl,
         }),
       });
 
@@ -2782,12 +3399,47 @@ function CategoryHomePanel({ authHeaders }: { authHeaders: Record<string, string
 
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Trang chủ" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Trang chủ</h1>
-      </div>
-
       <Card className="mb-4">
+        <CardHeader className="pb-3">
+          <CardTitle className="">Thay đổi Video hiển thị</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {loading ? (
+            <div className="flex items-center gap-2 text-sm text-slate-500">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Đang tải dữ liệu...
+            </div>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <label htmlFor="home-youtube-url" className="text-sm font-semibold text-slate-700">
+                  Đường dẫn YouTube
+                </label>
+                <Input
+                  id="home-youtube-url"
+                  type="url"
+                  value={settings.youtubeVideoUrl}
+                  onChange={(event) => setSettings((previous) => ({ ...previous, youtubeVideoUrl: event.target.value }))}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+                <p className="text-xs text-slate-500">Hỗ trợ liên kết youtube.com và youtu.be.</p>
+              </div>
+
+              {saveError && <p className="text-sm text-red-600">{saveError}</p>}
+              {saveSuccess && <p className="text-sm text-green-600">Đã cập nhật video trang chủ.</p>}
+
+              <div className="flex justify-end">
+                <Button onClick={handleSave} disabled={saving}>
+                  {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  {saving ? 'Đang lưu...' : 'Lưu đường dẫn video'}
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="hidden" aria-hidden="true">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Cài đặt Giao diện trang chủ</CardTitle>
           <CardDescription className="text-xs italic">Lưu ý: Banner hiển thị full chiều ngang và giữ chiều cao theo tỷ lệ ảnh gốc; Hình phần nội dung là 4:3.</CardDescription>
@@ -2954,12 +3606,6 @@ function CategoryHomePanel({ authHeaders }: { authHeaders: Record<string, string
 function CategoryStructurePanel({ adminPassword }: { adminPassword: string }) {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Cơ cấu" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Cơ cấu</h1>
-        <p className="text-sm text-slate-500 mt-1">Thêm, sửa và quản lý các ban trong cơ cấu tổ chức</p>
-      </div>
-
       <StructureAdmin adminPassword={adminPassword} />
     </div>
   );
@@ -2972,12 +3618,6 @@ function CategoryStructurePanel({ adminPassword }: { adminPassword: string }) {
 function CategoryAchievementsPanel({ adminPassword }: { adminPassword: string }) {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Thành tích" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Thành tích</h1>
-        <p className="text-sm text-slate-500 mt-1">Thêm, sửa và quản lý các thành tích của đoàn</p>
-      </div>
-
       <AchievementsAdmin adminPassword={adminPassword} />
     </div>
   );
@@ -2990,12 +3630,6 @@ function CategoryAchievementsPanel({ adminPassword }: { adminPassword: string })
 function CategoryActivitiesPanel({ adminPassword }: { adminPassword: string }) {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Hoạt động" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Hoạt động</h1>
-        <p className="text-sm text-slate-500 mt-1">Thêm, sửa và phân loại nội dung vào Chuyên mục hoặc Chương trình</p>
-      </div>
-
       <ActivitiesAdmin adminPassword={adminPassword} />
     </div>
   );
@@ -3008,12 +3642,6 @@ function CategoryActivitiesPanel({ adminPassword }: { adminPassword: string }) {
 function CategoryYouthPanel({ adminPassword }: { adminPassword: string }) {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Tuổi trẻ / Thêm mới" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Hoạt động Tuổi trẻ</h1>
-        <p className="text-sm text-slate-500 mt-1">Thêm, sửa và quản lý các mục hiển thị trên trang Tuổi trẻ</p>
-      </div>
-
       <YouthAdmin adminPassword={adminPassword} />
     </div>
   );
@@ -3026,14 +3654,6 @@ function CategoryYouthPanel({ adminPassword }: { adminPassword: string }) {
 function CategoryStudentInfoPanel() {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Tuổi trẻ / Thông tin sinh viên" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Thông tin sinh viên</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Quản lý danh sách lớp, cố vấn học tập và thông tin sinh viên trong khoa.
-        </p>
-      </div>
-
       <Card className="border-slate-100 bg-white shadow-sm">
         <CardContent className="p-10 flex flex-col items-center justify-center text-center gap-3">
           <GraduationCap className="w-12 h-12 text-slate-300" />
@@ -3051,14 +3671,6 @@ function CategoryStudentInfoPanel() {
 function CategoryYouthSchoolMapPanel({ adminPassword }: { adminPassword: string }) {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Tuổi trẻ / School Map" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý School Map</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Quản lý cấu trúc tòa nhà, tầng, phòng và điểm tương tác trên ảnh.
-        </p>
-      </div>
-
       <SchoolMapAdmin adminPassword={adminPassword} />
     </div>
   );
@@ -3071,12 +3683,6 @@ function CategoryYouthSchoolMapPanel({ adminPassword }: { adminPassword: string 
 function CategoryPartnersPanel({ adminPassword }: { adminPassword: string }) {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Đơn vị hợp tác" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Đơn vị hợp tác</h1>
-        <p className="text-sm text-slate-500 mt-1">Thêm, sửa và quản lý các đơn vị hợp tác</p>
-      </div>
-
       <PartnersAdmin adminPassword={adminPassword} />
     </div>
   );
@@ -3089,12 +3695,6 @@ function CategoryPartnersPanel({ adminPassword }: { adminPassword: string }) {
 function CategoryBlogTestimonialsPanel({ adminPassword }: { adminPassword: string }) {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Lời gửi gắm" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Lời gửi gắm cựu thành viên</h1>
-        <p className="text-sm text-slate-500 mt-1">Thêm, sửa và công khai lời gửi gắm từ cựu thành viên trên trang Diễn đàn</p>
-      </div>
-
       <BlogTestimonialsAdmin adminPassword={adminPassword} />
     </div>
   );
@@ -3107,13 +3707,34 @@ function CategoryBlogTestimonialsPanel({ adminPassword }: { adminPassword: strin
 function CategoryBlogDiscussionsPanel({ adminPassword }: { adminPassword: string }) {
   return (
     <div>
-      <div className="mb-6">
-        <Breadcrumb label="Diễn đàn" />
-        <h1 className="text-2xl font-bold text-slate-800">Quản lý Diễn đàn thảo luận</h1>
-        <p className="text-sm text-slate-500 mt-1">Xem bình luận người dùng, phản hồi với vai trò Admin và ẩn/hiện bình luận</p>
-      </div>
-
       <BlogDiscussionAdmin adminPassword={adminPassword} />
     </div>
+  );
+}
+
+function ForumManagementPanel({ adminPassword }: { adminPassword: string }) {
+  return (
+    <Tabs defaultValue="testimonials" className="space-y-6">
+      <TabsList className="grid h-auto w-full max-w-xl grid-cols-2 rounded-xl bg-slate-200/70 p-1.5">
+        <TabsTrigger
+          value="testimonials"
+          className="rounded-lg px-4 py-2.5 font-semibold data-[state=active]:text-[#144E8C]"
+        >
+          Duyệt lời chia sẻ
+        </TabsTrigger>
+        <TabsTrigger
+          value="comments"
+          className="rounded-lg px-4 py-2.5 font-semibold data-[state=active]:text-[#144E8C]"
+        >
+          Quản lý bình luận
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="testimonials" className="mt-0">
+        <CategoryBlogTestimonialsPanel adminPassword={adminPassword} />
+      </TabsContent>
+      <TabsContent value="comments" className="mt-0">
+        <CategoryBlogDiscussionsPanel adminPassword={adminPassword} />
+      </TabsContent>
+    </Tabs>
   );
 }

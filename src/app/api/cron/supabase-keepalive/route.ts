@@ -19,7 +19,7 @@ export async function GET(request: Request) {
 
   try {
     const { error } = await supabaseAdmin
-      .from("admin_settings")
+      .from("home_settings")
       .select("id")
       .limit(1);
 

@@ -1,19 +1,6 @@
 import { z } from 'zod';
 import { DEPARTMENTS, type Department } from './applicationForms';
 
-export const ContactFormSchema = z.object({
-  name: z.string().min(2, { message: "Tên phải có ít nhất 2 ký tự." }),
-  email: z.string().email({ message: "Vui lòng nhập một địa chỉ email hợp lệ." }),
-  message: z.string().min(10, { message: "Tin nhắn phải có ít nhất 10 ký tự." }),
-});
-
-export type ContactFormState = {
-  message: string;
-  fields?: Record<string, string>;
-  issues?: string[];
-} | null;
-
-
 export const CommentFormSchema = z.object({
   name: z.string().optional().nullable(),
   comment: z.string().min(5, { message: "Bình luận phải có ít nhất 5 ký tự." }),

@@ -10,7 +10,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {

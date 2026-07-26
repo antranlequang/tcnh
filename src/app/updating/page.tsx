@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
-import { Footer } from '@/components/layout/Footer';
 import { Wrench, Hammer, Cog, Sparkles, Clock, Heart, Coffee, Zap } from 'lucide-react';
 
 export default function UpdatingPage() {
@@ -76,7 +75,6 @@ export default function UpdatingPage() {
           </div>
         </ScrollReveal>
       </div>
-      <Footer />
     </div>
   );
 }

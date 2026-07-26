@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
-import { Footer } from '@/components/layout/Footer';
 import { useEffect, useState } from 'react';
 import { ACTIVITY_TYPE_LABELS, type ActivityRow } from '@/lib/activities';
 import type { PartnerRow } from '@/lib/partners';
@@ -111,9 +110,9 @@ export default function ActivitiesPage() {
     return (
         <div>
             <PageBanner
-                title="HOẠT ĐỘNG CỦA CHÚNG TỚ"
+                title="Hoạt động của chúng tớ"
                 subtitle="Các chuyên mục và chương trình nổi bật mà Đoàn Khoa đã thực hiện."
-                imageUrl="/images/back-ocean.jpg"
+                imageUrl="/images/banner-page/uel.jpg"
                 imageHint="students event"
             />
 
@@ -169,7 +168,7 @@ export default function ActivitiesPage() {
                 
                 {/* Partners Section */}
                 <section className="mt-24">
-                    <h2 className="text-4xl md:text-5xl font-anton font-medium text-center mb-0 md:mb-14 text-primary mt-0 md:mt-14">CÁC ĐƠN VỊ ĐÃ HỢP TÁC</h2>
+                    <h2 className="text-4xl md:text-5xl font-anton text-[#F05A23] font-medium text-center mb-0 md:mb-14 mt-0 md:mt-14">CÁC ĐƠN VỊ ĐÃ HỢP TÁC</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 items-center">
                         {partners.map((partner, index) => (
                             <div key={`${partner.name}-${index}`} className="flex justify-center " title={partner.name}>
@@ -186,7 +185,6 @@ export default function ActivitiesPage() {
                     </div>
                 </section>
             </main>
-            <Footer />
         </div>
     );
 }

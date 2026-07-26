@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { PageBanner } from "@/components/shared/PageBanner";
-import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,9 +48,9 @@ export default function YouthPage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_20%_0%,#fff2d6,transparent_40%),radial-gradient(circle_at_100%_20%,#dbeafe,transparent_35%),linear-gradient(180deg,#fffdf8_0%,#f8fafc_100%)]">
       <PageBanner
-        title="TUỔI TRẺ TÀI CHÍNH - NGÂN HÀNG"
+        title="Tuổi trẻ Tài chính - Ngân hàng"
         subtitle="Nơi hội tụ những hoạt động sôi nổi dành cho đoàn viên/thanh niên"
-        imageUrl="/images/back-ocean.jpg"
+        imageUrl="/images/banner-page/uel.jpg"
         imageHint="youth activities"
       />
 
@@ -200,7 +199,6 @@ export default function YouthPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Footer />
     </div>
   );
 }

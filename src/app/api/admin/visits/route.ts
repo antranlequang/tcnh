@@ -42,7 +42,7 @@ async function readVisits() {
 
 export async function GET(request: Request) {
   try {
-    const authError = assertAdminRequest(request);
+    const authError = await assertAdminRequest(request);
     if (authError) return authError;
 
     const data = await readVisits();
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const authError = assertAdminRequest(request);
+    const authError = await assertAdminRequest(request);
     if (authError) return authError;
 
     if (!supabaseAdmin) {

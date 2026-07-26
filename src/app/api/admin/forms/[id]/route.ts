@@ -14,9 +14,18 @@ function normalizeDepartmentQuestions(input: any): Record<Department, string[]> 
   return out;
 }
 
+function isMissingClassOptionsColumn(error: any): boolean {
+  const message = String(error?.message || "").toLowerCase();
+  return (
+    error?.code === "PGRST204" &&
+    message.includes("class_options") &&
+    message.includes("application_form_templates")
+  );
+}
+
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {
@@ -41,7 +50,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {
@@ -69,14 +78,35 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       class_options: Array.isArray(classOptions) ? (classOptions as unknown[]).map(String).filter(Boolean) : [],
     };
 
-    const { data, error } = await supabaseAdmin
+    const { class_options: classOptionsPayload, ...legacyPayload } = payload;
+    let saveResult = await supabaseAdmin
       .from("application_form_templates")
       .update(payload)
       .eq("id", id)
       .select("*")
       .single();
 
-    if (error) throw error;
+    if (isMissingClassOptionsColumn(saveResult.error)) {
+      if (classOptionsPayload.length > 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "Danh sách lớp chưa thể lưu vì Supabase thiếu cột class_options. Hãy chạy file docs/sql/2026-07-26_add_application_form_class_options.sql trong SQL Editor.",
+          },
+          { status: 503 }
+        );
+      }
+      saveResult = await supabaseAdmin
+        .from("application_form_templates")
+        .update(legacyPayload)
+        .eq("id", id)
+        .select("*")
+        .single();
+    }
+
+    if (saveResult.error) throw saveResult.error;
+    const data = { ...saveResult.data, class_options: saveResult.data?.class_options || [] };
 
     // Record history snapshot (fire-and-forget; never block the response)
     supabaseAdmin
@@ -94,7 +124,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {

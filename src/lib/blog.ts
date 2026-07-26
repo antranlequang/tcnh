@@ -4,6 +4,7 @@ export type AlumniTestimonialRow = {
   id: string;
   full_name: string;
   avatar_url: string | null;
+  image_urls: string[];
   positions: string[];
   message: string;
   is_published: boolean;
@@ -58,11 +59,37 @@ function toStringArray(input: unknown): string[] {
 export const TESTIMONIAL_SELECT_COLUMNS =
   "id, full_name, avatar_url, positions, message, is_published, display_order, created_at, updated_at";
 
+export function parseTestimonialImageUrls(value: unknown): string[] {
+  const raw = String(value ?? "").trim();
+  if (!raw) return [];
+
+  if (raw.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => String(item ?? "").trim()).filter(Boolean);
+      }
+    } catch {
+      // Older rows contain a plain URL, so malformed JSON should fall through.
+    }
+  }
+
+  return [raw];
+}
+
+export function serializeTestimonialImageUrls(urls: string[]): string | null {
+  const normalized = urls.map((url) => url.trim()).filter(Boolean);
+  if (normalized.length === 0) return null;
+  return normalized.length === 1 ? normalized[0] : JSON.stringify(normalized);
+}
+
 export function mapTestimonialRow(input: any): AlumniTestimonialRow {
+  const imageUrls = parseTestimonialImageUrls(input?.avatar_url);
   return {
     id: String(input?.id ?? ""),
     full_name: String(input?.full_name ?? ""),
     avatar_url: input?.avatar_url ? String(input.avatar_url) : null,
+    image_urls: imageUrls,
     positions: toStringArray(input?.positions),
     message: String(input?.message ?? ""),
     is_published: Boolean(input?.is_published),

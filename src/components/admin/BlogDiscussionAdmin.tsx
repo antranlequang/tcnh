@@ -113,8 +113,9 @@ export function BlogDiscussionAdmin({ adminPassword }: { adminPassword: string }
     }
   };
 
-  const CommentItem = ({ item, level = 0 }: { item: CommentNode; level?: number }) => (
-    <div className={level > 0 ? "ml-6 mt-3 border-l pl-4" : ""}>
+  function renderCommentItem(item: CommentNode, level = 0): React.ReactNode {
+    return (
+    <div key={item.id} className={level > 0 ? "ml-6 mt-3 border-l pl-4" : ""}>
       <div className="rounded-lg border p-4 bg-white space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={item.author_role === "admin" ? "default" : "secondary"}>
@@ -169,12 +170,13 @@ export function BlogDiscussionAdmin({ adminPassword }: { adminPassword: string }
       {item.replies.length > 0 && (
         <div className="mt-2 space-y-2">
           {item.replies.map((reply) => (
-            <CommentItem key={reply.id} item={reply} level={level + 1} />
+            renderCommentItem(reply, level + 1)
           ))}
         </div>
       )}
     </div>
-  );
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -187,7 +189,12 @@ export function BlogDiscussionAdmin({ adminPassword }: { adminPassword: string }
 
       <Card>
         <CardHeader className="flex-row items-center justify-between">
-          <CardTitle>Danh sách thảo luận</CardTitle>
+          <div>
+            <CardTitle>Danh sách thảo luận</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Bình luận được hiển thị ngay, không cần duyệt trước. Admin vẫn có thể ẩn nội dung vi phạm.
+            </p>
+          </div>
           <Button type="button" variant="outline" onClick={refresh} disabled={loading}>
             {loading ? "Đang tải..." : "Tải lại"}
           </Button>
@@ -198,7 +205,7 @@ export function BlogDiscussionAdmin({ adminPassword }: { adminPassword: string }
           ) : (
             <div className="space-y-4">
               {tree.map((item) => (
-                <CommentItem key={item.id} item={item} />
+                renderCommentItem(item)
               ))}
             </div>
           )}

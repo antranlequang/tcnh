@@ -6,15 +6,10 @@ import sharp from "sharp";
 import { serializeError } from "@/lib/utils";
 import { randomUUID } from "crypto";
 
-export const metadata = {
-  name: "Upload Activity Images",
-  description: "Upload activity images to Supabase Storage (converts to WebP)",
-};
-
 export async function POST(request: Request) {
   try {
     // Check admin auth
-    const authError = assertAdminRequest(request);
+    const authError = await assertAdminRequest(request);
     if (authError) return authError;
 
     if (!supabaseAdmin) {

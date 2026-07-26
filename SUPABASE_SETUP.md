@@ -91,7 +91,7 @@ ALTER publication supabase_realtime ADD TABLE submissions;
 
 For the current website content management features, also run the schema in [supabase-schema.sql](supabase-schema.sql).
 
-If you already have an older database deployed, run the upgrade migration in [docs/sql/2026-04-08_remove-google-legacy-columns.sql](docs/sql/2026-04-08_remove-google-legacy-columns.sql) before deploying the latest code. This removes legacy Google Drive and Google Sheets columns that are no longer used by the app.
+The current [supabase-schema.sql](supabase-schema.sql) automatically removes legacy Google Drive and Google Sheets columns before creating or updating current resources.
 
 Minimum extra resources required by the current codebase:
 
@@ -141,12 +141,56 @@ Image storage layout used by the app:
 
 If your Supabase project was created before the Google Drive and Google Sheets cleanup, apply this order:
 
-1. Run the latest base schema from [supabase-schema.sql](supabase-schema.sql) if those tables do not exist yet.
-2. Run the upgrade migration in [docs/sql/2026-04-08_remove-google-legacy-columns.sql](docs/sql/2026-04-08_remove-google-legacy-columns.sql).
-3. Create any missing storage buckets listed above.
-4. Redeploy the app with the current Supabase-only environment variables.
+1. Run the latest base schema from [supabase-schema.sql](supabase-schema.sql).
+2. Create any missing storage buckets listed above if the schema could not create them.
+3. Redeploy the app with the current Supabase-only environment variables.
 
 The current runtime no longer reads or writes any Google Drive or Google Sheets settings.
+
+## Google login for the admin page
+
+The admin page supports both the existing admin password and Google login through
+Supabase Auth. Before using role-based admin management, rerun the latest
+[supabase-schema.sql](supabase-schema.sql) to create `admin_accounts` and
+`admin_user_profiles`.
+
+Google login always grants protected super-admin access to these two accounts:
+
+- `dktaichinhnganhang@st.uel.edu.vn`
+- `tranlequangan2308@gmail.com`
+
+To enable Google login:
+
+1. In Google Auth Platform, create an OAuth client with application type
+   **Web application**.
+2. Add the website origin and the local development origin
+   `http://localhost:9002` under **Authorized JavaScript origins**.
+3. Copy the Supabase callback URL shown under
+   **Supabase Dashboard → Authentication → Providers → Google** into Google's
+   **Authorized redirect URIs**.
+4. Paste the Google Client ID and Client Secret into that Supabase Google
+   provider and enable it.
+5. Under **Supabase Dashboard → Authentication → URL Configuration**, set the
+   production Site URL and add these redirect URLs:
+   - `http://localhost:9002/admin`
+   - `https://YOUR-PRODUCTION-DOMAIN/admin`
+
+Only the standard `openid`, email, and profile scopes are required. Google
+Sheets, Google Drive, and their API credentials are not used by this login
+flow.
+
+After signing in with Google, the **Personal Profile** page changes according to
+the authenticated email:
+
+- A protected super admin sees the admin list, can add/remove regular admins,
+  and can inspect each person's profile.
+- A regular admin sees only their own editable profile.
+- Password login does not show the Personal Profile page and cannot manage
+  admin accounts.
+
+Removing a regular admin immediately prevents that email's existing Google
+session from accessing protected admin APIs. For a standalone upgrade, run
+[docs/sql/2026-07-26_admin_roles_and_profiles.sql](docs/sql/2026-07-26_admin_roles_and_profiles.sql).
 
 ## 4. Test the System
 

@@ -64,6 +64,8 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
   const [classOptionInput, setClassOptionInput] = useState("");
   const [uploadSlot, setUploadSlot] = useState<IllustrationSlot>("hero");
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const authHeaders = useMemo(() => {
     return { "x-admin-password": adminPassword };
@@ -158,6 +160,7 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
       classOptions,
     };
 
+    setSaving(true);
     try {
       const res = await fetch("/api/admin/forms", {
         method: "POST",
@@ -166,10 +169,41 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
       });
       if (!res.ok) throw new Error(await res.text());
       await res.json();
+      const successMessage = templateId
+        ? "Cập nhật form thành công. Đã mở form nhập mới."
+        : "Tạo form thành công. Đã mở form nhập mới.";
+      resetBuilder();
       await refreshTemplates();
-      alert("Lưu form thành công.");
+      alert(successMessage);
     } catch (e) {
       setError(String(e));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteTemplate = async (template: TemplateRow) => {
+    const confirmed = window.confirm(
+      `Bạn có chắc muốn xóa form “${template.name}”?\n\nToàn bộ đơn đăng ký và lịch sử liên quan đến form này cũng sẽ bị xóa. Thao tác này không thể hoàn tác.`
+    );
+    if (!confirmed) return;
+
+    setError(null);
+    setDeletingId(template.id);
+    try {
+      const res = await fetch(`/api/admin/forms/${encodeURIComponent(template.id)}`, {
+        method: "DELETE",
+        headers: authHeaders,
+      });
+      if (!res.ok) throw new Error(await res.text());
+
+      if (templateId === template.id) resetBuilder();
+      await refreshTemplates();
+      alert(`Đã xóa form “${template.name}”.`);
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -233,15 +267,28 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
                     <p className="text-xs text-muted-foreground">
                       Thời gian đóng: {formatDateTime(t.close_at)}
                     </p>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      className="mt-2 w-full"
-                      onClick={() => loadTemplate(t.id)}
-                    >
-                      Edit
-                    </Button>
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => loadTemplate(t.id)}
+                        disabled={deletingId === t.id}
+                      >
+                        Chỉnh sửa
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => void deleteTemplate(t)}
+                        disabled={deletingId === t.id}
+                      >
+                        <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                        {deletingId === t.id ? "Đang xóa…" : "Xóa"}
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -437,11 +484,11 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
             </div>
 
             <div className="flex gap-3 justify-end">
-              <Button type="button" variant="outline" onClick={resetBuilder}>
+              <Button type="button" variant="outline" onClick={resetBuilder} disabled={saving}>
                 Reset
               </Button>
-              <Button type="button" onClick={saveTemplate}>
-                Lưu Form
+              <Button type="button" onClick={saveTemplate} disabled={saving}>
+                {saving ? "Đang lưu…" : "Lưu Form"}
               </Button>
             </div>
           </CardContent>
@@ -450,4 +497,3 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
     </div>
   );
 }
-

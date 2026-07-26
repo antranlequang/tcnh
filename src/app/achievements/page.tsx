@@ -4,7 +4,6 @@ import { PageBanner } from '@/components/shared/PageBanner';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
 import { useEffect, useState } from "react";
-import { Footer } from '@/components/layout/Footer';
 import type { AchievementRow } from '@/lib/achievements';
 
 export default function AchievementsPage() {
@@ -43,17 +42,16 @@ export default function AchievementsPage() {
   return (
     <div>
       <PageBanner
-        title="THÀNH TÍCH CHÚNG TỚ ĐẠT ĐƯỢC"
+        title="Thành tích chúng tớ đạt được"
         subtitle='"Góc flexing chỉ là vô tình..."'
-        imageUrl="/images/back-ocean.jpg"
+        imageUrl="/images/banner-page/uel.jpg"
         imageHint="trophies awards"
-        className="brightness-150"
       />
 
       <main className="mx-auto w-full max-w-[1700px] px-4 py-14 md:px-8 md:py-20 lg:px-12">
         <div className="mt-8 grid grid-cols-1 gap-8 md:mt-10">
           {!loading && achievements.length === 0 && (
-            <p className="text-sm text-muted-foreground">Chưa có thành tích nào để hiển thị.</p>
+            <p className="text-xl text-muted-foreground">Thất bại...</p>
           )}
           {achievements.map((achievement, index) => (
             <ScrollReveal key={index} delayMs={80 * index} className="mx-auto w-full max-w-[1320px]">
@@ -84,7 +82,6 @@ export default function AchievementsPage() {
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

@@ -31,7 +31,7 @@ async function ensureYouthIconsBucket() {
 
 export async function POST(request: Request) {
   try {
-    const authError = assertAdminRequest(request);
+    const authError = await assertAdminRequest(request);
     if (authError) return authError;
 
     if (!supabaseAdmin) {

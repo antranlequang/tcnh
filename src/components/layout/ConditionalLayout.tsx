@@ -10,7 +10,6 @@ interface ConditionalLayoutProps {
 
 export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
-  const isA80Page = pathname === '/a80';
   const isAdminPage = pathname === '/admin';
   const isSchoolMapPage = pathname === '/youth/school-map';
 
@@ -19,26 +18,15 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
     return <>{children}</>;
   }
 
-  if (isA80Page) {
-    // A80 page with header but no footer, full height minus header
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow overflow-y-auto">
-          {children}
-        </main>
-      </div>
-    );
-  }
-
   if (isSchoolMapPage) {
-    // School map stays in a single viewport (no footer, no page scroll)
+    // Preserve a full viewport for the interactive map, then show the global footer.
     return (
-      <div className="h-screen flex flex-col overflow-hidden">
+      <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="h-[calc(100dvh-4rem)] overflow-hidden">
+        <main className="h-[calc(100dvh-60px)] shrink-0 overflow-hidden xl:h-[calc(100dvh-104px)]">
           {children}
         </main>
+        <Footer />
       </div>
     );
   }

@@ -3,9 +3,47 @@ import { assertAdminRequest } from "@/lib/adminAuth";
 import { supabaseAdmin } from "@/lib/supabaseAdminClient";
 import { serializeError } from "@/lib/utils";
 
+export async function PATCH(req: Request, context: { params: Promise<{ id: string }> }) {
+  try {
+    const authError = await assertAdminRequest(req);
+    if (authError) return authError;
+
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { success: false, message: "Supabase admin client not configured." },
+        { status: 500 }
+      );
+    }
+
+    const { id: rawId } = await context.params;
+    const id = String(rawId || "").trim();
+    const body = await req.json();
+
+    if (!id || body?.isPublished === undefined) {
+      return NextResponse.json(
+        { success: false, message: "Missing testimonial id or publication status." },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabaseAdmin
+      .from("alumni_testimonials")
+      .update({ is_published: Boolean(body.isPublished) })
+      .eq("id", id);
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, message: serializeError(error) },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const authError = assertAdminRequest(req);
+    const authError = await assertAdminRequest(req);
     if (authError) return authError;
 
     if (!supabaseAdmin) {

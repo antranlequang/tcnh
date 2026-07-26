@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
-import { Footer } from '@/components/layout/Footer';
 import { MessageSquare, User, Calendar, MapPin, Mail, GraduationCap } from 'lucide-react';
 
 interface Submission {
@@ -1206,7 +1205,6 @@ export default function A80Page() {
             )}
           </div>
 
-      <Footer />
     </div>
   );
 }

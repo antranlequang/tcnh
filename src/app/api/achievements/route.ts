@@ -8,7 +8,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const db = supabaseAdmin ?? supabase;
+    const db = supabase ?? supabaseAdmin;
 
     if (!db) {
       return NextResponse.json({ success: false, message: "Supabase not configured." }, { status: 500 });

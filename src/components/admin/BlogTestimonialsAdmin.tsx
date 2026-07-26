@@ -5,42 +5,17 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { GripVertical, Trash2 } from "lucide-react";
+import { CheckCircle2, EyeOff, GripVertical, Images, Trash2 } from "lucide-react";
 import type { AlumniTestimonialRow } from "@/lib/blog";
-
-type EditorState = {
-  id: string | null;
-  fullName: string;
-  avatarUrl: string;
-  avatarFile: File | null;
-  positionsText: string;
-  message: string;
-  isPublished: boolean;
-};
-
-const initialEditor: EditorState = {
-  id: null,
-  fullName: "",
-  avatarUrl: "",
-  avatarFile: null,
-  positionsText: "",
-  message: "",
-  isPublished: true,
-};
 
 export function BlogTestimonialsAdmin({ adminPassword }: { adminPassword: string }) {
   const [rows, setRows] = useState<AlumniTestimonialRow[]>([]);
-  const [editor, setEditor] = useState<EditorState>(initialEditor);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [dragOrder, setDragOrder] = useState<AlumniTestimonialRow[]>([]);
-  const [isDragging, setIsDragging] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [orderChanged, setOrderChanged] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const authHeaders = useMemo(() => ({ "x-admin-password": adminPassword }), [adminPassword]);
 
@@ -48,14 +23,16 @@ export function BlogTestimonialsAdmin({ adminPassword }: { adminPassword: string
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/blog/testimonials", { headers: authHeaders });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json?.message || "Không tải được dữ liệu.");
-      const data = Array.isArray(json?.data) ? json.data : [];
+      const response = await fetch("/api/admin/blog/testimonials", { headers: authHeaders });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.message || "Không tải được dữ liệu.");
+
+      const data = Array.isArray(payload?.data) ? payload.data : [];
       setRows(data);
       setDragOrder(data);
-    } catch (e) {
-      setError(String(e));
+      setOrderChanged(false);
+    } catch (refreshError) {
+      setError(String(refreshError));
     } finally {
       setLoading(false);
     }
@@ -65,164 +42,81 @@ export function BlogTestimonialsAdmin({ adminPassword }: { adminPassword: string
     refresh();
   }, []);
 
-  const resetEditor = () => setEditor(initialEditor);
-
-  const editRow = (row: AlumniTestimonialRow) => {
-    setEditor({
-      id: row.id,
-      fullName: row.full_name,
-      avatarUrl: row.avatar_url || "",
-      avatarFile: null,
-      positionsText: row.positions.join("\n"),
-      message: row.message,
-      isPublished: row.is_published,
-    });
-  };
-
-  const avatarPreviewUrl = useMemo(() => {
-    if (editor.avatarFile) {
-      return URL.createObjectURL(editor.avatarFile);
-    }
-    return editor.avatarUrl;
-  }, [editor.avatarFile, editor.avatarUrl]);
-
-  const save = async () => {
-    setError(null);
-    if (!editor.fullName.trim()) return setError("Vui lòng nhập tên cựu thành viên.");
-    if (!editor.message.trim()) return setError("Vui lòng nhập lời gửi gắm.");
-    if (!editor.avatarUrl && !editor.avatarFile) {
-      return setError("Vui lòng chọn ảnh đại diện để upload.");
-    }
-
-    setSaving(true);
-    try {
-      let testimonialId = editor.id;
-      let avatarUrl = editor.avatarUrl;
-
-      if (editor.avatarFile) {
-        setUploadingAvatar(true);
-        const formData = new FormData();
-        formData.append("file", editor.avatarFile);
-        if (testimonialId) {
-          formData.append("testimonialId", testimonialId);
-        }
-
-        const uploadRes = await fetch("/api/admin/blog/testimonials/upload-avatar", {
-          method: "POST",
-          headers: authHeaders,
-          body: formData,
-        });
-
-        const uploadJson = await uploadRes.json().catch(() => ({}));
-        if (!uploadRes.ok) {
-          throw new Error(uploadJson?.message || "Upload ảnh thất bại.");
-        }
-
-        testimonialId = uploadJson?.data?.testimonialId || testimonialId;
-        avatarUrl = uploadJson?.data?.avatarUrl || avatarUrl;
-        setUploadingAvatar(false);
-      }
-
-      const payload = {
-        id: testimonialId || undefined,
-        fullName: editor.fullName,
-        avatarUrl,
-        positions: editor.positionsText,
-        message: editor.message,
-        isPublished: editor.isPublished,
-      };
-
-      const res = await fetch("/api/admin/blog/testimonials", {
-        method: "POST",
-        headers: { ...authHeaders, "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json?.message || "Không lưu được dữ liệu.");
-
-      await refresh();
-      resetEditor();
-      alert("Lưu lời gửi gắm thành công.");
-    } catch (e) {
-      setError(String(e));
-    } finally {
-      setUploadingAvatar(false);
-      setSaving(false);
-    }
-  };
-
   const remove = async (id: string) => {
-    const ok = confirm("Bạn có chắc muốn xóa lời gửi gắm này?");
-    if (!ok) return;
+    if (!confirm("Bạn có chắc muốn xóa lời chia sẻ này?")) return;
 
     setError(null);
     try {
-      const res = await fetch(`/api/admin/blog/testimonials/${id}`, {
+      const response = await fetch(`/api/admin/blog/testimonials/${id}`, {
         method: "DELETE",
         headers: authHeaders,
       });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json?.message || "Không xóa được dữ liệu.");
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.message || "Không xóa được dữ liệu.");
       await refresh();
-    } catch (e) {
-      setError(String(e));
+    } catch (removeError) {
+      setError(String(removeError));
     }
   };
 
-  const handleDragStart = (e: React.DragEvent, id: string) => {
-    setDraggedId(id);
-    setIsDragging(true);
-    e.dataTransfer.effectAllowed = "move";
+  const togglePublication = async (id: string, isPublished: boolean) => {
+    setError(null);
+    try {
+      const response = await fetch(`/api/admin/blog/testimonials/${id}`, {
+        method: "PATCH",
+        headers: { ...authHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublished }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.message || "Không cập nhật được trạng thái duyệt.");
+      await refresh();
+    } catch (updateError) {
+      setError(String(updateError));
+    }
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e: React.DragEvent, targetId: string) => {
-    e.preventDefault();
+  const handleDrop = (event: React.DragEvent, targetId: string) => {
+    event.preventDefault();
     if (!draggedId || draggedId === targetId) {
-      setIsDragging(false);
+      setDraggedId(null);
       return;
     }
 
-    const draggedIndex = dragOrder.findIndex((r) => r.id === draggedId);
-    const targetIndex = dragOrder.findIndex((r) => r.id === targetId);
+    const draggedIndex = dragOrder.findIndex((row) => row.id === draggedId);
+    const targetIndex = dragOrder.findIndex((row) => row.id === targetId);
     if (draggedIndex === -1 || targetIndex === -1) return;
 
-    const newOrder = [...dragOrder];
-    const [draggedItem] = newOrder.splice(draggedIndex, 1);
-    newOrder.splice(targetIndex, 0, draggedItem);
-
-    setDragOrder(newOrder);
+    const nextOrder = [...dragOrder];
+    const [draggedItem] = nextOrder.splice(draggedIndex, 1);
+    nextOrder.splice(targetIndex, 0, draggedItem);
+    setDragOrder(nextOrder);
     setDraggedId(null);
-    setIsDragging(false);
+    setOrderChanged(true);
   };
 
   const saveOrder = async () => {
     setSavingOrder(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/blog/testimonials", {
+      const response = await fetch("/api/admin/blog/testimonials", {
         method: "PATCH",
         headers: { ...authHeaders, "Content-Type": "application/json" },
         body: JSON.stringify(dragOrder.map((item) => ({ id: item.id }))),
       });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json?.message || "Không lưu được thứ tự.");
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.message || "Không lưu được thứ tự.");
       await refresh();
-      alert("Cập nhật thứ tự thành công.");
-    } catch (e) {
-      setError(String(e));
+    } catch (orderError) {
+      setError(String(orderError));
     } finally {
       setSavingOrder(false);
     }
   };
 
+  const pendingCount = rows.filter((row) => !row.is_published).length;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {error && (
         <Alert variant="destructive">
           <AlertTitle>Lỗi</AlertTitle>
@@ -231,95 +125,18 @@ export function BlogTestimonialsAdmin({ adminPassword }: { adminPassword: string
       )}
 
       <Card>
-        <CardHeader>
-          <CardTitle>{editor.id ? "Sửa lời gửi gắm" : "Thêm lời gửi gắm mới"}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-2">
-            <label className="text-sm font-semibold">Họ và tên</label>
-            <Input
-              value={editor.fullName}
-              onChange={(e) => setEditor((prev) => ({ ...prev, fullName: e.target.value }))}
-              placeholder="VD: NGUYEN VAN A"
-            />
+        <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <CardTitle>Duyệt lời chia sẻ</CardTitle>
+              {pendingCount > 0 && <Badge variant="secondary">{pendingCount} chờ duyệt</Badge>}
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Bài được gửi từ website chính. Admin chỉ duyệt, ẩn, sắp xếp hoặc xóa nội dung.
+            </p>
           </div>
-
-          <div className="grid gap-2">
-            <label className="text-sm font-semibold">Ảnh đại diện (upload file)</label>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0] || null;
-                setEditor((prev) => ({ ...prev, avatarFile: file }));
-              }}
-            />
-            {avatarPreviewUrl && (
-              <div className="rounded-md border p-2 w-fit">
-                <img
-                  src={avatarPreviewUrl}
-                  alt="Avatar preview"
-                  className="w-20 h-20 rounded-full object-cover"
-                />
-              </div>
-            )}
-            {editor.avatarFile && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-fit"
-                onClick={() => setEditor((prev) => ({ ...prev, avatarFile: null }))}
-              >
-                Bỏ ảnh đã chọn
-              </Button>
-            )}
-          </div>
-
-          <div className="grid gap-2">
-            <label className="text-sm font-semibold">Chức vụ (mỗi dòng một chức vụ)</label>
-            <Textarea
-              value={editor.positionsText}
-              onChange={(e) => setEditor((prev) => ({ ...prev, positionsText: e.target.value }))}
-              rows={4}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <label className="text-sm font-semibold">Lời gửi gắm</label>
-            <Textarea
-              value={editor.message}
-              onChange={(e) => setEditor((prev) => ({ ...prev, message: e.target.value }))}
-              rows={5}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={editor.isPublished}
-                onChange={(e) => setEditor((prev) => ({ ...prev, isPublished: e.target.checked }))}
-              />
-              Công khai
-            </label>
-          </div>
-
-          <div className="flex gap-3 justify-end">
-            <Button type="button" variant="outline" onClick={resetEditor} disabled={saving}>
-              Reset
-            </Button>
-            <Button type="button" onClick={save} disabled={saving}>
-              {saving || uploadingAvatar ? "Đang lưu..." : "Lưu lời gửi gắm"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex-row items-center justify-between">
-          <CardTitle>Danh sách lời gửi gắm</CardTitle>
           <div className="flex gap-2">
-            {isDragging && (
+            {orderChanged && (
               <Button type="button" onClick={saveOrder} disabled={savingOrder}>
                 {savingOrder ? "Đang lưu..." : "Lưu thứ tự"}
               </Button>
@@ -330,38 +147,67 @@ export function BlogTestimonialsAdmin({ adminPassword }: { adminPassword: string
           </div>
         </CardHeader>
         <CardContent>
-          {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Chưa có dữ liệu. Nhấn "Tải lại" để đồng bộ.</p>
+          {dragOrder.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">Chưa có lời chia sẻ nào được gửi.</p>
           ) : (
             <div className="space-y-3">
               {dragOrder.map((row) => (
                 <div
                   key={row.id}
                   draggable
-                  onDragStart={(e) => handleDragStart(e, row.id)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, row.id)}
-                  className={`border rounded-lg p-3 cursor-move transition ${
-                    draggedId === row.id ? "opacity-50 bg-muted" : isDragging ? "bg-muted/30" : ""
+                  onDragStart={(event) => {
+                    setDraggedId(row.id);
+                    event.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => handleDrop(event, row.id)}
+                  onDragEnd={() => setDraggedId(null)}
+                  className={`rounded-xl border p-4 transition ${
+                    draggedId === row.id ? "border-[#144E8C]/30 bg-blue-50/70 opacity-60" : "bg-white"
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <GripVertical className="w-4 h-4 mt-1 text-muted-foreground" />
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold truncate">{row.full_name}</p>
+                    <GripVertical className="mt-1 h-4 w-4 shrink-0 cursor-grab text-muted-foreground" />
+                    {row.image_urls?.[0] && (
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                        <img src={row.image_urls[0]} alt="" className="h-full w-full object-cover" />
+                        {row.image_urls.length > 1 && (
+                          <span className="absolute bottom-1 right-1 flex items-center gap-1 rounded bg-black/65 px-1.5 py-0.5 text-[10px] text-white">
+                            <Images className="h-3 w-3" />
+                            {row.image_urls.length}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold text-slate-900">{row.full_name}</p>
                         <Badge variant={row.is_published ? "default" : "secondary"}>
-                          {row.is_published ? "Công khai" : "Ẩn"}
+                          {row.is_published ? "Đã duyệt" : "Chờ duyệt"}
                         </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2">{row.message}</p>
+                      {row.positions.length > 0 && (
+                        <p className="mt-1 text-xs text-slate-500">{row.positions.join(" · ")}</p>
+                      )}
+                      <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                        {row.message}
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button type="button" variant="outline" size="sm" onClick={() => editRow(row)}>
-                        Sửa
+                    <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                      <Button
+                        type="button"
+                        variant={row.is_published ? "outline" : "default"}
+                        size="sm"
+                        onClick={() => togglePublication(row.id, !row.is_published)}
+                      >
+                        {row.is_published ? (
+                          <><EyeOff className="h-4 w-4" />Ẩn</>
+                        ) : (
+                          <><CheckCircle2 className="h-4 w-4" />Duyệt</>
+                        )}
                       </Button>
                       <Button type="button" variant="destructive" size="sm" onClick={() => remove(row.id)}>
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>

@@ -20,6 +20,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2, Clock3, Loader2, Send, Sparkles } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 import { submitApplication } from "@/app/actions";
@@ -56,6 +57,12 @@ const optionalPersonalKeys = [
 
 const deptOptionalKeys = ["deptOptional1", "deptOptional2", "deptOptional3"] as const;
 
+const FIELD_CLASS =
+  "h-12 rounded-xl border-slate-200 bg-slate-50/80 px-4 text-slate-800 shadow-none transition-colors placeholder:text-slate-400 focus-visible:border-[#144E8C] focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-[#144E8C]/15 focus-visible:ring-offset-0";
+const TEXTAREA_CLASS =
+  "rounded-xl border-slate-200 bg-slate-50/80 px-4 py-3 text-slate-800 shadow-none transition-colors placeholder:text-slate-400 focus-visible:border-[#144E8C] focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-[#144E8C]/15 focus-visible:ring-offset-0";
+const LABEL_CLASS = "text-sm font-bold text-[#0b3767]";
+
 function formatCountdown(diffMs: number) {
   const diff = Math.max(0, diffMs);
   const seconds = Math.floor((diff / 1000) % 60);
@@ -68,16 +75,21 @@ function formatCountdown(diffMs: number) {
 function IllustrationList({ illustrations }: { illustrations: ApplicationFormIllustration[] }) {
   if (illustrations.length === 0) return null;
   return (
-    <div className="space-y-4">
+    <div className="grid gap-4 sm:grid-cols-2">
       {illustrations.map((img) => (
-        <div key={img.id} className="flex justify-center">
+        <div key={img.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           {/* External images from Supabase/public URLs => use plain <img> */}
           <img
             src={img.url}
             alt={img.title || "illustration"}
-            className="max-w-full h-auto rounded-3xl shadow-md"
+            className="h-64 w-full object-cover sm:h-72"
             loading="lazy"
           />
+          {img.title && (
+            <p className="border-t border-slate-100 px-4 py-3 text-sm font-semibold text-[#0b3767]">
+              {img.title}
+            </p>
+          )}
         </div>
       ))}
     </div>
@@ -253,53 +265,72 @@ export function TemplateDrivenApplicationForm() {
   }, [state, toast, form]);
 
   return (
-    <div>
-      <div className="text-center mb-6">
-        {status === "loading" && <p className="text-gray-600">Đang tải...</p>}
+    <div className="space-y-6">
+      <div className="flex justify-center">
+        {status === "loading" && (
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-5 py-2.5 text-sm font-bold text-[#144E8C]">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Đang tải biểu mẫu…
+          </div>
+        )}
 
         {status === "not_started" && countdown && (
-          <p className="text-1xl md:text-2xl font-nunito font-semibold text-red-600">
-            Mở đơn sau: {countdown.days} ngày {countdown.hours} giờ {countdown.minutes} phút{" "}
-            {countdown.seconds} giây
-          </p>
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-5 py-2.5 text-sm font-bold text-[#d84b18]">
+            <Clock3 className="h-4 w-4" />
+            Mở đơn sau: {countdown.days} ngày {countdown.hours} giờ {countdown.minutes} phút {countdown.seconds} giây
+          </div>
         )}
 
         {status === "active" && countdown && (
-          <p className="text-1xl md:text-2xl font-nunito font-semibold text-green-600">
-            Còn {countdown.days} ngày {countdown.hours} giờ {countdown.minutes} phút {countdown.seconds} giây
-          </p>
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-bold text-emerald-700">
+            <CheckCircle2 className="h-4 w-4" />
+            Đang mở đơn · Còn {countdown.days} ngày {countdown.hours} giờ {countdown.minutes} phút {countdown.seconds} giây
+          </div>
         )}
 
         {status === "ended" && (
-          <p className="text-1xl md:text-2xl font-nunito font-semibold text-gray-500">Đã kết thúc vòng 1</p>
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-500">
+            <Clock3 className="h-4 w-4" />
+            Đã kết thúc vòng 1
+          </div>
         )}
       </div>
 
       {status === "active" && template && (
-        <div className="space-y-6">
+        <div className="space-y-7">
           <IllustrationList illustrations={heroIllustrations} />
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)}>
               {personalIllustrations.length > 0 && (
-                <div className="my-6">
+                <div className="mb-7">
                   <IllustrationList illustrations={personalIllustrations} />
                 </div>
               )}
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl font-bold">{template.name || "Đơn đăng ký ứng tuyển"}</CardTitle>
+              <Card className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_24px_70px_rgba(11,55,103,0.10)]">
+                <CardHeader className="relative overflow-hidden border-b border-white/10 bg-[#0b3767] px-5 py-7 text-white sm:px-8 sm:py-9">
+                  <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full border-[44px] border-white/[0.05]" />
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(240,90,35,0.35),transparent_30%)]" />
+                  <div className="relative">
+                    <CardTitle className="font-headline text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl text-center">
+                      {template.name || "Đơn đăng ký ứng tuyển"}
+                    </CardTitle>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CardContent className="space-y-8 p-5 sm:p-8">
+                  <section>
+                    <div className="mb-5">
+                      <h3 className="mt-2 text-xl font-bold text-[#F05A23]">01. Giới thiệu bản thân</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <FormField
                       control={form.control}
                       name="fullName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Họ và Tên *</FormLabel>
+                          <FormLabel className={LABEL_CLASS}>Họ và tên *</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]" />
+                            <Input {...field} placeholder="Nguyễn Văn A" className={FIELD_CLASS} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -311,9 +342,9 @@ export function TemplateDrivenApplicationForm() {
                       name="birthDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Ngày sinh *</FormLabel>
+                          <FormLabel className={LABEL_CLASS}>Ngày sinh *</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]" />
+                            <Input type="date" {...field} className={FIELD_CLASS} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -325,27 +356,13 @@ export function TemplateDrivenApplicationForm() {
                       name="className"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Lớp *</FormLabel>
-                          <FormControl>
-                            <Input {...field} className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="className"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Lớp *</FormLabel>
+                          <FormLabel className={LABEL_CLASS}>Lớp *</FormLabel>
                           <FormControl>
                             {Array.isArray((template as any)?.class_options) && (template as any).class_options.length > 0 ? (
                               <select
                                 value={field.value ?? ""}
                                 onChange={(e) => field.onChange(e.target.value)}
-                                className="w-full h-10 rounded-md border border-gray-300 bg-[#45973c]/10 focus:bg-[#45973c]/20 focus:border-[#45973c] px-3 text-sm focus:outline-none"
+                                className={FIELD_CLASS}
                               >
                                 <option value="">-- Chọn lớp --</option>
                                 {((template as any).class_options as string[]).map((cls: string) => (
@@ -353,7 +370,7 @@ export function TemplateDrivenApplicationForm() {
                                 ))}
                               </select>
                             ) : (
-                              <Input {...field} className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]" />
+                              <Input {...field} placeholder="Ví dụ: K22414" className={FIELD_CLASS} />
                             )}
                           </FormControl>
                           <FormMessage />
@@ -366,9 +383,9 @@ export function TemplateDrivenApplicationForm() {
                       name="studentId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>MSSV *</FormLabel>
+                          <FormLabel className={LABEL_CLASS}>MSSV *</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]" />
+                            <Input {...field} placeholder="Nhập mã số sinh viên" className={FIELD_CLASS} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -380,9 +397,9 @@ export function TemplateDrivenApplicationForm() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email *</FormLabel>
+                          <FormLabel className={LABEL_CLASS}>Email *</FormLabel>
                           <FormControl>
-                            <Input type="email" {...field} className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]" />
+                            <Input type="email" {...field} placeholder="example@st.uel.edu.vn" className={FIELD_CLASS} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -394,14 +411,14 @@ export function TemplateDrivenApplicationForm() {
                       name="gender"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Giới tính *</FormLabel>
+                          <FormLabel className={LABEL_CLASS}>Giới tính *</FormLabel>
                           <FormControl>
                             <Input
                               value={field.value ?? ""}
                               onChange={(e) => field.onChange(e.target.value)}
                               list="gender-options"
                               placeholder="Nam/Nữ/Khác"
-                              className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]"
+                              className={FIELD_CLASS}
                             />
                           </FormControl>
                           <datalist id="gender-options">
@@ -418,26 +435,27 @@ export function TemplateDrivenApplicationForm() {
                       control={form.control}
                       name="photo"
                       render={({ field }) => (
-                        <FormItem className="md:col-span-2">
-                          <FormLabel>Ảnh cá nhân (tùy chọn)</FormLabel>
+                        <FormItem className="md:col-span-2 rounded-2xl border border-dashed border-[#144E8C]/25 bg-blue-50/40 p-4">
+                          <FormLabel className={LABEL_CLASS}>Ảnh cá nhân (tùy chọn)</FormLabel>
                           <FormControl>
                             <Input
                               type="file"
                               accept="image/*"
                               onChange={(e) => field.onChange(e.target.files?.[0])}
-                              className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]"
+                              className={`${FIELD_CLASS} cursor-pointer bg-white file:mr-4 file:rounded-full file:bg-[#144E8C]/10 file:px-3 file:py-1 file:text-[#144E8C]`}
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </div>
+                    </div>
+                  </section>
 
                   {visiblePersonalQuestions.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Các câu hỏi cá nhân (tùy chọn)</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <section className="border-t border-slate-100 pt-8">
+                    <h3 className="mt-2 text-xl font-bold text-[#F05A23]">02. Câu hỏi cá nhân</h3>
+                    <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
                       {visiblePersonalQuestions.map(({ key, label }) => {
                         return (
                           <FormField
@@ -446,12 +464,12 @@ export function TemplateDrivenApplicationForm() {
                             name={key}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{label}</FormLabel>
+                                <FormLabel className={LABEL_CLASS}>{label}</FormLabel>
                                 <FormControl>
                                   <Textarea
                                     rows={3}
                                     {...field}
-                                    className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]"
+                                    className={TEXTAREA_CLASS}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -461,11 +479,11 @@ export function TemplateDrivenApplicationForm() {
                         );
                       })}
                     </div>
-                  </div>
+                  </section>
                   )}
 
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Chọn ban *</h3>
+                  <section className="border-t border-slate-100 pt-8">
+                    <h3 className="mt-2 text-xl font-bold text-[#F05A23]">03. Chọn ban bạn muốn đồng hành</h3>
                     <FormField
                       control={form.control}
                       name="department"
@@ -475,18 +493,22 @@ export function TemplateDrivenApplicationForm() {
                             <RadioGroup
                               onValueChange={field.onChange}
                               value={field.value}
-                              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                              className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2"
                             >
                               {DEPARTMENTS.map((dept) => (
                                 <FormItem
                                   key={dept}
-                                  className="flex items-center space-x-2 border rounded-lg p-3 bg-white"
+                                  className={`flex cursor-pointer items-center space-x-3 rounded-xl border p-4 transition-all ${
+                                    field.value === dept
+                                      ? "border-[#144E8C] bg-blue-50 shadow-sm"
+                                      : "border-slate-200 bg-white hover:border-[#144E8C]/40 hover:bg-slate-50"
+                                  }`}
                                 >
                                   <RadioGroupItem
                                     value={dept}
-                                    className="text-[#45973c] border-[#45973c] focus:ring-[#45973c]"
+                                    className="border-[#144E8C] text-[#144E8C] focus:ring-[#144E8C]"
                                   />
-                                  <FormLabel className="m-0 font-normal">{dept}</FormLabel>
+                                  <FormLabel className="m-0 cursor-pointer font-semibold text-slate-700">{dept}</FormLabel>
                                 </FormItem>
                               ))}
                             </RadioGroup>
@@ -495,13 +517,13 @@ export function TemplateDrivenApplicationForm() {
                         </FormItem>
                       )}
                     />
-                  </div>
+                  </section>
 
                   {selectedDepartment && deptQuestions && visibleDeptQuestions.length > 0 && (
-                    <div className="space-y-4">
+                    <section className="border-t border-slate-100 pt-8">
                       {deptIllustrations.length > 0 && <IllustrationList illustrations={deptIllustrations} />}
-                      <h3 className="text-lg font-semibold">Câu hỏi theo ban (tùy chọn)</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <h3 className="mt-2 text-xl font-bold text-[#F05A23]">04. Câu hỏi dành cho Ban {selectedDepartment}</h3>
+                      <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
                         {visibleDeptQuestions.map(({ key, label }) => {
                           return (
                             <FormField
@@ -510,12 +532,12 @@ export function TemplateDrivenApplicationForm() {
                               name={key}
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>{label}</FormLabel>
+                                  <FormLabel className={LABEL_CLASS}>{label}</FormLabel>
                                   <FormControl>
                                     <Textarea
                                       rows={3}
                                       {...field}
-                                      className="bg-[#45973c]/10 focus:bg-[#45973c]/20 border-gray-300 focus:border-[#45973c]"
+                                      className={TEXTAREA_CLASS}
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -525,17 +547,30 @@ export function TemplateDrivenApplicationForm() {
                           );
                         })}
                       </div>
-                    </div>
+                    </section>
                   )}
 
-                  <div className="flex justify-end">
+                  <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-7 sm:flex-row">
+                    <p className="text-center text-xs leading-5 text-slate-900 sm:text-left">
+                      Bằng việc gửi đơn, bạn xác nhận các thông tin đã cung cấp là chính xác.
+                    </p>
                     <Button
                       type="submit"
                       size="lg"
                       disabled={form.formState.isSubmitting || isPending}
-                      className="bg-[#45973c] hover:bg-[#357a2e] text-white"
+                      className="h-12 w-full rounded-full bg-[#F05A23] px-7 font-bold text-white shadow-lg shadow-orange-500/20 transition-all hover:-translate-y-0.5 hover:bg-[#d84b18] hover:shadow-xl sm:w-auto"
                     >
-                      {form.formState.isSubmitting || isPending ? "Đang gửi..." : "SUBMIT"}
+                      {form.formState.isSubmitting || isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Đang gửi đơn…
+                        </>
+                      ) : (
+                        <>
+                          <Send className="mr-2 h-4 w-4" />
+                          Gửi đơn ứng tuyển
+                        </>
+                      )}
                     </Button>
                   </div>
                 </CardContent>
@@ -554,4 +589,3 @@ export function TemplateDrivenApplicationForm() {
     </div>
   );
 }
-

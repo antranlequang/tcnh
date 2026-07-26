@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { PageBanner } from '@/components/shared/PageBanner';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollReveal } from '@/components/shared/ScrollReveal';
-import { Footer } from '@/components/layout/Footer';
 import type { StructureDepartmentRow } from '@/lib/structureDepartments';
 
 export default function StructurePage() {
@@ -36,9 +35,9 @@ export default function StructurePage() {
   return (
     <div>
       <PageBanner
-        title="CƠ CẤU TỔ CHỨC"
+        title="Cơ cấu tổ chức"
         subtitle='"Một ban làm chẳng nên non, bốn ban chụm lại nên hòn núi cao"'
-        imageUrl="/images/back-ocean.jpg"
+        imageUrl="/images/banner-page/uel.jpg"
         imageHint="teamwork architecture"
       />
 
@@ -99,7 +98,6 @@ export default function StructurePage() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

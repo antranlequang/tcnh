@@ -3,7 +3,7 @@
 import { z } from 'zod';
 // import { moderateBlogComments } from '@/ai/flows/moderate-blog-comments';
 // import { analyzeApplication } from '@/ai/flows/analyze-application';
-import { ContactFormSchema, CommentFormSchema, ApplicationFormSubmissionStrictSchema, type ContactFormState, type CommentFormState, type ApplicationFormState } from '@/lib/definitions';
+import { CommentFormSchema, ApplicationFormSubmissionStrictSchema, type CommentFormState, type ApplicationFormState } from '@/lib/definitions';
 import { supabase } from "@/lib/supabaseClient";
 import { supabaseAdmin } from '@/lib/supabaseAdminClient';
 import { randomUUID } from 'crypto';
@@ -54,43 +54,6 @@ async function uploadApplicantPhoto(photoFile: File, templateId: string): Promis
     .getPublicUrl(objectPath);
 
   return publicUrlData?.publicUrl || '';
-}
-
-export async function submitContactForm(
-  prevState: ContactFormState,
-  formData: FormData
-): Promise<ContactFormState> {
-  const validatedFields = ContactFormSchema.safeParse({
-    name: formData.get('name'),
-    email: formData.get('email'),
-    message: formData.get('message'),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: "Validation failed.",
-      issues: Object.values(validatedFields.error.flatten().fieldErrors).flat().filter(Boolean),
-      fields: {
-        name: formData.get('name')?.toString() ?? '',
-        email: formData.get('email')?.toString() ?? '',
-        message: formData.get('message')?.toString() ?? '',
-      }
-    };
-  }
-
-  const { name, email, message } = validatedFields.data;
-
-  if (supabaseAdmin) {
-    try {
-      // Optional persistence table for contact messages if it exists in Supabase.
-      await supabaseAdmin.from('contact_messages').insert({ name, email, message });
-      return { message: `Thank you, ${name}! Your message has been received and saved.` };
-    } catch (error) {
-      console.warn('Could not persist contact message to Supabase:', error);
-    }
-  }
-
-  return { message: `Thank you, ${name}! Your message has been received.` };
 }
 
 export async function submitComment(

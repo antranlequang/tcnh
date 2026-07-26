@@ -133,7 +133,7 @@ function parseSchema(sql: string): { tables: SchemaTable[]; edges: SchemaEdge[] 
 }
 
 export async function GET(request: Request) {
-  const authError = assertAdminRequest(request);
+  const authError = await assertAdminRequest(request);
   if (authError) return authError;
 
   try {

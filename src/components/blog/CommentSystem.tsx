@@ -219,7 +219,7 @@ export function CommentSystem() {
   return (
     <Card className="mt-12">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 font-anton text-primary font-medium">
+        <CardTitle className="flex items-center gap-2 font-anton font-medium text-[#F05A23]">
           <MessageCircle className="w-6 h-6" />
           Diễn đàn thảo luận
         </CardTitle>

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { PageBanner } from "@/components/shared/PageBanner";
-import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -245,7 +244,6 @@ export default function StudentInfoPage() {
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 }
