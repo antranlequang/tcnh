@@ -186,6 +186,9 @@ CREATE TABLE IF NOT EXISTS public.application_form_submissions (
   class_name TEXT NOT NULL,
   student_id TEXT NOT NULL,
   email TEXT NOT NULL,
+  phone_number TEXT NOT NULL,
+  facebook_url TEXT NOT NULL,
+  hometown TEXT NOT NULL,
   gender TEXT NOT NULL,
   photo_url TEXT NOT NULL,
   department TEXT NOT NULL,
@@ -196,13 +199,18 @@ CREATE TABLE IF NOT EXISTS public.application_form_submissions (
   status TEXT NOT NULL DEFAULT 'not_selected'
     CHECK (status IN ('not_selected', 'accepted', 'undecided', 'rejected')),
   standing_committee_comment TEXT NOT NULL DEFAULT '',
-  board_comment TEXT NOT NULL DEFAULT ''
+  board_comment TEXT NOT NULL DEFAULT '',
+  team_leader_comment TEXT NOT NULL DEFAULT ''
 );
 
 ALTER TABLE public.application_form_submissions
   ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'not_selected',
   ADD COLUMN IF NOT EXISTS standing_committee_comment TEXT NOT NULL DEFAULT '',
-  ADD COLUMN IF NOT EXISTS board_comment TEXT NOT NULL DEFAULT '';
+  ADD COLUMN IF NOT EXISTS board_comment TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS team_leader_comment TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS phone_number TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS facebook_url TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS hometown TEXT NOT NULL DEFAULT '';
 
 DO $$
 BEGIN

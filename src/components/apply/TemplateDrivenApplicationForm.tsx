@@ -155,6 +155,9 @@ export function TemplateDrivenApplicationForm() {
       className: "",
       studentId: "",
       email: "",
+      phoneNumber: "",
+      facebookUrl: "",
+      hometown: "",
       gender: undefined,
       department: undefined,
       photo: undefined,
@@ -232,6 +235,9 @@ export function TemplateDrivenApplicationForm() {
     formData.append("className", data.className);
     formData.append("studentId", data.studentId);
     formData.append("email", data.email);
+    formData.append("phoneNumber", data.phoneNumber);
+    formData.append("facebookUrl", data.facebookUrl);
+    formData.append("hometown", data.hometown);
     formData.append("gender", data.gender);
     formData.append("department", data.department);
 
@@ -400,6 +406,67 @@ export function TemplateDrivenApplicationForm() {
                           <FormLabel className={LABEL_CLASS}>Email *</FormLabel>
                           <FormControl>
                             <Input type="email" {...field} placeholder="example@st.uel.edu.vn" className={FIELD_CLASS} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="phoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_CLASS}>Số điện thoại *</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="tel"
+                              inputMode="tel"
+                              autoComplete="tel"
+                              {...field}
+                              placeholder="0901 234 567"
+                              className={FIELD_CLASS}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="facebookUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_CLASS}>Link Facebook *</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="url"
+                              inputMode="url"
+                              autoComplete="url"
+                              {...field}
+                              placeholder="https://facebook.com/..."
+                              className={FIELD_CLASS}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="hometown"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_CLASS}>Quê quán *</FormLabel>
+                          <FormControl>
+                            <Input
+                              autoComplete="address-level1"
+                              {...field}
+                              placeholder="Tỉnh/Thành phố"
+                              className={FIELD_CLASS}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

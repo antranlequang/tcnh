@@ -28,7 +28,7 @@ export function Footer() {
 
   useEffect(() => {
     const updateScrollButton = () => {
-      setShowScrollToTop(window.scrollY > 0);
+      setShowScrollToTop(window.scrollY > 320);
     };
 
     updateScrollButton();
@@ -38,12 +38,16 @@ export function Footer() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "auto"
-        : "smooth",
-    });
+    const behavior: ScrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth";
+    const scrollRoot = document.scrollingElement;
+
+    if (scrollRoot && typeof scrollRoot.scrollTo === "function") {
+      scrollRoot.scrollTo({ top: 0, left: 0, behavior });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior });
+    }
   };
 
   return (
@@ -155,7 +159,7 @@ export function Footer() {
       <button
         type="button"
         onClick={scrollToTop}
-        className={`fixed bottom-5 right-5 z-50 grid h-12 w-12 place-items-center rounded-full bg-[#F05A23] text-white shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:bg-[#d94d19] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F05A23] focus-visible:ring-offset-2 sm:bottom-8 sm:right-8 ${
+        className={`scroll-to-top-button fixed z-40 grid h-11 w-11 touch-manipulation place-items-center rounded-full border border-white/30 bg-[#F05A23] text-white shadow-lg shadow-black/20 transition-[opacity,transform,background-color] duration-300 active:scale-95 hover:-translate-y-1 hover:bg-[#d94d19] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F05A23] focus-visible:ring-offset-2 sm:h-12 sm:w-12 ${
           showScrollToTop
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none translate-y-4 opacity-0"

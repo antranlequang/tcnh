@@ -58,6 +58,9 @@ interface FormSubmission {
   class_name?: string;
   student_id?: string;
   email?: string;
+  phone_number?: string;
+  facebook_url?: string;
+  hometown?: string;
   gender?: string;
   department: string;
   photo_url: string;
@@ -66,6 +69,7 @@ interface FormSubmission {
   status?: string;
   standing_committee_comment?: string;
   board_comment?: string;
+  team_leader_comment?: string;
 }
 
 const CANDIDATE_STATUS = {
@@ -1273,10 +1277,11 @@ function OverviewPanel({
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>(DEFAULT_COLUMN_WIDTHS);
 
   // ── Inline submission updates (status + comments) ──────────────────────────
-  const [submissionUpdates, setSubmissionUpdates] = useState<Record<string, { status: CandidateStatus; standingComment: string; boardComment: string }>>({});
+  const [submissionUpdates, setSubmissionUpdates] = useState<Record<string, { status: CandidateStatus; standingComment: string; boardComment: string; teamLeaderComment: string }>>({});
   const [dialogStatus, setDialogStatus] = useState<CandidateStatus>('not_selected');
   const [dialogStandingComment, setDialogStandingComment] = useState('');
   const [dialogBoardComment, setDialogBoardComment] = useState('');
+  const [dialogTeamLeaderComment, setDialogTeamLeaderComment] = useState('');
   const [savingDetail, setSavingDetail] = useState(false);
   const [saveDetailError, setSaveDetailError] = useState<string | null>(null);
   const [saveDetailSuccess, setSaveDetailSuccess] = useState(false);
@@ -1392,6 +1397,8 @@ function OverviewPanel({
         row.class_name,
         row.student_id,
         row.email,
+        row.phone_number,
+        row.hometown,
       ]
         .map((v) => String(v || '').toLowerCase())
         .join(' ');
@@ -1496,6 +1503,7 @@ function OverviewPanel({
     setDialogStatus(update?.status ?? (row.status as CandidateStatus | undefined) ?? 'not_selected');
     setDialogStandingComment(update?.standingComment ?? row.standing_committee_comment ?? '');
     setDialogBoardComment(update?.boardComment ?? row.board_comment ?? '');
+    setDialogTeamLeaderComment(update?.teamLeaderComment ?? row.team_leader_comment ?? '');
     setSaveDetailError(null);
     setSaveDetailSuccess(false);
     setDetailTemplate(templates.find(t => t.id === row.template_id) ?? null);
@@ -1528,6 +1536,7 @@ function OverviewPanel({
           status: dialogStatus,
           standing_committee_comment: dialogStandingComment,
           board_comment: dialogBoardComment,
+          team_leader_comment: dialogTeamLeaderComment,
         }),
       });
       if (!res.ok) {
@@ -1540,6 +1549,7 @@ function OverviewPanel({
           status: dialogStatus,
           standingComment: dialogStandingComment,
           boardComment: dialogBoardComment,
+          teamLeaderComment: dialogTeamLeaderComment,
         },
       }));
       setSaveDetailSuccess(true);
@@ -2212,73 +2222,77 @@ function OverviewPanel({
       )}
 
       <Dialog open={!!detailSubmission} onOpenChange={(open) => { if (!open) { setDetailSubmission(null); setDetailTemplate(null); } }}>
-        <DialogContent className="inset-0 left-0 top-0 translate-x-0 translate-y-0 m-auto w-[calc(100%-2rem)] max-w-5xl h-fit max-h-[90vh] overflow-y-auto rounded-2xl border-slate-200 bg-white shadow-2xl">
-          <DialogHeader className="pb-4 border-b border-slate-150">
+        <DialogContent className="inset-0 left-0 top-0 m-auto h-fit max-h-[92vh] w-[calc(100%-1.5rem)] max-w-5xl translate-x-0 translate-y-0 overflow-y-auto rounded-2xl border border-slate-200 bg-[#f8fafc] p-0 shadow-xl">
+          <DialogHeader className="sticky top-0 z-10 border-b border-slate-200 bg-white px-5 py-4 pr-12 sm:px-7">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <ClipboardList className="w-5 h-5 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900">
+                <ClipboardList className="h-5 w-5 text-white" />
               </div>
               <div>
-                <DialogTitle className="flex items-center gap-2 text-lg">
-                  Hồ Sơ Ứng Viên
+                <DialogTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                  Hồ sơ ứng viên
                   {loadingTemplate && <Loader2 className="w-4 h-4 animate-spin text-blue-500" />}
                 </DialogTitle>
-                <DialogDescription className="text-xs">
-                  Xem chi tiết hồ sơ, câu trả lời và đánh giá
+                <DialogDescription className="mt-0.5 text-xs text-slate-500">
+                  Thông tin đăng ký, câu trả lời và nhận xét phỏng vấn
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
 
           {detailSubmission && (
-            <div className="space-y-5 pt-2">
+            <div className="space-y-5 p-4 sm:p-6">
               {/* ── Profile header ── */}
-              <div className="grid md:grid-cols-[140px_1fr] gap-5 bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+              <div className="grid gap-5 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:grid-cols-[132px_1fr]">
                 <div>
                   <img
                     src={detailSubmission.photo_url || 'https://placehold.co/140x170?text=Photo'}
                     alt={detailSubmission.full_name || 'Candidate'}
-                    className="w-full h-[170px] rounded-lg object-cover border-2 border-slate-200 bg-gradient-to-br from-slate-100 to-slate-200 shadow-md"
+                    className="mx-auto h-[160px] w-[124px] rounded-xl border border-slate-200 bg-slate-100 object-cover md:mx-0"
                   />
                 </div>
-                <div className="space-y-3">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900">{detailSubmission.full_name || 'N/A'}</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">ID: {detailSubmission.student_id || 'N/A'}</p>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-blue-50 border border-blue-150 rounded-lg px-3 py-2">
-                      <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Ban</p>
-                      <p className="text-sm font-medium text-blue-900">{detailSubmission.department || '—'}</p>
-                    </div>
-                    <div className="bg-purple-50 border border-purple-150 rounded-lg px-3 py-2">
-                      <p className="text-xs font-semibold text-purple-600 uppercase tracking-wider">Lớp</p>
-                      <p className="text-sm font-medium text-purple-900">{detailSubmission.class_name || '—'}</p>
-                    </div>
-                    <div className="bg-amber-50 border border-amber-150 rounded-lg px-3 py-2">
-                      <p className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Giới tính</p>
-                      <p className="text-sm font-medium text-amber-900">{detailSubmission.gender || '—'}</p>
+                <div className="min-w-0">
+                  <div className="border-b border-slate-100 pb-4">
+                    <h3 className="text-xl font-semibold text-slate-950">{detailSubmission.full_name || 'N/A'}</h3>
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-600">
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1">MSSV {detailSubmission.student_id || 'N/A'}</span>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1">{detailSubmission.class_name || 'Chưa có lớp'}</span>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1">{detailSubmission.department || 'Chưa chọn ban'}</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm border-t border-slate-100 pt-3">
-                    <div>
-                      <p className="text-xs font-semibold text-slate-500 uppercase">Ngày sinh</p>
-                      <p className="text-slate-800 font-medium">{detailSubmission.birth_date || '—'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-slate-500 uppercase">Email</p>
-                      <p className="text-slate-800 font-medium break-all text-xs">{detailSubmission.email || '—'}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-xs font-semibold text-slate-500 uppercase">Nộp lúc</p>
-                      <p className="text-slate-800 font-medium text-xs">{formatDateTime(detailSubmission.submitted_at)}</p>
+                  <div className="mt-4 grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                    {[
+                      { label: 'Ngày sinh', value: detailSubmission.birth_date || '—' },
+                      { label: 'Giới tính', value: detailSubmission.gender || '—' },
+                      { label: 'Số điện thoại', value: detailSubmission.phone_number || '—' },
+                      { label: 'Email', value: detailSubmission.email || '—' },
+                      { label: 'Quê quán', value: detailSubmission.hometown || '—' },
+                      { label: 'Nộp hồ sơ', value: formatDateTime(detailSubmission.submitted_at) },
+                    ].map((item) => (
+                      <div key={item.label} className="min-w-0">
+                        <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">{item.label}</p>
+                        <p className="break-words font-medium text-slate-700">{item.value}</p>
+                      </div>
+                    ))}
+                    <div className="min-w-0 sm:col-span-2 lg:col-span-3">
+                      <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">Facebook</p>
+                      {detailSubmission.facebook_url ? (
+                        <a
+                          href={detailSubmission.facebook_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 break-all font-medium text-blue-700 hover:underline"
+                        >
+                          {detailSubmission.facebook_url}
+                          <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                        </a>
+                      ) : (
+                        <p className="font-medium text-slate-700">—</p>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* ── Divider ── */}
-              <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
               {/* ── Answers ── */}
               {(() => {
@@ -2294,46 +2308,46 @@ function OverviewPanel({
                 return (
                   <>
                     {personalCount > 0 && (
-                      <Card className="border-blue-100 bg-blue-50/40 shadow-sm">
-                        <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-t-lg">
-                          <CardTitle className="text-sm font-semibold text-blue-900 flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                      <Card className="rounded-2xl border-slate-200 bg-white shadow-none">
+                        <CardHeader className="border-b border-slate-100 pb-3">
+                          <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                            <MessageSquare className="h-4 w-4 text-slate-500" />
                             Câu hỏi cá nhân
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 pt-4">
                           {Array.from({ length: personalCount }).map((_, i) => (
-                            <div key={`p-${i}`} className="text-sm border-l-4 border-blue-300 pl-4 py-2">
+                            <div key={`p-${i}`} className="rounded-xl bg-slate-50 p-3 text-sm">
                               {personalQs[i] && (
-                                <p className="text-xs font-semibold text-blue-700 mb-2">Câu {i + 1}: {personalQs[i]}</p>
+                                <p className="mb-2 text-xs font-semibold text-slate-700">Câu {i + 1}: {personalQs[i]}</p>
                               )}
                               {!personalQs[i] && (
                                 <p className="text-xs text-slate-400 mb-2">Câu {i + 1}</p>
                               )}
-                              <p className="rounded-lg bg-white border border-blue-200 px-3 py-3 text-slate-700 leading-relaxed">{detailSubmission.optional_personal_answers?.[i] || <span className="text-slate-400 italic">Chưa trả lời</span>}</p>
+                              <p className="leading-relaxed text-slate-700">{detailSubmission.optional_personal_answers?.[i] || <span className="italic text-slate-400">Chưa trả lời</span>}</p>
                             </div>
                           ))}
                         </CardContent>
                       </Card>
                     )}
                     {deptCount > 0 && (
-                      <Card className="border-purple-100 bg-purple-50/40 shadow-sm">
-                        <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-purple-100/50 rounded-t-lg">
-                          <CardTitle className="text-sm font-semibold text-purple-900 flex items-center gap-2">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                      <Card className="rounded-2xl border-slate-200 bg-white shadow-none">
+                        <CardHeader className="border-b border-slate-100 pb-3">
+                          <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                            <Users className="h-4 w-4 text-slate-500" />
                             Câu hỏi của ban {detailSubmission.department}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 pt-4">
                           {Array.from({ length: deptCount }).map((_, i) => (
-                            <div key={`d-${i}`} className="text-sm border-l-4 border-purple-300 pl-4 py-2">
+                            <div key={`d-${i}`} className="rounded-xl bg-slate-50 p-3 text-sm">
                               {deptQs[i] && (
-                                <p className="text-xs font-semibold text-purple-700 mb-2">Câu {i + 1}: {deptQs[i]}</p>
+                                <p className="mb-2 text-xs font-semibold text-slate-700">Câu {i + 1}: {deptQs[i]}</p>
                               )}
                               {!deptQs[i] && (
                                 <p className="text-xs text-slate-400 mb-2">Câu {i + 1}</p>
                               )}
-                              <p className="rounded-lg bg-white border border-purple-200 px-3 py-3 text-slate-700 leading-relaxed">{detailSubmission.dept_optional_answers?.[i] || <span className="text-slate-400 italic">Chưa trả lời</span>}</p>
+                              <p className="leading-relaxed text-slate-700">{detailSubmission.dept_optional_answers?.[i] || <span className="italic text-slate-400">Chưa trả lời</span>}</p>
                             </div>
                           ))}
                         </CardContent>
@@ -2344,11 +2358,15 @@ function OverviewPanel({
               })()}
 
               {/* ── Comments Section ── */}
-              <div className="grid md:grid-cols-2 gap-4">
-                <Card className="border-green-100 bg-green-50/40 shadow-sm">
-                  <CardHeader className="pb-3 bg-gradient-to-r from-green-50 to-green-100/50 rounded-t-lg">
-                    <CardTitle className="text-sm font-semibold text-green-900 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <section>
+                <div className="mb-3">
+                  <h3 className="text-base font-semibold text-slate-900">Nhận xét</h3>
+                </div>
+                <div className="grid gap-3 lg:grid-cols-3">
+                <Card className="rounded-2xl border-slate-200 bg-white shadow-none">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[11px] text-slate-600">01</span>
                       Ban Thường Vụ
                     </CardTitle>
                   </CardHeader>
@@ -2356,17 +2374,17 @@ function OverviewPanel({
                     <Textarea
                       value={dialogStandingComment}
                       onChange={(e) => setDialogStandingComment(e.target.value)}
-                      placeholder="Nhập nhận xét sau khi phỏng vấn..."
-                      rows={3}
-                      className="rounded-lg border-green-200 bg-white focus:border-green-400 focus:ring-green-200"
+                      placeholder="Nhập nhận xét..."
+                      rows={5}
+                      className="resize-none rounded-xl border-slate-200 bg-slate-50 focus-visible:border-slate-400 focus-visible:ring-slate-200"
                     />
                   </CardContent>
                 </Card>
 
-                <Card className="border-amber-100 bg-amber-50/40 shadow-sm">
-                  <CardHeader className="pb-3 bg-gradient-to-r from-amber-50 to-amber-100/50 rounded-t-lg">
-                    <CardTitle className="text-sm font-semibold text-amber-900 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-amber-500 rounded-full" />
+                <Card className="rounded-2xl border-slate-200 bg-white shadow-none">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[11px] text-slate-600">02</span>
                       Ban Chuyên môn
                     </CardTitle>
                   </CardHeader>
@@ -2374,16 +2392,35 @@ function OverviewPanel({
                     <Textarea
                       value={dialogBoardComment}
                       onChange={(e) => setDialogBoardComment(e.target.value)}
-                      placeholder="Nhập nhận xét sau khi phỏng vấn..."
-                      rows={3}
-                      className="rounded-lg border-amber-200 bg-white focus:border-amber-400 focus:ring-amber-200"
+                      placeholder="Nhập nhận xét..."
+                      rows={5}
+                      className="resize-none rounded-xl border-slate-200 bg-slate-50 focus-visible:border-slate-400 focus-visible:ring-slate-200"
                     />
                   </CardContent>
                 </Card>
-              </div>
+
+                <Card className="rounded-2xl border-slate-200 bg-white shadow-none">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[11px] text-slate-600">03</span>
+                      Dẫn nhóm
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <Textarea
+                      value={dialogTeamLeaderComment}
+                      onChange={(e) => setDialogTeamLeaderComment(e.target.value)}
+                      placeholder="Nhập nhận xét..."
+                      rows={5}
+                      className="resize-none rounded-xl border-slate-200 bg-slate-50 focus-visible:border-slate-400 focus-visible:ring-slate-200"
+                    />
+                  </CardContent>
+                </Card>
+                </div>
+              </section>
 
               {/* ── Status picker ── */}
-              <Card className="border-slate-100 shadow-sm">
+              <Card className="rounded-2xl border-slate-200 bg-white shadow-none">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-semibold text-slate-900">Trạng thái ứng viên</CardTitle>
                 </CardHeader>
@@ -2437,7 +2474,7 @@ function OverviewPanel({
                 <Button
                   onClick={saveDetailChanges}
                   disabled={savingDetail}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all"
+                  className="rounded-lg bg-slate-900 text-white hover:bg-slate-800"
                 >
                   {savingDetail ? (
                     <>
@@ -2658,8 +2695,7 @@ function FunctionPanel({ authHeaders }: { authHeaders: Record<string, string> })
     <div>
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Kiểm thử kết nối</h1>
-          <p className="text-sm text-slate-500 mt-1">Kiểm tra trạng thái các dịch vụ backend</p>
+          <h1 className="text-2xl font-bold text-slate-800"></h1>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setLogs([])} variant="outline" size="sm" disabled={logs.length === 0}>

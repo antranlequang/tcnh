@@ -1,22 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Reply, Clock, User, UserX, ShieldCheck } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Clock,
+  MessageCircle,
+  Reply,
+  ShieldCheck,
+  User,
+  UserX,
+} from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import type { BlogCommentRow } from "@/lib/blog";
 
 type CommentNode = BlogCommentRow & { replies: CommentNode[] };
+const COMMENTS_PER_PAGE = 5;
 
 export function CommentSystem() {
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(() => new Set());
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchComments = async () => {
     try {
@@ -36,9 +50,27 @@ export function CommentSystem() {
     fetchComments();
   }, []);
 
+  const totalPages = Math.max(1, Math.ceil(comments.length / COMMENTS_PER_PAGE));
+  const visibleComments = useMemo(() => {
+    const start = (currentPage - 1) * COMMENTS_PER_PAGE;
+    return comments.slice(start, start + COMMENTS_PER_PAGE);
+  }, [comments, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
+
   const formatDate = formatDateTime;
 
-  const CommentForm = ({ parentId, onCancel }: { parentId?: string; onCancel?: () => void }) => {
+  const CommentForm = ({
+    parentId,
+    onCancel,
+    onSubmitted,
+  }: {
+    parentId?: string;
+    onCancel?: () => void;
+    onSubmitted?: () => void;
+  }) => {
     const [name, setName] = useState("");
     const [comment, setComment] = useState("");
     const [isAnonymous, setIsAnonymous] = useState(false);
@@ -81,7 +113,8 @@ export function CommentSystem() {
         setComment("");
         setIsAnonymous(false);
         if (onCancel) onCancel();
-        fetchComments();
+        await fetchComments();
+        onSubmitted?.();
       } catch (error) {
         console.error("Error submitting comment:", error);
         alert("Có lỗi xảy ra khi gửi bình luận. Vui lòng thử lại!");
@@ -138,8 +171,21 @@ export function CommentSystem() {
     );
   };
 
-  const CommentItem = ({ comment, level = 0 }: { comment: CommentNode; level?: number }) => (
-    <div className={`${level > 0 ? "ml-8 mt-4 border-l-2 border-gray-200 pl-4" : "mb-6"}`}>
+  const CommentItem = ({ comment, level = 0 }: { comment: CommentNode; level?: number }) => {
+    const hasReplies = comment.replies.length > 0;
+    const repliesAreOpen = expandedReplies.has(comment.id);
+
+    const toggleReplies = () => {
+      setExpandedReplies((current) => {
+        const next = new Set(current);
+        if (next.has(comment.id)) next.delete(comment.id);
+        else next.add(comment.id);
+        return next;
+      });
+    };
+
+    return (
+    <div className={`${level > 0 ? "ml-5 mt-3 border-l-2 border-slate-200 pl-3 sm:ml-8 sm:pl-4" : "mb-6"}`}>
       <div className="bg-white rounded-lg shadow-sm border p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-3">
@@ -194,27 +240,47 @@ export function CommentSystem() {
             <Reply className="w-4 h-4 mr-1" />
             Phản hồi
           </Button>
-          {comment.replies.length > 0 && (
-            <span className="text-xs text-gray-500">{comment.replies.length} phản hồi</span>
+          {hasReplies && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={toggleReplies}
+              aria-expanded={repliesAreOpen}
+              aria-controls={`comment-replies-${comment.id}`}
+              className="text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            >
+              {repliesAreOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              {repliesAreOpen
+                ? "Thu gọn phản hồi"
+                : `Xem ${comment.replies.length} phản hồi`}
+            </Button>
           )}
         </div>
 
         {replyingTo === comment.id && (
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <CommentForm parentId={comment.id} onCancel={() => setReplyingTo(null)} />
+            <CommentForm
+              parentId={comment.id}
+              onCancel={() => setReplyingTo(null)}
+              onSubmitted={() => {
+                setExpandedReplies((current) => new Set(current).add(comment.id));
+              }}
+            />
           </div>
         )}
       </div>
 
-      {comment.replies.length > 0 && (
-        <div className="mt-4">
+      {hasReplies && repliesAreOpen && (
+        <div id={`comment-replies-${comment.id}`} className="mt-3">
           {comment.replies.map((reply) => (
             <CommentItem key={reply.id} comment={reply} level={level + 1} />
           ))}
         </div>
       )}
     </div>
-  );
+    );
+  };
 
   return (
     <Card className="mt-12">
@@ -227,7 +293,7 @@ export function CommentSystem() {
       <CardContent className="space-y-6">
         <div className="bg-gray-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-900">Bạn có thắc mắc gì hãy bình luận ở đây nha</h3>
-          <CommentForm />
+          <CommentForm onSubmitted={() => setCurrentPage(1)} />
         </div>
 
         <div>
@@ -246,9 +312,38 @@ export function CommentSystem() {
             </div>
           ) : (
             <div className="space-y-6 text-justify">
-              {comments.map((comment) => (
+              {visibleComments.map((comment) => (
                 <CommentItem key={comment.id} comment={comment} />
               ))}
+              {totalPages > 1 && (
+                <nav className="flex items-center justify-center gap-2 pt-2" aria-label="Phân trang bình luận">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                    aria-label="Trang bình luận trước"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Trước
+                  </Button>
+                  <span className="min-w-20 text-center text-sm font-medium text-slate-600">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                    aria-label="Trang bình luận tiếp theo"
+                  >
+                    Sau
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </nav>
+              )}
             </div>
           )}
         </div>

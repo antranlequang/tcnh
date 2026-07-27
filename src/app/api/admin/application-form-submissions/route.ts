@@ -4,7 +4,7 @@ import { assertAdminRequest } from "@/lib/adminAuth";
 import { serializeError } from "@/lib/utils";
 
 const SUBMISSION_SELECT =
-  "id, template_id, submitted_at, full_name, birth_date, class_name, student_id, email, gender, department, photo_url, optional_personal_answers, dept_optional_answers, status, standing_committee_comment, board_comment";
+  "id, template_id, submitted_at, full_name, birth_date, class_name, student_id, email, phone_number, facebook_url, hometown, gender, department, photo_url, optional_personal_answers, dept_optional_answers, status, standing_committee_comment, board_comment, team_leader_comment";
 const BATCH_SIZE = 1000;
 
 async function fetchAllApplicationSubmissions() {
@@ -99,4 +99,3 @@ export async function GET(req: Request) {
     return NextResponse.json({ success: false, message: serializeError(e) }, { status: 500 });
   }
 }
-

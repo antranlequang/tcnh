@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, Search } from "lucide-react";
@@ -16,65 +16,19 @@ const navItems = [
   { href: "/youth", label: "Tuổi trẻ" },
 ];
 
-type Locale = "vi" | "en";
-
 export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [locale, setLocale] = useState<Locale>("vi");
-
-  useEffect(() => {
-    const browserLanguage = navigator.languages?.[0] ?? navigator.language;
-    setLocale(browserLanguage.toLowerCase().startsWith("vi") ? "vi" : "en");
-  }, []);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 
-  const LanguageSwitcher = ({ dark = false }: { dark?: boolean }) => (
-    <div
-      className={cn(
-        "flex items-center rounded-full border px-2 py-1 text-[11px] font-semibold",
-        dark ? "border-white/15 text-white/45" : "border-[#144E8C]/15 text-[#144E8C]/45"
-      )}
-      aria-label="Chọn ngôn ngữ"
-    >
-      <button
-        type="button"
-        onClick={() => setLocale("vi")}
-        aria-pressed={locale === "vi"}
-        className={cn(
-          "rounded-full px-1.5 py-1 transition-colors",
-          locale === "vi" && (dark ? "bg-white text-[#144E8C]" : "bg-[#144E8C] text-white")
-        )}
-      >
-        VN
-      </button>
-      <span className="mx-0.5 opacity-35">|</span>
-      <button
-        type="button"
-        onClick={() => setLocale("en")}
-        aria-pressed={locale === "en"}
-        className={cn(
-          "rounded-full px-1.5 py-1 transition-colors",
-          locale === "en" && (dark ? "bg-white text-[#144E8C]" : "bg-[#144E8C] text-white")
-        )}
-      >
-        EN
-      </button>
-    </div>
-  );
-
   return (
     <header className="sticky top-0 z-50 h-[60px] shrink-0 bg-white text-[#144E8C] shadow-[0_4px_24px_rgba(11,31,51,0.08)] xl:h-[104px]">
       <div className="relative mx-auto h-full max-w-[1440px]">
-        <div className="absolute inset-y-0 left-4 flex items-center xl:hidden">
-          <LanguageSwitcher />
-        </div>
-
         <Link
           href="/"
-          className="absolute inset-y-0 left-1/2 z-10 flex -translate-x-1/2 items-center xl:left-8 xl:w-[340px] xl:translate-x-0"
+          className="absolute inset-y-0 left-4 z-10 flex items-center xl:left-8 xl:w-[340px]"
           aria-label="Đoàn Khoa Tài chính - Ngân hàng"
         >
           <img
@@ -121,10 +75,6 @@ export function Header() {
             })}
           </nav>
 
-          <div className="ml-2">
-            <LanguageSwitcher />
-          </div>
-
           <Link
             href="/apply"
             className="group ml-2 flex h-10 items-center gap-2 rounded-full bg-[#F05A23] pl-4 pr-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#d84b18]"
@@ -157,16 +107,20 @@ export function Header() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-full border-none bg-[#07192b] p-0 text-white sm:max-w-md [&>button]:right-6 [&>button]:top-6 [&>button]:text-white/70"
+              className="h-[100dvh] w-full overflow-y-auto border-none bg-[#07192b] p-0 text-white sm:max-w-md [&>button]:right-5 [&>button]:top-[max(1.25rem,env(safe-area-inset-top))] [&>button]:z-20 [&>button]:text-white/70"
             >
-              <div className="flex min-h-full flex-col p-6">
+              <div className="flex min-h-full flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-6">
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="mb-12 flex items-center gap-3"
+                  className="mb-9 flex items-center gap-3 pr-12"
                 >
-                  <span className="grid h-11 w-11 place-items-center rounded-full bg-white">
-                    <img src="/images/logo.png" alt="" className="h-8 w-auto" />
+                  <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full border border-white/15 bg-white">
+                    <img
+                      src="/images/logo-dk.jpg"
+                      alt="Logo Đoàn Khoa Tài chính - Ngân hàng"
+                      className="h-full w-full object-contain"
+                    />
                   </span>
                   <span className="text-xs font-semibold uppercase leading-relaxed tracking-[0.15em]">
                     Đoàn Khoa
@@ -189,7 +143,7 @@ export function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "group flex items-center justify-between border-b border-white/10 py-4 text-lg font-medium transition-colors",
+                          "group flex min-h-14 items-center justify-between border-b border-white/10 py-3.5 text-[17px] font-medium transition-colors",
                           active ? "text-white" : "text-white/50 hover:text-white"
                         )}
                       >
@@ -202,10 +156,7 @@ export function Header() {
                   })}
                 </nav>
 
-                <div className="mt-auto pt-8">
-                  <div className="mb-4 flex justify-center">
-                    <LanguageSwitcher dark />
-                  </div>
+                <div className="mt-auto pt-7">
                   <Link
                     href="/apply"
                     onClick={() => setMobileMenuOpen(false)}

@@ -49,6 +49,10 @@ export async function PATCH(
       updateData.board_comment = String(body.board_comment);
     }
 
+    if (body.team_leader_comment !== undefined) {
+      updateData.team_leader_comment = String(body.team_leader_comment);
+    }
+
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
         { success: false, message: "No fields to update." },

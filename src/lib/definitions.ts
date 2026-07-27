@@ -52,6 +52,9 @@ export const ApplicationFormSchema = z.object({
   className: z.string().optional(),
   studentId: z.string().optional(),
   email: z.string().email().optional(),
+  phoneNumber: z.string().optional(),
+  facebookUrl: z.string().url().optional(),
+  hometown: z.string().optional(),
   gender: genderEnum.optional(),
   department: departmentEnum.optional(),
   photo: z.any().optional(),
@@ -93,6 +96,12 @@ export const ApplicationFormSubmissionStrictSchema = z.object({
   className: z.string().min(1, "Lớp không hợp lệ."),
   studentId: z.string().min(1, "MSSV không hợp lệ."),
   email: z.string().email("Email không hợp lệ."),
+  phoneNumber: z
+    .string()
+    .trim()
+    .regex(/^[0-9+()\s.-]{8,20}$/, "Số điện thoại không hợp lệ."),
+  facebookUrl: z.string().trim().url("Link Facebook không hợp lệ."),
+  hometown: z.string().trim().min(2, "Quê quán phải có ít nhất 2 ký tự."),
   gender: genderEnum,
   department: departmentEnum,
 

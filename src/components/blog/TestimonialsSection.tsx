@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bookmark,
   ChevronLeft,
@@ -11,6 +11,9 @@ import {
   Send,
 } from "lucide-react";
 import type { AlumniTestimonialRow } from "@/lib/blog";
+import { Button } from "@/components/ui/button";
+
+const TESTIMONIALS_PER_PAGE = 5;
 
 function TestimonialPost({ item }: { item: AlumniTestimonialRow }) {
   const [activeImage, setActiveImage] = useState(0);
@@ -141,6 +144,7 @@ function TestimonialPost({ item }: { item: AlumniTestimonialRow }) {
 export function TestimonialsSection() {
   const [rows, setRows] = useState<AlumniTestimonialRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetch("/api/blog/testimonials", { cache: "no-store" })
@@ -156,6 +160,16 @@ export function TestimonialsSection() {
       .finally(() => setLoading(false));
   }, []);
 
+  const totalPages = Math.max(1, Math.ceil(rows.length / TESTIMONIALS_PER_PAGE));
+  const visibleRows = useMemo(() => {
+    const start = (currentPage - 1) * TESTIMONIALS_PER_PAGE;
+    return rows.slice(start, start + TESTIMONIALS_PER_PAGE);
+  }, [currentPage, rows]);
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
+
   if (loading) {
     return <p className="text-center text-sm text-muted-foreground">Đang tải lời gửi gắm...</p>;
   }
@@ -166,9 +180,38 @@ export function TestimonialsSection() {
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
-      {rows.map((item) => (
+      {visibleRows.map((item) => (
         <TestimonialPost key={item.id} item={item} />
       ))}
+      {totalPages > 1 && (
+        <nav className="flex items-center justify-center gap-2 pt-2" aria-label="Phân trang góc chia sẻ">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            aria-label="Trang chia sẻ trước"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Trước
+          </Button>
+          <span className="min-w-20 text-center text-sm font-medium text-slate-600">
+            {currentPage} / {totalPages}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            aria-label="Trang chia sẻ tiếp theo"
+          >
+            Sau
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </nav>
+      )}
     </div>
   );
 }

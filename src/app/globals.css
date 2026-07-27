@@ -69,6 +69,24 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.scroll-to-top-button {
+  right: 1rem;
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 640px) {
+  .scroll-to-top-button {
+    right: 2rem;
+    bottom: 2rem;
+  }
 }
 
 ::selection {
@@ -89,6 +107,12 @@ html {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+@media (max-width: 767px) {
+  .terra-reference-hero {
+    background-attachment: scroll;
+  }
 }
 
 @keyframes hero-initial-load {
@@ -406,25 +430,12 @@ body {
   .background-fixed {
     background-attachment: scroll !important;
   }
-  
-  /* Mobile performance optimizations */
-  * {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-  }
-  
+
   /* Reduce blur effects on mobile */
   .backdrop-blur-sm {
     backdrop-filter: none !important;
   }
-  
-  /* Simplify gradients on mobile */
-  .bg-gradient-to-b,
-  .bg-gradient-to-br,
-  .bg-gradient-to-r {
-    background-image: none !important;
-  }
-  
+
   /* Disable complex animations on mobile */
   .animate-pulse {
     animation: none !important;
