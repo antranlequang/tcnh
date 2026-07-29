@@ -11,81 +11,52 @@ export async function GET() {
       );
     }
 
-    const now = new Date();
-    const nowIso = now.toISOString();
-
-    // 1) Currently active template
-    const { data: activeRows, error: activeErr } = await supabaseAdmin
+    const nowIso = new Date().toISOString();
+    const { data: template, error } = await supabaseAdmin
       .from("application_form_templates")
       .select("*")
-      .lte("open_at", nowIso)
-      .gte("close_at", nowIso)
-      .order("open_at", { ascending: false })
-      .limit(1);
+      .eq("is_selected", true)
+      .maybeSingle();
 
-    if (activeErr) {
+    if (error) {
       return NextResponse.json(
-        { success: false, message: activeErr.message },
+        { success: false, message: error.message },
         { status: 500 }
       );
     }
 
-    const active = activeRows?.[0];
-    if (active) {
+    if (!template) {
       return NextResponse.json({
         success: true,
-        status: "active",
+        status: "closed",
         now: nowIso,
-        template: active,
+        template: null,
       });
     }
 
-    // 2) Next template that will open
-    const { data: nextRows, error: nextErr } = await supabaseAdmin
-      .from("application_form_templates")
-      .select("*")
-      .gt("open_at", nowIso)
-      .order("open_at", { ascending: true })
-      .limit(1);
-
-    if (nextErr) {
-      return NextResponse.json(
-        { success: false, message: nextErr.message },
-        { status: 500 }
-      );
+    if (!template.is_enabled || nowIso > template.close_at) {
+      return NextResponse.json({
+        success: true,
+        status: "closed",
+        now: nowIso,
+        template,
+      });
     }
 
-    const next = nextRows?.[0];
-    if (next) {
+    if (nowIso < template.open_at) {
       return NextResponse.json({
         success: true,
         status: "not_started",
         now: nowIso,
-        template: next,
+        template,
       });
     }
 
-    // 3) Most recently closed template (for a nice fallback message)
-    const { data: lastRows, error: lastErr } = await supabaseAdmin
-      .from("application_form_templates")
-      .select("*")
-      .lt("close_at", nowIso)
-      .order("close_at", { ascending: false })
-      .limit(1);
-
-    if (lastErr) {
-      return NextResponse.json(
-        { success: false, message: lastErr.message },
-        { status: 500 }
-      );
-    }
-
-    const last = lastRows?.[0];
     return NextResponse.json({
       success: true,
-      status: "ended",
+      status: "active",
       now: nowIso,
-      template: last ?? null,
+      template,
     });
   } catch (error) {
     return NextResponse.json(
@@ -94,4 +65,3 @@ export async function GET() {
     );
   }
 }
-

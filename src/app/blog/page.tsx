@@ -13,7 +13,7 @@ export default function BlogPage() {
       <PageBanner
         title="Cộng đồng"
         subtitle="Nơi chia sẻ, thảo luận và kết nối các thành viên trong Khoa Tài chính - Ngân hàng."
-        imageUrl="/images/banner-page/uel.jpg"
+        imageUrl="/images/banner-page/uel.webp"
         imageHint="community discussion"
       />
 
@@ -46,7 +46,7 @@ export default function BlogPage() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="/images/banner.jpg"
+                  src="/images/banner.webp"
                   alt="Fanpage preview"
                   width={400}
                   height={250}

@@ -112,7 +112,7 @@ export default function ActivitiesPage() {
             <PageBanner
                 title="Hoạt động của chúng tớ"
                 subtitle="Các chuyên mục và chương trình nổi bật mà Đoàn Khoa đã thực hiện."
-                imageUrl="/images/banner-page/uel.jpg"
+                imageUrl="/images/banner-page/uel.webp"
                 imageHint="students event"
             />
 

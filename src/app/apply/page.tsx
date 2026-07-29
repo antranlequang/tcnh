@@ -8,7 +8,7 @@ export default function ApplyPage() {
       <PageBanner
         title="Đơn đăng ký ứng tuyển"
         subtitle='"Chần chờ gì mà không tham gia vào Đoàn khoa Tài chính - Ngân hàng"'
-        imageUrl="/images/banner-page/uel.jpg"
+        imageUrl="/images/banner-page/uel.webp"
         imageHint="recruitment hiring"
       />
       <main className="relative overflow-hidden px-4 py-16 sm:px-6 md:py-24">

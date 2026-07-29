@@ -387,7 +387,7 @@ export default function HomePageClient({
               }}
             >
               <Image
-                src="/images/hero-page/doankhoa1.jpg"
+                src="/images/hero-page/1.webp"
                 alt="Tập thể Đoàn Khoa Tài chính - Ngân hàng"
                 fill
                 priority
@@ -433,7 +433,7 @@ export default function HomePageClient({
             <ScrollReveal className="md:col-span-7 md:row-span-2">
               <div className="group relative min-h-[560px] overflow-hidden rounded-[2rem]">
                 <Image
-                  src="/images/hero-page/doankhoa1.jpg"
+                  src="/images/hero-page/1.webp"
                   alt="Tập thể Đoàn Khoa Tài chính - Ngân hàng"
                   fill
                   sizes="(max-width: 768px) 100vw, 60vw"
@@ -468,13 +468,12 @@ export default function HomePageClient({
             <ScrollReveal className="md:col-span-5">
               <div className="group relative min-h-[270px] overflow-hidden rounded-[2rem]">
                 <Image
-                  src="/images/hero-page/doankhoa2.jpg"
+                  src="/images/hero-page/2.webp"
                   alt="Hoạt động sinh viên"
                   fill
                   sizes="(max-width: 768px) 100vw, 40vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-[#F05A23]/25 mix-blend-multiply" />
               </div>
             </ScrollReveal>
           </div>

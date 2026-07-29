@@ -3,15 +3,7 @@ import path from "node:path";
 import HomePageClient, { type HeroSlide } from "./HomePageClient";
 
 const supportedImageExtensions = new Set([
-  ".avif",
-  ".gif",
-  ".jpeg",
-  ".jpg",
-  ".png",
   ".webp",
-  ".JPG",
-  ".JPEG",
-  ".PNG",
   ".WEBP",
 ]);
 

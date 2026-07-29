@@ -34,6 +34,42 @@ function missingClassOptionsResponse() {
   );
 }
 
+function isMissingDisplayControlColumn(error: any): boolean {
+  const message = String(error?.message || "").toLowerCase();
+  return (
+    error?.code === "PGRST204" &&
+    (message.includes("is_selected") || message.includes("is_enabled")) &&
+    message.includes("application_form_templates")
+  );
+}
+
+function missingDisplayControlsResponse() {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        "Supabase chưa có cột điều khiển form. Hãy chạy file docs/sql/2026-07-29_application_form_display_controls.sql trong SQL Editor.",
+    },
+    { status: 503 }
+  );
+}
+
+async function setSelectedTemplate(id: string, isSelected: boolean) {
+  if (isSelected) {
+    const clearResult = await supabaseAdmin!
+      .from("application_form_templates")
+      .update({ is_selected: false })
+      .eq("is_selected", true);
+    if (clearResult.error) return clearResult.error;
+  }
+
+  const selectResult = await supabaseAdmin!
+    .from("application_form_templates")
+    .update({ is_selected: isSelected })
+    .eq("id", id);
+  return selectResult.error;
+}
+
 export async function GET(req: Request) {
   try {
     const authError = await assertAdminRequest(req);
@@ -45,9 +81,10 @@ export async function GET(req: Request) {
 
     const { data, error } = await supabaseAdmin
       .from("application_form_templates")
-      .select("id, name, open_at, close_at, optional_personal_questions, department_questions")
+      .select("id, name, open_at, close_at, optional_personal_questions, department_questions, is_selected, is_enabled")
       .order("created_at", { ascending: false });
 
+    if (isMissingDisplayControlColumn(error)) return missingDisplayControlsResponse();
     if (error) throw error;
 
     return NextResponse.json({ success: true, data: data || [] });
@@ -75,6 +112,8 @@ export async function POST(req: Request) {
       departmentQuestions,
       illustrations,
       classOptions,
+      isSelected,
+      isEnabled,
     } = body || {};
 
     if (!name || !openAt || !closeAt) {
@@ -97,6 +136,7 @@ export async function POST(req: Request) {
       department_questions: deptQs,
       illustrations: Array.isArray(illustrations) ? illustrations : [],
       class_options: classOpts,
+      is_enabled: Boolean(isEnabled),
     };
 
     // Upsert by id when provided (client uses same endpoint for create/edit)
@@ -108,6 +148,7 @@ export async function POST(req: Request) {
         optional_personal_questions: payload.optional_personal_questions,
         department_questions: payload.department_questions,
         illustrations: payload.illustrations,
+        is_enabled: payload.is_enabled,
       };
       let saveResult = await supabaseAdmin
         .from("application_form_templates")
@@ -129,8 +170,16 @@ export async function POST(req: Request) {
           .single();
       }
 
+      if (isMissingDisplayControlColumn(saveResult.error)) return missingDisplayControlsResponse();
       if (saveResult.error) throw saveResult.error;
-      const data = { ...saveResult.data, class_options: saveResult.data?.class_options || [] };
+      const selectionError = await setSelectedTemplate(String(id), Boolean(isSelected));
+      if (isMissingDisplayControlColumn(selectionError)) return missingDisplayControlsResponse();
+      if (selectionError) throw selectionError;
+      const data = {
+        ...saveResult.data,
+        class_options: saveResult.data?.class_options || [],
+        is_selected: Boolean(isSelected),
+      };
 
       // Record history snapshot (fire-and-forget; never block the response)
       supabaseAdmin
@@ -150,6 +199,8 @@ export async function POST(req: Request) {
       optional_personal_questions: payload.optional_personal_questions,
       department_questions: payload.department_questions,
       illustrations: payload.illustrations,
+      is_enabled: payload.is_enabled,
+      is_selected: false,
     };
     let saveResult = await supabaseAdmin
       .from("application_form_templates")
@@ -169,8 +220,16 @@ export async function POST(req: Request) {
         .single();
     }
 
+    if (isMissingDisplayControlColumn(saveResult.error)) return missingDisplayControlsResponse();
     if (saveResult.error) throw saveResult.error;
-    const data = { ...saveResult.data, class_options: saveResult.data?.class_options || [] };
+    const selectionError = await setSelectedTemplate(String(saveResult.data.id), Boolean(isSelected));
+    if (isMissingDisplayControlColumn(selectionError)) return missingDisplayControlsResponse();
+    if (selectionError) throw selectionError;
+    const data = {
+      ...saveResult.data,
+      class_options: saveResult.data?.class_options || [],
+      is_selected: Boolean(isSelected),
+    };
 
     // Record history snapshot (fire-and-forget; never block the response)
     supabaseAdmin

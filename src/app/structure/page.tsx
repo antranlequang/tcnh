@@ -37,7 +37,7 @@ export default function StructurePage() {
       <PageBanner
         title="Cơ cấu tổ chức"
         subtitle='"Một ban làm chẳng nên non, bốn ban chụm lại nên hòn núi cao"'
-        imageUrl="/images/banner-page/uel.jpg"
+        imageUrl="/images/banner-page/uel.webp"
         imageHint="teamwork architecture"
       />
 

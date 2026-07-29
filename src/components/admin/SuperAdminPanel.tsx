@@ -181,7 +181,7 @@ export function SuperAdminPanel({
       {
         key: "super_admin",
         title: "Super Admin",
-        description: "Toàn quyền · tài khoản được bảo vệ",
+        description: "Toàn quyền",
         accounts: visibleAccounts.filter((account) => account.role === "super_admin"),
       },
       {
@@ -459,7 +459,6 @@ export function SuperAdminPanel({
                           <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-600">
                             {group.title}
                           </p>
-                          <p className="mt-0.5 text-[11px] text-slate-400">{group.description}</p>
                         </div>
                         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-500">
                           {group.accounts.length}

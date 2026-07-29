@@ -23,6 +23,26 @@ function isMissingClassOptionsColumn(error: any): boolean {
   );
 }
 
+function isMissingDisplayControlColumn(error: any): boolean {
+  const message = String(error?.message || "").toLowerCase();
+  return (
+    error?.code === "PGRST204" &&
+    (message.includes("is_selected") || message.includes("is_enabled")) &&
+    message.includes("application_form_templates")
+  );
+}
+
+function missingDisplayControlsResponse() {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        "Supabase chưa có cột điều khiển form. Hãy chạy file docs/sql/2026-07-29_application_form_display_controls.sql trong SQL Editor.",
+    },
+    { status: 503 }
+  );
+}
+
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authError = await assertAdminRequest(req);
@@ -48,6 +68,61 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const authError = await assertAdminRequest(req);
+    if (authError) return authError;
+
+    if (!supabaseAdmin) {
+      return NextResponse.json({ success: false, message: "Supabase admin client not configured." }, { status: 500 });
+    }
+
+    const { id } = await params;
+    if (!id) return NextResponse.json({ success: false, message: "Missing id" }, { status: 400 });
+
+    const body = await req.json();
+    const hasSelection = typeof body?.isSelected === "boolean";
+    const hasEnabled = typeof body?.isEnabled === "boolean";
+    if (!hasSelection && !hasEnabled) {
+      return NextResponse.json({ success: false, message: "No control value provided." }, { status: 400 });
+    }
+
+    if (body.isSelected === true) {
+      const clearResult = await supabaseAdmin
+        .from("application_form_templates")
+        .update({ is_selected: false })
+        .eq("is_selected", true);
+      if (isMissingDisplayControlColumn(clearResult.error)) return missingDisplayControlsResponse();
+      if (clearResult.error) throw clearResult.error;
+    }
+
+    const updates: Record<string, boolean> = {};
+    if (hasSelection) updates.is_selected = body.isSelected;
+    if (hasEnabled) updates.is_enabled = body.isEnabled;
+
+    const { data, error } = await supabaseAdmin
+      .from("application_form_templates")
+      .update(updates)
+      .eq("id", id)
+      .select("id, name, open_at, close_at, is_selected, is_enabled")
+      .single();
+
+    if (isMissingDisplayControlColumn(error)) return missingDisplayControlsResponse();
+    if (error) throw error;
+
+    supabaseAdmin
+      .from("application_form_template_history")
+      .insert({ template_id: data.id, action: "updated", snapshot: data })
+      .then(({ error: histErr }) => {
+        if (histErr) console.warn("History insert failed:", histErr.message);
+      });
+
+    return NextResponse.json({ success: true, data });
+  } catch (e) {
+    return NextResponse.json({ success: false, message: serializeError(e) }, { status: 500 });
+  }
+}
+
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authError = await assertAdminRequest(req);
@@ -61,7 +136,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!id) return NextResponse.json({ success: false, message: "Missing id" }, { status: 400 });
 
     const body = await req.json();
-    const { name, openAt, closeAt, optionalPersonalQuestions, departmentQuestions, illustrations, classOptions } =
+    const {
+      name,
+      openAt,
+      closeAt,
+      optionalPersonalQuestions,
+      departmentQuestions,
+      illustrations,
+      classOptions,
+      isSelected,
+      isEnabled,
+    } =
       body || {};
 
     if (!name || !openAt || !closeAt) {
@@ -76,6 +161,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       department_questions: normalizeDepartmentQuestions(departmentQuestions),
       illustrations: Array.isArray(illustrations) ? illustrations : [],
       class_options: Array.isArray(classOptions) ? (classOptions as unknown[]).map(String).filter(Boolean) : [],
+      is_enabled: Boolean(isEnabled),
     };
 
     const { class_options: classOptionsPayload, ...legacyPayload } = payload;
@@ -105,8 +191,29 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         .single();
     }
 
+    if (isMissingDisplayControlColumn(saveResult.error)) return missingDisplayControlsResponse();
     if (saveResult.error) throw saveResult.error;
-    const data = { ...saveResult.data, class_options: saveResult.data?.class_options || [] };
+
+    if (Boolean(isSelected)) {
+      const clearResult = await supabaseAdmin
+        .from("application_form_templates")
+        .update({ is_selected: false })
+        .eq("is_selected", true);
+      if (isMissingDisplayControlColumn(clearResult.error)) return missingDisplayControlsResponse();
+      if (clearResult.error) throw clearResult.error;
+    }
+    const selectionResult = await supabaseAdmin
+      .from("application_form_templates")
+      .update({ is_selected: Boolean(isSelected) })
+      .eq("id", id);
+    if (isMissingDisplayControlColumn(selectionResult.error)) return missingDisplayControlsResponse();
+    if (selectionResult.error) throw selectionResult.error;
+
+    const data = {
+      ...saveResult.data,
+      class_options: saveResult.data?.class_options || [],
+      is_selected: Boolean(isSelected),
+    };
 
     // Record history snapshot (fire-and-forget; never block the response)
     supabaseAdmin

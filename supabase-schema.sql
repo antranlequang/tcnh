@@ -151,6 +151,8 @@ CREATE TABLE IF NOT EXISTS public.application_form_templates (
     CHECK (jsonb_typeof(illustrations) = 'array'),
   class_options JSONB NOT NULL DEFAULT '[]'::jsonb
     CHECK (jsonb_typeof(class_options) = 'array'),
+  is_selected BOOLEAN NOT NULL DEFAULT false,
+  is_enabled BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
   CHECK (close_at > open_at)
@@ -159,10 +161,16 @@ CREATE TABLE IF NOT EXISTS public.application_form_templates (
 -- CREATE TABLE IF NOT EXISTS does not add new columns to an existing table.
 -- Keep older Supabase projects compatible with the current form builder.
 ALTER TABLE public.application_form_templates
-  ADD COLUMN IF NOT EXISTS class_options JSONB NOT NULL DEFAULT '[]'::jsonb;
+  ADD COLUMN IF NOT EXISTS class_options JSONB NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS is_selected BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN NOT NULL DEFAULT false;
 
 CREATE INDEX IF NOT EXISTS idx_application_form_templates_window
   ON public.application_form_templates(open_at, close_at);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_application_form_templates_one_selected
+  ON public.application_form_templates(is_selected)
+  WHERE is_selected = true;
 
 DROP TRIGGER IF EXISTS trg_application_form_templates_updated_at
   ON public.application_form_templates;

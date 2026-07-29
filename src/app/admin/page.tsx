@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -88,6 +88,9 @@ const STATUS_PIE_COLORS: Record<CandidateStatus, string> = {
 };
 const DEPT_COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6'];
 const BAR_PALETTE = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#f43f5e', '#06b6d4', '#84cc16', '#f97316'];
+const ADMIN_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+const GOOGLE_OAUTH_PENDING_KEY = 'admin-google-oauth-pending';
+const GOOGLE_OAUTH_MAX_AGE_MS = 10 * 60 * 1000;
 const GENDER_PIE_COLORS = ['#3b82f6', '#ec4899', '#a78bfa', '#9ca3af', '#f97316'];
 
 interface FormTemplateSummary {
@@ -346,7 +349,7 @@ function AdminWorkspaceHeader({
           className="absolute left-4 top-3 flex h-10 items-center sm:inset-y-0 sm:top-auto xl:left-8 xl:h-auto"
           aria-label="Mở trang quản trị tổng quan"
         >
-          <img src="/images/logo.png" alt="" className="h-9 w-[138px] object-contain xl:h-14 xl:w-[168px]" />
+          <img src="/images/logo.webp" alt="" className="h-9 w-[138px] object-contain xl:h-14 xl:w-[168px]" />
           <span className="ml-4 hidden border-l border-[#144E8C]/15 pl-4 leading-none xl:block">
             <span className="block whitespace-nowrap text-xs font-bold uppercase tracking-[0.14em]">Đoàn Khoa</span>
             <span className="mt-1.5 block whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.08em] text-[#144E8C]/60">
@@ -667,6 +670,7 @@ export default function AdminPage() {
   const [categoryOpen, setCategoryOpen] = useState(true);
   const [youthSubOpen, setYouthSubOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const googleSessionAuthorizedInThisTab = useRef(false);
 
   const authHeaders = useMemo(() => ({ 'x-admin-password': password }), [password]);
 
@@ -690,11 +694,15 @@ export default function AdminPage() {
             setLoginError(payload?.message || 'Tài khoản Google không có quyền truy cập.');
             setIsAuthenticated(false);
           }
+          window.sessionStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+          googleSessionAuthorizedInThisTab.current = false;
           await supabase?.auth.signOut();
           return;
         }
 
         if (active) {
+          window.sessionStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+          googleSessionAuthorizedInThisTab.current = true;
           setPassword(accessToken);
           setGoogleEmail(String(payload?.email || ''));
           setAdminDisplayName(String(payload?.fullName || payload?.email?.split('@')[0] || 'Admin'));
@@ -718,9 +726,16 @@ export default function AdminPage() {
       return;
     }
 
+    const oauthStartedAt = Number(window.sessionStorage.getItem(GOOGLE_OAUTH_PENDING_KEY) || 0);
+    const hasPendingOAuth =
+      oauthStartedAt > 0 && Date.now() - oauthStartedAt <= GOOGLE_OAUTH_MAX_AGE_MS;
+    if (!hasPendingOAuth) {
+      window.sessionStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
+    }
+
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
-      if (data.session?.access_token) {
+      if (hasPendingOAuth && data.session?.access_token) {
         void authenticateGoogleSession(data.session.access_token);
       } else {
         setCheckingGoogleSession(false);
@@ -729,7 +744,10 @@ export default function AdminPage() {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (!active || !session?.access_token) return;
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      const canUseSession =
+        googleSessionAuthorizedInThisTab.current ||
+        Boolean(window.sessionStorage.getItem(GOOGLE_OAUTH_PENDING_KEY));
+      if (canUseSession && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
         window.setTimeout(() => {
           if (active) void authenticateGoogleSession(session.access_token);
         }, 0);
@@ -782,6 +800,7 @@ export default function AdminPage() {
       return;
     }
 
+    window.sessionStorage.setItem(GOOGLE_OAUTH_PENDING_KEY, String(Date.now()));
     setAuthenticating(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -794,15 +813,16 @@ export default function AdminPage() {
     });
 
     if (error) {
+      window.sessionStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
       setLoginError(`Không thể mở đăng nhập Google: ${error.message}`);
       setAuthenticating(false);
     }
   };
 
-  const handleLogout = async () => {
-    if (authMethod === 'google') {
-      await supabase?.auth.signOut();
-    }
+  const handleLogout = useCallback(async (message?: string) => {
+    const shouldSignOutGoogle = authMethod === 'google';
+    googleSessionAuthorizedInThisTab.current = false;
+    window.sessionStorage.removeItem(GOOGLE_OAUTH_PENDING_KEY);
     setIsAuthenticated(false);
     setPassword('');
     setGoogleEmail('');
@@ -810,7 +830,61 @@ export default function AdminPage() {
     setAuthMethod(null);
     setAuthRole('admin');
     setAdminSection('general');
-  };
+    setLoginError(message || null);
+
+    if (shouldSignOutGoogle) {
+      await supabase?.auth.signOut();
+    }
+  }, [authMethod]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let lastRecordedActivity = Date.now();
+    let logoutTriggered = false;
+    const triggerIdleLogout = () => {
+      if (logoutTriggered) return;
+      logoutTriggered = true;
+      void handleLogout('Phiên quản trị đã tự động đăng xuất sau 30 phút không hoạt động.');
+    };
+    let logoutTimer = window.setTimeout(triggerIdleLogout, ADMIN_IDLE_TIMEOUT_MS);
+
+    const recordActivity = () => {
+      const now = Date.now();
+      if (now - lastRecordedActivity >= ADMIN_IDLE_TIMEOUT_MS) {
+        triggerIdleLogout();
+        return;
+      }
+      if (now - lastRecordedActivity < 1000) return;
+      lastRecordedActivity = now;
+      window.clearTimeout(logoutTimer);
+      logoutTimer = window.setTimeout(triggerIdleLogout, ADMIN_IDLE_TIMEOUT_MS);
+    };
+
+    const activityEvents: Array<keyof WindowEventMap> = [
+      'pointerdown',
+      'pointermove',
+      'keydown',
+      'scroll',
+      'touchstart',
+      'focus',
+    ];
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(eventName, recordActivity, { passive: true });
+    });
+    const checkWhenVisible = () => {
+      if (document.visibilityState === 'visible') recordActivity();
+    };
+    document.addEventListener('visibilitychange', checkWhenVisible);
+
+    return () => {
+      window.clearTimeout(logoutTimer);
+      activityEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, recordActivity);
+      });
+      document.removeEventListener('visibilitychange', checkWhenVisible);
+    };
+  }, [handleLogout, isAuthenticated]);
 
   // ── Data loading ──────────────────────────────────────────────────────────
 
@@ -876,7 +950,7 @@ export default function AdminPage() {
             <div className="absolute -bottom-28 -right-28 h-80 w-80 rounded-full border-[64px] border-white/[0.05]" />
             <div className="relative">
               <div className="inline-flex rounded-2xl bg-white px-4 py-3 shadow-xl">
-                <img src="/images/logo.png" alt="ĐKTCNH Logo" className="h-10 w-auto" />
+                <img src="/images/logo.webp" alt="ĐKTCNH Logo" className="h-10 w-auto" />
               </div>
             </div>
             <div className="relative">
@@ -907,7 +981,7 @@ export default function AdminPage() {
             }}
           >
             <div className="mb-10 inline-flex w-fit rounded-2xl bg-slate-50 p-3 lg:hidden">
-              <img src="/images/logo.png" alt="ĐKTCNH Logo" className="h-9 w-auto" />
+              <img src="/images/logo.webp" alt="ĐKTCNH Logo" className="h-9 w-auto" />
             </div>
             <div className="mb-8">
               <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-[#eaf2fa] text-[#0b4f8a]">
@@ -1082,22 +1156,6 @@ export default function AdminPage() {
 
       {/* Sidebar footer */}
       <div className="space-y-1 border-t border-white/50 bg-[#144E8C] p-3">
-        {authMethod === 'google' && googleEmail && (
-          <p className="truncate px-3 pb-2 text-xs font-semibold text-white/45" title={googleEmail}>
-            {googleEmail}
-          </p>
-        )}
-        {siteConfig?.showAdminLink && (
-          <a
-            href={siteConfig.frontendUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 transition-colors hover:bg-white/[0.08] hover:text-white"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Xem website
-          </a>
-        )}
         <button
           onClick={() => void handleLogout()}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 transition-colors hover:bg-red-500/10 hover:text-red-300"
@@ -1174,22 +1232,7 @@ export default function AdminPage() {
                       timeZone: 'Asia/Ho_Chi_Minh',
                     }).format(new Date())}
                   </p>
-                  <p className="mt-0.5 flex items-center justify-end gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    Hệ thống hoạt động
-                  </p>
                 </div>
-                {siteConfig?.showAdminLink && (
-                  <a
-                    href={siteConfig.frontendUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#0b4f8a]/25 hover:text-[#0b4f8a] hover:shadow-md"
-                  >
-                    Xem website
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                )}
               </div>
             </div>
           </header>

@@ -50,7 +50,7 @@ export default function YouthPage() {
       <PageBanner
         title="Tuổi trẻ Tài chính - Ngân hàng"
         subtitle="Nơi hội tụ những hoạt động sôi nổi dành cho đoàn viên/thanh niên"
-        imageUrl="/images/banner-page/uel.jpg"
+        imageUrl="/images/banner-page/uel.webp"
         imageHint="youth activities"
       />
 

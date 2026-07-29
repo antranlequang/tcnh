@@ -191,7 +191,7 @@ export async function submitApplication(
 
     const { data: template, error: templateError } = await supabaseAdmin
       .from("application_form_templates")
-      .select("id")
+      .select("id, open_at, close_at, is_selected, is_enabled")
       .eq("id", templateId)
       .single();
 
@@ -199,6 +199,17 @@ export async function submitApplication(
       return {
         message: "Không tìm thấy cấu hình form hợp lệ.",
         issues: templateError ? [templateError.message] : ["Missing template."],
+      };
+    }
+
+    const nowMs = Date.now();
+    const isInsideSchedule =
+      nowMs >= new Date(template.open_at).getTime() &&
+      nowMs <= new Date(template.close_at).getTime();
+    if (!template.is_selected || !template.is_enabled || !isInsideSchedule) {
+      return {
+        message: "Đơn đăng ký hiện đã đóng.",
+        issues: ["Application form is closed."],
       };
     }
 

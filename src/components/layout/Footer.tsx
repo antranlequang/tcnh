@@ -68,7 +68,7 @@ export function Footer() {
               aria-label="Đoàn Khoa Tài chính - Ngân hàng"
             >
               <img
-                src="/images/logo.png"
+                src="/images/logo.webp"
                 alt=""
                 className="h-12 w-[190px] object-contain"
               />

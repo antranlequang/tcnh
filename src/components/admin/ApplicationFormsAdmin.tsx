@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Eye, Power, Trash2 } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 
 import {
@@ -24,6 +26,8 @@ type TemplateRow = {
   name: string;
   open_at: string;
   close_at: string;
+  is_selected: boolean;
+  is_enabled: boolean;
 };
 
 function isoToDatetimeLocal(iso: string): string {
@@ -51,6 +55,8 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
   const [name, setName] = useState("Đơn đăng ký ứng tuyển");
   const [openAt, setOpenAt] = useState<string>("");
   const [closeAt, setCloseAt] = useState<string>("");
+  const [isSelected, setIsSelected] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
 
   const [optionalPersonalQuestions, setOptionalPersonalQuestions] = useState<string[]>(
     defaultOptionalPersonalQuestions()
@@ -66,6 +72,7 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingControlId, setUpdatingControlId] = useState<string | null>(null);
 
   const authHeaders = useMemo(() => {
     return { "x-admin-password": adminPassword };
@@ -103,6 +110,8 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
       setName(t.name || "");
       setOpenAt(isoToDatetimeLocal(t.open_at));
       setCloseAt(isoToDatetimeLocal(t.close_at));
+      setIsSelected(Boolean(t.is_selected));
+      setIsEnabled(Boolean(t.is_enabled));
       setOptionalPersonalQuestions(
         Array.from({ length: 5 }).map((_, i) => String(t.optional_personal_questions?.[i] ?? ""))
       );
@@ -136,6 +145,8 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
     setName("Đơn đăng ký ứng tuyển");
     setOpenAt("");
     setCloseAt("");
+    setIsSelected(false);
+    setIsEnabled(false);
     setOptionalPersonalQuestions(defaultOptionalPersonalQuestions());
     setDepartmentQuestions(defaultDepartmentQuestions());
     setIllustrations([]);
@@ -158,6 +169,8 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
       departmentQuestions,
       illustrations,
       classOptions,
+      isSelected,
+      isEnabled,
     };
 
     setSaving(true);
@@ -204,6 +217,33 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
       setError(String(e));
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const updateTemplateControl = async (
+    template: TemplateRow,
+    updates: { isSelected?: boolean; isEnabled?: boolean }
+  ) => {
+    setError(null);
+    setUpdatingControlId(template.id);
+    try {
+      const res = await fetch(`/api/admin/forms/${encodeURIComponent(template.id)}`, {
+        method: "PATCH",
+        headers: { ...authHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      await refreshTemplates();
+      if (templateId === template.id) {
+        if (typeof updates.isSelected === "boolean") setIsSelected(updates.isSelected);
+        if (typeof updates.isEnabled === "boolean") setIsEnabled(updates.isEnabled);
+      } else if (updates.isSelected) {
+        setIsSelected(false);
+      }
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setUpdatingControlId(null);
     }
   };
 
@@ -259,21 +299,71 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
             ) : (
               <div className="space-y-3">
                 {templates.map((t) => (
-                  <div key={t.id} className="border rounded-lg p-3">
-                    <p className="font-semibold">{t.name}</p>
+                  <div
+                    key={t.id}
+                    className={`rounded-xl border p-3 ${
+                      t.is_selected ? "border-blue-300 bg-blue-50/60 shadow-sm" : "bg-white"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <p className="font-semibold">{t.name}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {t.is_selected && (
+                          <Badge className="bg-[#144E8C] hover:bg-[#144E8C]">Đang hiển thị</Badge>
+                        )}
+                        <Badge
+                          variant="outline"
+                          className={
+                            t.is_enabled
+                              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                              : "border-slate-300 bg-slate-50 text-slate-600"
+                          }
+                        >
+                          {t.is_enabled ? "Đã bật" : "Đã đóng"}
+                        </Badge>
+                      </div>
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       Thời gian mở: {formatDateTime(t.open_at)}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Thời gian đóng: {formatDateTime(t.close_at)}
                     </p>
-                    <div className="mt-3 grid grid-cols-2 gap-2">
+                    <div className="mt-3 grid gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={t.is_selected ? "secondary" : "outline"}
+                        className={t.is_selected ? "text-[#144E8C]" : ""}
+                        onClick={() => void updateTemplateControl(t, { isSelected: true })}
+                        disabled={t.is_selected || updatingControlId === t.id || deletingId === t.id}
+                      >
+                        <Eye className="mr-1.5 h-3.5 w-3.5" />
+                        {t.is_selected ? "Đang dùng trên website" : "Dùng form này trên website"}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className={
+                          t.is_enabled
+                            ? "border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            : "border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+                        }
+                        onClick={() => void updateTemplateControl(t, { isEnabled: !t.is_enabled })}
+                        disabled={updatingControlId === t.id || deletingId === t.id}
+                      >
+                        <Power className="mr-1.5 h-3.5 w-3.5" />
+                        {t.is_enabled ? "Đóng form" : "Bật form"}
+                      </Button>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
                       <Button
                         type="button"
                         size="sm"
                         variant="secondary"
                         onClick={() => loadTemplate(t.id)}
-                        disabled={deletingId === t.id}
+                        disabled={updatingControlId === t.id || deletingId === t.id}
                       >
                         Chỉnh sửa
                       </Button>
@@ -283,7 +373,7 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
                         variant="outline"
                         className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
                         onClick={() => void deleteTemplate(t)}
-                        disabled={deletingId === t.id}
+                        disabled={updatingControlId === t.id || deletingId === t.id}
                       >
                         <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                         {deletingId === t.id ? "Đang xóa…" : "Xóa"}
@@ -318,6 +408,38 @@ export function ApplicationFormsAdmin({ adminPassword }: { adminPassword: string
               <div className="space-y-2">
                 <label className="font-semibold">Đóng đơn</label>
                 <Input type="datetime-local" value={closeAt} onChange={(e) => setCloseAt(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4">
+              <h3 className="font-semibold text-[#0b3767]">Hiển thị trên website</h3>
+              <p className="mt-1 text-sm text-slate-600">
+                Chọn form dùng trên trang ứng tuyển và chủ động bật hoặc đóng nhận đơn.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border bg-white p-3">
+                  <span>
+                    <span className="block text-sm font-semibold">Dùng form này trên website</span>
+                    <span className="block text-xs text-slate-500">Form được chọn sẽ thay thế form đang hiển thị.</span>
+                  </span>
+                  <Switch
+                    checked={isSelected}
+                    onCheckedChange={setIsSelected}
+                    aria-label="Dùng form này trên website"
+                  />
+                </label>
+                <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border bg-white p-3">
+                  <span>
+                    <span className="block text-sm font-semibold">Bật nhận đơn</span>
+                    <span className="block text-xs text-slate-500">Khi bật, form chạy theo lịch; khi tắt, trang công khai báo đã đóng.</span>
+                  </span>
+                  <Switch
+                    checked={isEnabled}
+                    onCheckedChange={setIsEnabled}
+                    aria-label="Bật nhận đơn"
+                    className="data-[state=checked]:bg-emerald-600"
+                  />
+                </label>
               </div>
             </div>
 

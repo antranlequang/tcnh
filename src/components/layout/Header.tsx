@@ -32,7 +32,7 @@ export function Header() {
           aria-label="Đoàn Khoa Tài chính - Ngân hàng"
         >
           <img
-            src="/images/logo.png"
+            src="/images/logo.webp"
             alt=""
             className="h-9 w-[138px] object-contain xl:h-14 xl:w-[168px]"
           />
@@ -117,7 +117,7 @@ export function Header() {
                 >
                   <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full border border-white/15 bg-white">
                     <img
-                      src="/images/logo-dk.jpg"
+                      src="/images/logo-dk.webp"
                       alt="Logo Đoàn Khoa Tài chính - Ngân hàng"
                       className="h-full w-full object-contain"
                     />

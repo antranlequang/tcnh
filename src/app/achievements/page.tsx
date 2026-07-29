@@ -44,7 +44,7 @@ export default function AchievementsPage() {
       <PageBanner
         title="Thành tích chúng tớ đạt được"
         subtitle='"Góc flexing chỉ là vô tình..."'
-        imageUrl="/images/banner-page/uel.jpg"
+        imageUrl="/images/banner-page/uel.webp"
         imageHint="trophies awards"
       />
 

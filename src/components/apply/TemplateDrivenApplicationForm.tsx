@@ -20,7 +20,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2, Clock3, Loader2, Send, Sparkles } from "lucide-react";
+import { Clock3, Loader2, Send, Sparkles } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 import { submitApplication } from "@/app/actions";
@@ -39,7 +39,7 @@ import {
 type ActiveTemplateResponse =
   | {
       success: true;
-      status: "active" | "not_started" | "ended";
+      status: "active" | "not_started" | "closed";
       now: string;
       template: any;
     }
@@ -74,23 +74,38 @@ function formatCountdown(diffMs: number) {
 
 function IllustrationList({ illustrations }: { illustrations: ApplicationFormIllustration[] }) {
   if (illustrations.length === 0) return null;
+  const hasSingleIllustration = illustrations.length === 1;
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div
+      className={
+        hasSingleIllustration
+          ? "mx-auto grid w-full max-w-4xl gap-4"
+          : "grid gap-4 sm:grid-cols-2"
+      }
+    >
       {illustrations.map((img) => (
-        <div key={img.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <figure
+          key={img.id}
+          className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_16px_40px_rgba(11,55,103,0.10)]"
+        >
           {/* External images from Supabase/public URLs => use plain <img> */}
           <img
             src={img.url}
             alt={img.title || "illustration"}
-            className="h-64 w-full object-cover sm:h-72"
+            className={
+              hasSingleIllustration
+                ? "mx-auto h-auto max-h-[38rem] w-full object-contain"
+                : "h-64 w-full object-cover sm:h-72"
+            }
             loading="lazy"
           />
           {img.title && (
-            <p className="border-t border-slate-100 px-4 py-3 text-sm font-semibold text-[#0b3767]">
+            <figcaption className="border-t border-slate-100 px-4 py-3 text-center text-sm font-semibold text-[#0b3767]">
               {img.title}
-            </p>
+            </figcaption>
           )}
-        </div>
+        </figure>
       ))}
     </div>
   );
@@ -102,18 +117,17 @@ export function TemplateDrivenApplicationForm() {
   const [isPending, startTransition] = useTransition();
 
   const [template, setTemplate] = useState<any | null>(null);
-  const [status, setStatus] = useState<"loading" | "active" | "not_started" | "ended">("loading");
+  const [status, setStatus] = useState<"loading" | "active" | "not_started" | "closed">("loading");
 
   const [nowMs, setNowMs] = useState(() => Date.now());
   useEffect(() => {
-    // Only update every 5 seconds to reduce rerenders and memory pressure
-    const t = setInterval(() => setNowMs(Date.now()), 5000);
+    const t = setInterval(() => setNowMs(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+    const loadActiveTemplate = async () => {
       try {
         const res = await fetch("/api/forms/active", { cache: "no-store" });
         const data = (await res.json()) as ActiveTemplateResponse;
@@ -123,15 +137,19 @@ export function TemplateDrivenApplicationForm() {
           setStatus(data.status);
         } else {
           setTemplate(null);
-          setStatus("ended");
+          setStatus("closed");
         }
       } catch {
         setTemplate(null);
-        setStatus("ended");
+        setStatus("closed");
       }
-    })();
+    };
+
+    void loadActiveTemplate();
+    const refreshTimer = setInterval(() => void loadActiveTemplate(), 15000);
     return () => {
       mounted = false;
+      clearInterval(refreshTimer);
     };
   }, []);
 
@@ -281,23 +299,45 @@ export function TemplateDrivenApplicationForm() {
         )}
 
         {status === "not_started" && countdown && (
-          <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-5 py-2.5 text-sm font-bold text-[#d84b18]">
-            <Clock3 className="h-4 w-4" />
-            Mở đơn sau: {countdown.days} ngày {countdown.hours} giờ {countdown.minutes} phút {countdown.seconds} giây
+          <div
+            className="inline-flex flex-wrap items-center justify-center gap-3 rounded-2xl border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-white px-5 py-3 text-center text-base font-bold text-[#c94316] shadow-[0_12px_32px_rgba(240,90,35,0.16)] sm:px-7"
+            role="timer"
+            aria-live="polite"
+          >
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#F05A23] text-white shadow-sm">
+              <Clock3 className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <span>
+              Mở đơn sau: <span className="font-extrabold text-[#9f3210]">{countdown.days} ngày {countdown.hours} giờ {countdown.minutes} phút {countdown.seconds} giây</span>
+            </span>
           </div>
         )}
 
         {status === "active" && countdown && (
-          <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-bold text-emerald-700">
-            <CheckCircle2 className="h-4 w-4" />
-            Đang mở đơn · Còn {countdown.days} ngày {countdown.hours} giờ {countdown.minutes} phút {countdown.seconds} giây
+          <div
+            className="inline-flex flex-wrap items-center justify-center gap-3 rounded-2xl border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-white px-5 py-3 text-center text-base font-bold text-emerald-700 shadow-[0_12px_32px_rgba(5,150,105,0.16)] sm:px-7"
+            role="timer"
+            aria-live="polite"
+          >
+            <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-600 text-white shadow-sm">
+              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400 opacity-20" />
+              <Clock3 className="relative h-5 w-5" aria-hidden="true" />
+            </span>
+            <span>
+              Đang mở đơn · Còn <span className="font-extrabold text-emerald-800">{countdown.days} ngày {countdown.hours} giờ {countdown.minutes} phút {countdown.seconds} giây</span>
+            </span>
           </div>
         )}
 
-        {status === "ended" && (
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-500">
-            <Clock3 className="h-4 w-4" />
-            Đã kết thúc vòng 1
+        {status === "closed" && (
+          <div
+            className="inline-flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-5 py-3 text-base font-bold text-slate-600 shadow-[0_12px_30px_rgba(15,23,42,0.08)] sm:px-7"
+            role="status"
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-700 text-white">
+              <Clock3 className="h-5 w-5" aria-hidden="true" />
+            </span>
+            Đơn đăng ký hiện đã đóng
           </div>
         )}
       </div>
