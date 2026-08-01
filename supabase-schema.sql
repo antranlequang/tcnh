@@ -644,8 +644,8 @@ WHERE email = 'dktaichinhnganhang@st.uel.edu.vn'
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES
-  ('blog-testimonials', 'blog-testimonials', true, 5242880,
-    ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']::text[]),
+  ('blog-testimonials', 'blog-testimonials', true, NULL,
+    ARRAY['image/webp']::text[]),
   ('achievements', 'achievements', true, 8388608,
     ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']::text[]),
   ('activities', 'activities', true, 10485760,

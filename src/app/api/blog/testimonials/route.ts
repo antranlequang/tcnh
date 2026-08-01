@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
-import sharp from "sharp";
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 import { supabaseAdmin } from "@/lib/supabaseAdminClient";
+import { convertBlogImageToWebp } from "@/lib/blogImageProcessing";
 import {
   mapTestimonialRow,
   serializeTestimonialImageUrls,
@@ -14,9 +14,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const BLOG_TESTIMONIALS_BUCKET = "blog-testimonials";
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_IMAGE_COUNT = 10;
-const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 async function ensureBlogTestimonialsBucket() {
   if (!supabaseAdmin) return;
@@ -25,7 +23,18 @@ async function ensureBlogTestimonialsBucket() {
     BLOG_TESTIMONIALS_BUCKET
   );
 
-  if (!getBucketError && bucket) return;
+  if (!getBucketError && bucket) {
+    const { error: updateError } = await supabaseAdmin.storage.updateBucket(
+      BLOG_TESTIMONIALS_BUCKET,
+      {
+        public: true,
+        fileSizeLimit: null,
+        allowedMimeTypes: ["image/webp"],
+      }
+    );
+    if (updateError) throw updateError;
+    return;
+  }
 
   const missingBucket =
     getBucketError && /not\s*found|does\s*not\s*exist/i.test(getBucketError.message);
@@ -33,8 +42,8 @@ async function ensureBlogTestimonialsBucket() {
 
   const { error } = await supabaseAdmin.storage.createBucket(BLOG_TESTIMONIALS_BUCKET, {
     public: true,
-    fileSizeLimit: MAX_IMAGE_SIZE,
-    allowedMimeTypes: Array.from(ALLOWED_IMAGE_TYPES),
+    fileSizeLimit: null,
+    allowedMimeTypes: ["image/webp"],
   });
 
   if (error && !/already\s*exists|duplicate/i.test(error.message)) throw error;
@@ -114,26 +123,31 @@ export async function POST(request: Request) {
       );
     }
 
-    const invalidImage = images.find(
-      (image) => !ALLOWED_IMAGE_TYPES.has(image.type) || image.size > MAX_IMAGE_SIZE
-    );
-    if (invalidImage) {
-      return NextResponse.json(
-        { success: false, message: "Hình ảnh phải là JPG, PNG hoặc WebP và không vượt quá 5 MB." },
-        { status: 400 }
-      );
-    }
-
     const testimonialId = randomUUID();
     const imageUrls: string[] = [];
     if (images.length > 0) {
       await ensureBlogTestimonialsBucket();
 
       for (const [index, image] of images.entries()) {
-        const imageBuffer = await sharp(new Uint8Array(await image.arrayBuffer()))
-          .rotate()
-          .webp({ quality: 82 })
-          .toBuffer();
+        let imageBuffer: Buffer;
+        try {
+          imageBuffer = await convertBlogImageToWebp(await image.arrayBuffer(), {
+            fileName: image.name,
+            mimeType: image.type,
+          });
+        } catch {
+          if (uploadedPaths.length > 0) {
+            await supabaseAdmin.storage.from(BLOG_TESTIMONIALS_BUCKET).remove(uploadedPaths);
+            uploadedPaths.length = 0;
+          }
+          return NextResponse.json(
+            {
+              success: false,
+              message: `Không thể đọc tệp “${image.name}”. Vui lòng chọn một tệp hình ảnh hợp lệ.`,
+            },
+            { status: 400 }
+          );
+        }
         const uploadedPath = `${testimonialId}/image-${index + 1}.webp`;
 
         const { error: uploadError } = await supabaseAdmin.storage

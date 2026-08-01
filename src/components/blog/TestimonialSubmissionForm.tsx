@@ -134,10 +134,12 @@ export function TestimonialSubmissionForm() {
                 id="testimonial-image"
                 type="file"
                 multiple
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/*,.heic,.heif"
                 onChange={(event) => setImages(Array.from(event.target.files || []).slice(0, 10))}
               />
-              <p className="mt-1.5 text-xs text-slate-400">Tối đa 10 hình JPG, PNG hoặc WebP; mỗi hình không quá 5 MB.</p>
+              <p className="mt-1.5 text-xs text-slate-400">
+                Tối đa 10 hình; hỗ trợ mọi định dạng ảnh, bao gồm HEIC/HEIF, không giới hạn dung lượng.
+              </p>
 
               {previewUrls.length > 0 && (
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">

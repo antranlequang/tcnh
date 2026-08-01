@@ -2,12 +2,24 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/utils";
 import type { BlogCommentRow } from "@/lib/blog";
+import { Trash2 } from "lucide-react";
 
 type CommentNode = BlogCommentRow & { replies: CommentNode[] };
 
@@ -47,6 +59,7 @@ export function BlogDiscussionAdmin({ adminPassword }: { adminPassword: string }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submittingReply, setSubmittingReply] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeReplyTarget, setActiveReplyTarget] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
 
@@ -113,6 +126,30 @@ export function BlogDiscussionAdmin({ adminPassword }: { adminPassword: string }
     }
   };
 
+  const deleteComment = async (id: string) => {
+    setDeletingId(id);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/admin/blog/comments/${id}`, {
+        method: "DELETE",
+        headers: authHeaders,
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.message || "Không xóa được bình luận.");
+
+      if (activeReplyTarget === id) {
+        setActiveReplyTarget(null);
+        setReplyText("");
+      }
+      await refresh();
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   function renderCommentItem(item: CommentNode, level = 0): React.ReactNode {
     return (
     <div key={item.id} className={level > 0 ? "ml-6 mt-3 border-l pl-4" : ""}>
@@ -142,9 +179,42 @@ export function BlogDiscussionAdmin({ adminPassword }: { adminPassword: string }
             type="button"
             size="sm"
             onClick={() => setActiveReplyTarget(activeReplyTarget === item.id ? null : item.id)}
+            disabled={deletingId === item.id}
           >
             Trả lời với vai trò Admin
           </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                disabled={deletingId === item.id}
+              >
+                <Trash2 className="mr-1.5 h-4 w-4" />
+                {deletingId === item.id ? "Đang xóa..." : "Xóa bình luận"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Xóa bình luận này?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Hành động này không thể hoàn tác.
+                  {item.replies.length > 0 &&
+                    ` ${item.replies.length} phản hồi bên dưới cũng sẽ bị xóa.`}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => deleteComment(item.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Xóa vĩnh viễn
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         {activeReplyTarget === item.id && (

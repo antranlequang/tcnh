@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
-import sharp from "sharp";
 import { NextResponse } from "next/server";
 import { assertAdminRequest } from "@/lib/adminAuth";
+import { convertBlogImageToWebp } from "@/lib/blogImageProcessing";
 import { isUuid } from "@/lib/blog";
 import { supabaseAdmin } from "@/lib/supabaseAdminClient";
 import { serializeError } from "@/lib/utils";
@@ -16,6 +16,15 @@ async function ensureBlogTestimonialsBucket() {
   );
 
   if (!getBucketError && bucket) {
+    const { error: updateError } = await supabaseAdmin.storage.updateBucket(
+      BLOG_TESTIMONIALS_BUCKET,
+      {
+        public: true,
+        fileSizeLimit: null,
+        allowedMimeTypes: ["image/webp"],
+      }
+    );
+    if (updateError) throw updateError;
     return;
   }
 
@@ -30,8 +39,8 @@ async function ensureBlogTestimonialsBucket() {
     BLOG_TESTIMONIALS_BUCKET,
     {
       public: true,
-      fileSizeLimit: "5MB",
-      allowedMimeTypes: ["image/jpeg", "image/jpg", "image/png", "image/webp"],
+      fileSizeLimit: null,
+      allowedMimeTypes: ["image/webp"],
     }
   );
 
@@ -67,14 +76,17 @@ export async function POST(request: Request) {
 
     const testimonialId = isUuid(providedId) ? providedId : randomUUID();
 
-    const buffer = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(buffer);
-
     let webpBuffer: Buffer;
     try {
-      webpBuffer = await sharp(uint8Array).webp({ quality: 82 }).toBuffer();
+      webpBuffer = await convertBlogImageToWebp(await file.arrayBuffer(), {
+        fileName: file.name,
+        mimeType: file.type,
+      });
     } catch {
-      return NextResponse.json({ success: false, message: "Failed to process image." }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Không thể đọc tệp này. Vui lòng chọn một tệp hình ảnh hợp lệ." },
+        { status: 400 }
+      );
     }
 
     const objectPath = `${testimonialId}/avatar.webp`;

@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   productionBrowserSourceMaps: false,
-  serverExternalPackages: ['sharp'],
+  serverExternalPackages: ['sharp', 'heic-convert'],
   onDemandEntries: {
     maxInactiveAge: 60000,
     pagesBufferLength: 5,
